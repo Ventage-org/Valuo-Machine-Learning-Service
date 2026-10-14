@@ -1,0 +1,16 @@
+﻿# Entorno Python
+.env
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.egg-info/
+
+# Logs
+*.log

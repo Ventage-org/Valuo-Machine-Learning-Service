@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  mlflow-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: valuo-mlflow-server
+    restart: unless-stopped
+    ports:
+      - "${MLFLOW_PORT:-5000}:5000"
+    environment:
+      # Conexión al schema 'mlops' en la base de datos operacional
+      - BACKEND_STORE_URI=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST:-host.docker.internal}:${DB_PORT:-5432}/${DB_NAME:-db_operacional_valuo}?options=-csearch_path%3D${DB_SCHEMA:-mlops}
+      
+      # Ubicación de artefactos (Azure Blob Storage o volumen local)
+      - DEFAULT_ARTIFACT_ROOT=${DEFAULT_ARTIFACT_ROOT:-/mlflow/artifacts}
+      
+      # Credenciales de Azure Blob Storage (si se usan)
+      - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING:-}
+      - AZURE_STORAGE_ACCESS_KEY=${AZURE_STORAGE_ACCESS_KEY:-}
+    volumes:
+      # Volumen para fallback local de artefactos
+      - ./artifacts:/mlflow/artifacts
+    extra_hosts:
+      # Permite al contenedor comunicarse con el PostgreSQL en el host de Windows
+      - "host.docker.internal:host-gateway"

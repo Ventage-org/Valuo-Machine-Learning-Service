@@ -1,0 +1,36 @@
+﻿# Environment variables & secrets
+.env
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# MLflow local runs
+mlflow-server/mlruns/
+mlflow-server/artifacts/*
+!mlflow-server/artifacts/.gitkeep

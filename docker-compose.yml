@@ -1,0 +1,79 @@
+services:
+  # ─── SERVICIO 1: Servidor MLflow (Tracking & Model Registry) ─────────────────
+  mlflow-server:
+    build:
+      context: ./mlflow-server
+      dockerfile: Dockerfile
+    container_name: valuo-mlflow-server
+    restart: unless-stopped
+    ports:
+      - "${MLFLOW_PORT:-5000}:5000"
+    environment:
+      - BACKEND_STORE_URI=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-5432}@${DB_HOST:-host.docker.internal}:${DB_PORT:-5432}/${DB_OPERACIONAL_NAME:-db_operacional_valuo}?options=-csearch_path%3D${DB_SCHEMA:-mlops}
+      - DEFAULT_ARTIFACT_ROOT=${DEFAULT_ARTIFACT_ROOT:-/mlflow/artifacts}
+      - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING:-}
+      - AZURE_STORAGE_ACCESS_KEY=${AZURE_STORAGE_ACCESS_KEY:-}
+    volumes:
+      - ./mlflow-server/artifacts:/mlflow/artifacts
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - valuo-ml-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ─── SERVICIO 2: Microservicio ML (FastAPI + XGBoost + Inferencia) ───────────
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: valuo-ml-service
+    restart: unless-stopped
+    depends_on:
+      mlflow-server:
+        condition: service_healthy
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      # Conexión a MLflow Server interno en la red Docker
+      - MLFLOW_TRACKING_URI=http://mlflow-server:5000
+      - MLFLOW_EXPERIMENT_VENTA=${MLFLOW_EXPERIMENT_VENTA:-experimento_tasacion_venta}
+      - MLFLOW_EXPERIMENT_ALQUILER=${MLFLOW_EXPERIMENT_ALQUILER:-experimento_tasacion_alquiler}
+      - MLFLOW_MODEL_NAME_VENTA=${MLFLOW_MODEL_NAME_VENTA:-xgboost_venta}
+      - MLFLOW_MODEL_NAME_ALQUILER=${MLFLOW_MODEL_NAME_ALQUILER:-xgboost_alquiler}
+
+      # Conexión a PostgreSQL (inmobiliaria_ml_db) en el host
+      - DB_HOST=${DB_HOST:-host.docker.internal}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME:-inmobiliaria_ml_db}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-5432}
+
+      # Rutas relativas dentro del contenedor
+      - CONFIG_PATH=config/model_config.json
+      - CONFIG_ALQUILER_PATH=config/model_alquiler_config.json
+      - METADATA_PATH=data/features_metadata.json
+      - METADATA_ALQUILER_PATH=data/features_metadata_alquiler.json
+      - MODELS_DIR=models
+
+      # Seguridad y CORS
+      - ADMIN_TOKEN=${ADMIN_TOKEN:-}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
+    volumes:
+      # Persistencia de configuraciones dinámicas (IPC, hiperparámetros)
+      - ./ml-service/config:/app/config
+      # Persistencia de modelos exportados y fallback local
+      - ./ml-service/models:/app/models
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - valuo-ml-network
+
+networks:
+  valuo-ml-network:
+    name: valuo-ml-network
+    driver: bridge
