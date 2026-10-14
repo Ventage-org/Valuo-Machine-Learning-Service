@@ -44,6 +44,7 @@ load_dotenv(find_dotenv(usecwd=True))
 load_dotenv()
 
 from app.core.model_loader import cargar_modelo, liberar_recursos, model_state
+from app.services.comparables_service import comparables_service
 from app.routers import configuracion as configuracion_router
 from app.routers import entrenamiento as entrenamiento_router
 from app.routers import health as health_router
@@ -68,6 +69,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     print("=" * 55)
 
     cargar_modelo(model_state)
+    comparables_service.cargar_datos()
 
     print("=" * 55)
     print("  Servicio listo. Accede a /docs para la API.")

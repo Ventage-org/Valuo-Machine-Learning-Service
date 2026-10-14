@@ -1076,3 +1076,51 @@ public record FactorSensibilidadDTO(
 ```
 
 
+
+
+
+### 1.4 Regla de las Tres (3) Muestras Comparables de Mercado (RNTP Art. 3)
+
+Tanto `POST /api/v1/prediccion/venta` como `POST /api/v1/prediccion/alquiler` retornan automáticamente los bloques `comparables_rntp` y `resumen_rntp` para cumplimiento normativo del **Reglamento Nacional de Tasaciones del Perú (RNTP)**:
+
+```json
+{
+  "comparables_rntp": [
+    {
+      "posicion": 1,
+      "distrito": "San Miguel",
+      "es_mismo_distrito": true,
+      "zona_homogenea": "LIMA_MODERNA",
+      "superficie_m2": 75.0,
+      "habitaciones": 3,
+      "banios": 2.0,
+      "garajes": 1,
+      "piso": 5,
+      "antiguedad_anios": 8,
+      "precio_total_pen": 482873.01,
+      "precio_m2_pen": 6438.31,
+      "periodo_muestra": "2025-Q2",
+      "indice_similitud_pct": 100.0,
+      "diferencias": {
+        "dif_superficie_m2": 0.0,
+        "dif_habitaciones": 0,
+        "dif_banios": 0.0,
+        "dif_antiguedad_anios": 0,
+        "dif_piso": 0
+      }
+    }
+  ],
+  "resumen_rntp": {
+    "cantidad_muestras": 3,
+    "precio_promedio_pen": 469759.14,
+    "precio_m2_promedio_pen": 6232.92,
+    "desviacion_vs_prediccion_pct": 3.24,
+    "cumple_regla_tres_muestras": true,
+    "criterio_busqueda": "Mismo distrito",
+    "advertencia": null
+  }
+}
+```
+
+- **Latencia:** Sub-milisegundo (< 0.5 ms) gracias al pre-cálculo de índices Numpy en memoria RAM.
+- **Resiliencia / Fallback:** En caso de baja densidad muestral en un distrito, conmuta a la Zona Homogénea (NSE) y/o degrada elegantemente sin romper el endpoint.

@@ -194,6 +194,105 @@ class Explicabilidad(BaseModel):
     )
 
 
+class DiferenciasInmueble(BaseModel):
+    """Diferencias físicas directas entre el testigo y el inmueble evaluado (testigo - target)."""
+    dif_superficie_m2: float = Field(
+        description="Diferencia de superficie en m² respecto al inmueble tasado."
+    )
+    dif_habitaciones: int = Field(
+        description="Diferencia de habitaciones respecto al inmueble tasado."
+    )
+    dif_banios: float = Field(
+        description="Diferencia de baños respecto al inmueble tasado."
+    )
+    dif_antiguedad_anios: int = Field(
+        description="Diferencia de antigüedad en años respecto al inmueble tasado."
+    )
+    dif_piso: int = Field(
+        description="Diferencia de piso respecto al inmueble tasado."
+    )
+
+
+class MuestraComparable(BaseModel):
+    """
+    Muestra de mercado comparable explícita para sustento de tasación (Regla de las 3 muestras del RNTP - Art. 3).
+    """
+    posicion: int = Field(
+        description="Posición ordinal según proximidad física y metodológica (1 = más semejante)."
+    )
+    distrito: str = Field(
+        description="Distrito donde se ubica el inmueble testigo de mercado."
+    )
+    es_mismo_distrito: bool = Field(
+        default=True,
+        description="True si el testigo pertenece al mismo distrito que el inmueble tasado."
+    )
+    zona_homogenea: str = Field(
+        description="Zona homogénea o estrato socioeconómico de Lima (ej: LIMA_TOP, LIMA_MODERNA)."
+    )
+    superficie_m2: float = Field(
+        description="Superficie total en m² del inmueble testigo."
+    )
+    habitaciones: int = Field(
+        description="Número de habitaciones/dormitorios."
+    )
+    banios: float = Field(
+        description="Número de baños."
+    )
+    garajes: int = Field(
+        description="Número de cocheras/estacionamientos."
+    )
+    piso: int = Field(
+        description="Piso en el que se ubica el testigo."
+    )
+    antiguedad_anios: int = Field(
+        description="Antigüedad del inmueble testigo en años."
+    )
+    precio_total_pen: float = Field(
+        description="Precio de venta o canon de alquiler mensual en Soles (PEN) actualizado por IPC."
+    )
+    precio_m2_pen: float = Field(
+        description="Precio de venta o alquiler mensual por m² en Soles (PEN)."
+    )
+    periodo_muestra: str = Field(
+        description="Año y trimestre en que se registró la muestra (ej: '2025-Q2')."
+    )
+    indice_similitud_pct: float = Field(
+        description="Porcentaje de similitud física multidimensional respecto al inmueble objetivo (0% a 100%)."
+    )
+    diferencias: DiferenciasInmueble = Field(
+        description="Diferencias físicas detalladas respecto al inmueble valuado."
+    )
+
+
+class ResumenComparablesRNTP(BaseModel):
+    """Resumen estadístico de las 3 muestras comparables conforme al RNTP."""
+    cantidad_muestras: int = Field(
+        description="Cantidad de muestras comparables obtenidas (mínimo 3 según RNTP Art. 3)."
+    )
+    precio_promedio_pen: float = Field(
+        description="Precio o renta mensual promedio de los testigos comparables en Soles."
+    )
+    precio_m2_promedio_pen: float = Field(
+        description="Precio o renta promedio por m² de los testigos comparables en Soles."
+    )
+    desviacion_vs_prediccion_pct: float = Field(
+        description="Diferencia porcentual entre el valor predicho por el modelo y el promedio de los testigos de mercado."
+    )
+    cumple_regla_tres_muestras: bool = Field(
+        default=True,
+        description="True si se encontraron las 3 muestras de mercado exigidas por la normativa."
+    )
+    criterio_busqueda: str = Field(
+        default="Mismo distrito",
+        description="Criterio metodológico aplicado: 'Mismo distrito' o 'Zona homogénea (NSE)'."
+    )
+    advertencia: str | None = Field(
+        default=None,
+        description="Advertencia en caso de baja densidad muestral o fallback zonal."
+    )
+
+
 class InfoModelo(BaseModel):
     """Metadata del modelo incluida en cada response."""
     version: str
@@ -218,6 +317,14 @@ class PrediccionVentaResponse(BaseModel):
     intervalo_confianza: IntervaloConfianza
     explicabilidad: Explicabilidad
     modelo: InfoModelo
+    comparables_rntp: list[MuestraComparable] = Field(
+        default_factory=list,
+        description="Muestras comparables de mercado explícitas (Regla de las 3 muestras del RNTP - Art. 3)."
+    )
+    resumen_rntp: ResumenComparablesRNTP | None = Field(
+        default=None,
+        description="Resumen de homologación y consistencia con las muestras del RNTP."
+    )
 
     model_config = {"json_schema_extra": {
         "example": {

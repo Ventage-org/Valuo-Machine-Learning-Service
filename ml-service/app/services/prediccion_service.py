@@ -22,6 +22,8 @@ Flujo por request (< 50ms):
 
 from __future__ import annotations
 
+from app.services.comparables_service import comparables_service
+
 import math
 from typing import TYPE_CHECKING, Literal
 
@@ -302,7 +304,21 @@ def _predecir_generico(
     else:
         base_const = float(math.expm1(base_log) / factor_calibracion) if not math.isnan(base_log) else media_global
 
-    # 10. Armar response
+    # 10. Consulta de 3 Muestras Comparables de Mercado (Regla de las 3 muestras del RNTP - Art. 3)
+    muestras_rntp, resumen_rntp = comparables_service.buscar_tres_comparables(
+        tipo=tipo,
+        distrito=req.distrito,
+        superficie=sup,
+        habitaciones=hab,
+        banios=ban,
+        antiguedad=req.antiguedad,
+        garajes=gar,
+        piso=req.piso,
+        ipc_factor=ipc_factor,
+        prediccion_nominal=round(pred_nominal, 2),
+    )
+
+    # 11. Armar response completo
     return PrediccionVentaResponse(
         distrito=req.distrito,
         superficie_m2=sup,
@@ -334,6 +350,8 @@ def _predecir_generico(
             train_periodo=config.get("train_periodo", "2016-2023"),
             test_periodo=config.get("test_periodo", "2024-2025"),
         ),
+        comparables_rntp=muestras_rntp,
+        resumen_rntp=resumen_rntp,
     )
 
 
