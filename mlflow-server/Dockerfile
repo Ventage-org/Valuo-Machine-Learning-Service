@@ -21,7 +21,8 @@ EXPOSE 5000
 # Script de arranque optimizado para Cloud (Container Apps):
 # - workers 1: Evita sobrecarga de CPU/RAM (0.25 vCPU) y race conditions en PostgreSQL
 # - allowed-hosts / cors-allowed-origins: Desbloquea el middleware de seguridad en dominios *.azurecontainerapps.io
-CMD ["sh", "-c", "mlflow server \
+# Script de arranque con auto-migración de esquema (Alembic db upgrade)
+CMD ["sh", "-c", "mlflow db upgrade ${BACKEND_STORE_URI} && mlflow server \
     --backend-store-uri ${BACKEND_STORE_URI} \
     --default-artifact-root ${DEFAULT_ARTIFACT_ROOT} \
     --host 0.0.0.0 \
