@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Instalar MLflow, driver PostgreSQL y SDK de Azure Blob Storage
 RUN pip install --no-cache-dir \
-    mlflow==2.12.2 \
+    mlflow==3.16.1 \
     psycopg2-binary==2.9.9 \
     azure-storage-blob==12.19.1 \
     azure-identity==1.15.0
