@@ -25,6 +25,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, status
 from app.core.model_loader import model_state
 from app.schemas.entrenamiento import (
     EntrenamientoBaseRequest,
+    EntrenamientoInicialRequest,
     ArtifactosGenerados,
     EntrenamientoAlquilerRequest,
     EntrenamientoIniciadoResponse,
@@ -261,22 +262,22 @@ def estado_entrenamiento(
 )
 def iniciar_entrenamiento_inicial(
     tipo_operacion: Literal["venta", "alquiler"],
-    request: EntrenamientoBaseRequest = EntrenamientoBaseRequest(),
+    request: EntrenamientoInicialRequest = EntrenamientoInicialRequest(),
     _: None = Depends(_verificar_admin_token),
 ) -> EntrenamientoIniciadoResponse:
     nombre = request.nombre_modelo or ("xgboost_venta_v2" if tipo_operacion == "venta" else "xgboost_alquiler_v1")
     job_id = iniciar_entrenamiento(
         tipo_operacion=tipo_operacion,
         nombre_modelo=nombre,
-        hiperparametros=request.hiperparametros,
-        shap_top_n=request.shap_top_n,
+        hiperparametros=None,
+        shap_top_n=10,
         state=model_state,
-        guardar_como_activo=True,  # Siempre True: entrenamiento inicial directo a Producción
+        guardar_como_activo=True,  # Siempre True: entrenamiento inicial directo a Producción (@champion)
         max_depth=request.max_depth,
         learning_rate=request.learning_rate,
         n_estimators=request.n_estimators,
         min_child_weight=request.min_child_weight,
-        usar_target_m2=request.usar_target_m2,
+        usar_target_m2=True,
         factor_calibracion=request.factor_calibracion,
     )
 

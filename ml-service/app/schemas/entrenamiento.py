@@ -104,6 +104,14 @@ class EntrenamientoVentaRequest(EntrenamientoBaseRequest):
         examples=["xgboost_venta_v2"],
     )
 
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "nombre_modelo": "xgboost_venta_v2"
+            }
+        }
+    }
+
 
 class EntrenamientoAlquilerRequest(EntrenamientoBaseRequest):
     """Parámetros para reentrenar el modelo de alquiler."""
@@ -112,6 +120,61 @@ class EntrenamientoAlquilerRequest(EntrenamientoBaseRequest):
         description="Nombre base del artefacto a generar (ej: 'xgboost_alquiler_v2').",
         examples=["xgboost_alquiler_v1"],
     )
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "nombre_modelo": "xgboost_alquiler_v1"
+            }
+        }
+    }
+
+
+class EntrenamientoInicialRequest(BaseModel):
+    """Parámetros para el entrenamiento inicial directo a Producción (@champion)."""
+    nombre_modelo: str | None = Field(
+        default=None,
+        description="Nombre base del artefacto a generar (ej: 'xgboost_venta_v2' o 'xgboost_alquiler_v1'). Si se omite, se asigna el valor canónico.",
+        examples=["xgboost_venta_v2"],
+    )
+    max_depth: int | None = Field(
+        default=None,
+        ge=3, le=15,
+        description="Profundidad máxima de los árboles. Si se omite, usa el valor óptimo validado (6).",
+        examples=[6],
+    )
+    learning_rate: float | None = Field(
+        default=None,
+        ge=0.001, le=1.0,
+        description="Tasa de aprendizaje (shrinkage). Si se omite, usa el valor óptimo validado (0.040 venta / 0.035 alquiler).",
+        examples=[0.040],
+    )
+    n_estimators: int | None = Field(
+        default=None,
+        ge=50, le=2000,
+        description="Cantidad de árboles. Si se omite, usa el valor óptimo validado (650 venta / 600 alquiler).",
+        examples=[650],
+    )
+    min_child_weight: int | None = Field(
+        default=None,
+        ge=1, le=50,
+        description="Peso mínimo requerido en nodo hoja (Palanca 4: 8 venta / 4 alquiler).",
+        examples=[8],
+    )
+    factor_calibracion: float | None = Field(
+        default=None,
+        ge=0.5, le=2.0,
+        description="Factor de calibración post-hoc de ratio IAAO. Si es None, se calcula automáticamente.",
+        examples=[1.0266],
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "nombre_modelo": "xgboost_venta_v2"
+            }
+        }
+    }
 
 
 # ─── RESPONSE — Job iniciado ──────────────────────────────────────────────────
