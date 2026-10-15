@@ -37,6 +37,7 @@ from app.schemas.entrenamiento import (
 from app.services.entrenamiento_service import (
     get_job_status,
     get_latest_job,
+    iniciar_entrenamiento,
     iniciar_entrenamiento_alquiler,
     iniciar_entrenamiento_venta,
     list_all_jobs,
