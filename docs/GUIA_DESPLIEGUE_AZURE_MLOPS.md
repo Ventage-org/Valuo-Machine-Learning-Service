@@ -135,8 +135,8 @@ ALTER USER mlflow_user SET search_path TO mlops;
 | :--- | :--- |
 | `BACKEND_STORE_URI` | `postgresql://mlflow_user:MlflowPass2026!@psql-valuo-dev-01.postgres.database.azure.com:5432/db_operational_valuo?sslmode=require` |
 | `DEFAULT_ARTIFACT_ROOT` | `wasbs://mlflow-artifacts@stvaluodev.blob.core.windows.net/` |
-| `AZURE_STORAGE_CONNECTION_STRING` | `DefaultEndpointsProtocol=https;AccountName=stvaluodev;AccountKey=/OPp0MyMHzx60pqyPlVfLyWPiexIVjBLNNQmjwPjcyM5LZdcc9+SSEQC5bSncrPKdF1uEmAlsz9U+AStSg368A==;EndpointSuffix=core.windows.net` |
-| `AZURE_STORAGE_ACCESS_KEY` | `/OPp0MyMHzx60pqyPlVfLyWPiexIVjBLNNQmjwPjcyM5LZdcc9+SSEQC5bSncrPKdF1uEmAlsz9U+AStSg368A==` |
+| `AZURE_STORAGE_CONNECTION_STRING` | `DefaultEndpointsProtocol=https;AccountName=stvaluodev;AccountKey=<TU_AZURE_STORAGE_KEY>;EndpointSuffix=core.windows.net` |
+| `AZURE_STORAGE_ACCESS_KEY` | `<TU_AZURE_STORAGE_KEY>` |
 
 ### 4.5. Configuración de Red e Ingress
 * **Entrada (Ingress)**: Habilitada
@@ -191,9 +191,6 @@ ALTER USER mlflow_user SET search_path TO mlops;
 | `MLFLOW_MODEL_NAME_VENTA` | `xgboost_venta` | Modelo registrado en MLflow (Venta) |
 | `MLFLOW_MODEL_NAME_ALQUILER` | `xgboost_alquiler` | Modelo registrado en MLflow (Alquiler) |
 | `ADMIN_TOKEN` | *(Vacío)* | Permite acceso libre a endpoints administrativos en fase DEV |
-| `AZURE_STORAGE_CONNECTION_STRING` | `DefaultEndpointsProtocol=https;AccountName=stvaluodev;AccountKey=/OPp0MyMHzx60pqyPlVfLyWPiexIVjBLNNQmjwPjcyM5LZdcc9+SSEQC5bSncrPKdF1uEmAlsz9U+AStSg368A==;EndpointSuffix=core.windows.net` |
-| `AZURE_STORAGE_ACCESS_KEY` | `/OPp0MyMHzx60pqyPlVfLyWPiexIVjBLNNQmjwPjcyM5LZdcc9+SSEQC5bSncrPKdF1uEmAlsz9U+AStSg368A==` |
-
 
 ### 5.4. Configuración de Red e Ingress
 * **Entrada (Ingress)**: Habilitada
