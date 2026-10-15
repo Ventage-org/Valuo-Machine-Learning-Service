@@ -687,14 +687,6 @@ def _run_training_pipeline(
             recargado = True
             mensaje_progreso = f"[8/8] Entrenamiento de {tipo_operacion} completado y promovido a producción."
             estado_gob = "production"
-
-            # Limpiar binario local para que el contenedor permanezca ligero
-            try:
-                if os.path.exists(pkl_path):
-                    os.remove(pkl_path)
-                    print(f"[EntrenamientoService][{job_id}] [Clean-up] Binario local {pkl_path} eliminado del contenedor. El modelo reside en RAM y en Azure Storage.")
-            except Exception as e_del:
-                print(f"[EntrenamientoService][{job_id}] Advertencia al limpiar binario: {e_del}")
         else:
             recargado = False
             version_txt = f" v{mlflow_model_version}" if mlflow_model_version else ""
@@ -704,6 +696,15 @@ def _run_training_pipeline(
             )
             estado_gob = "candidate"
             print(f"[EntrenamientoService][{job_id}] Paso 8: Gobernanza activa. Modelo en espera de aprobación humana (no reemplaza producción en memoria).")
+
+        # ── Clean-up INCONDICIONAL: Eliminar siempre el binario .pkl local del contenedor ──
+        # El modelo ya fue subido a Azure Blob Storage vía MLflow y (si aplica) reside en la memoria RAM
+        try:
+            if os.path.exists(pkl_path):
+                os.remove(pkl_path)
+                print(f"[EntrenamientoService][{job_id}] [Clean-up] Binario local {pkl_path} eliminado del contenedor. El modelo reside en RAM y en Azure Blob Storage.")
+        except Exception as e_del:
+            print(f"[EntrenamientoService][{job_id}] Advertencia al limpiar binario: {e_del}")
 
         duracion = round(time.time() - inicio, 2)
 

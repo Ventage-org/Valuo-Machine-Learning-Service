@@ -360,7 +360,7 @@ def medir_latencia_p95(
     pkl_path = os.path.join(models_dir, pkl_name)
 
     artifacts = {
-        "model_pkl": os.path.exists(pkl_path),
+        "model_pkl": (modelo is not None) or os.path.exists(pkl_path),
         "params_json": os.path.exists(params_file),
         "metrics_json": os.path.exists(metricas_file),
         "model_config_json": os.path.exists(config_file),
