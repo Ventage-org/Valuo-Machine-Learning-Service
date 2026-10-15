@@ -18,14 +18,18 @@ RUN pip install --no-cache-dir \
 
 EXPOSE 5000
 
-# Script de arranque optimizado para Cloud (Container Apps):
-# - workers 1: Evita sobrecarga de CPU/RAM (0.25 vCPU) y race conditions en PostgreSQL
-# - allowed-hosts / cors-allowed-origins: Desbloquea el middleware de seguridad en dominios *.azurecontainerapps.io
-# Script de arranque con auto-migración de esquema (Alembic db upgrade)
+# Desactivar el middleware de seguridad interno de FastAPI de MLflow 3.5+
+# En Azure Container Apps, la seguridad y SSL ya son administrados por el Ingress (HTTPS)
+ENV MLFLOW_SERVER_DISABLE_SECURITY_MIDDLEWARE=true
+
+# Script de arranque optimizado para Cloud:
+# - mlflow db upgrade: auto-migración limpia del esquema en PostgreSQL
+# - workers 1: bajo consumo de RAM/CPU
+# - disable-security-middleware: elimina bloqueos 403 Forbidden de cross-origin en Azure
 CMD ["sh", "-c", "mlflow db upgrade ${BACKEND_STORE_URI} && mlflow server \
     --backend-store-uri ${BACKEND_STORE_URI} \
     --default-artifact-root ${DEFAULT_ARTIFACT_ROOT} \
     --host 0.0.0.0 \
     --port 5000 \
     --workers 1 \
-    --allowed-hosts '*'"]
+    --disable-security-middleware"]
