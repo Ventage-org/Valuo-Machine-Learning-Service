@@ -159,31 +159,39 @@ def _cargar_artefactos_venta(state: ModelState, model_path_override: str | None 
         )
 
         if not os.path.exists(model_path):
-            raise RuntimeError(
-                f"Modelo de venta no encontrado: {model_path}\n"
-                f"Verifica que el archivo exista en {models_dir}/"
+            print(
+                f"[ModelLoader][Venta] [Modo Cold-Start] No se encontró modelo en MLflow ni en local ({model_path}). "
+                "El servicio inicia a la espera del entrenamiento inicial (/api/v1/admin/entrenamiento/venta)."
             )
+            if os.path.exists(metadata_path):
+                with open(metadata_path, encoding="utf-8") as f:
+                    metadata = json.load(f)
+                state.feature_cols = metadata.get("features", [])
+                state.encoding_map = metadata.get("encoding_map_distrito", {})
+                state.media_global = metadata.get("media_global_target", 0.0)
+            return
+
         print(f"[ModelLoader][Venta] Cargando modelo: {model_path} ...")
         state.modelo = joblib.load(model_path)
         print(f"[ModelLoader][Venta] [OK] Modelo cargado ({os.path.getsize(model_path) / 1e6:.1f} MB)")
 
-    print("[ModelLoader][Venta] Inicializando SHAP TreeExplainer ...")
-    state.explainer = shap.TreeExplainer(state.modelo)
-    print("[ModelLoader][Venta] [OK] SHAP TreeExplainer listo")
+    if state.modelo is not None:
+        print("[ModelLoader][Venta] Inicializando SHAP TreeExplainer ...")
+        state.explainer = shap.TreeExplainer(state.modelo)
+        print("[ModelLoader][Venta] [OK] SHAP TreeExplainer listo")
 
-    if not os.path.exists(metadata_path):
-        raise RuntimeError(f"Metadata de venta no encontrada: {metadata_path}")
-    with open(metadata_path, encoding="utf-8") as f:
-        metadata = json.load(f)
+    if os.path.exists(metadata_path):
+        with open(metadata_path, encoding="utf-8") as f:
+            metadata = json.load(f)
 
-    state.feature_cols = (
-        list(state.modelo.feature_names_in_)
-        if hasattr(state.modelo, "feature_names_in_")
-        else metadata["features"]
-    )
-    state.encoding_map = metadata["encoding_map_distrito"]
-    state.media_global = metadata["media_global_target"]
-    print(f"[ModelLoader][Venta] [OK] Metadata: {len(state.feature_cols)} features, {len(state.encoding_map)} distritos")
+        state.feature_cols = (
+            list(state.modelo.feature_names_in_)
+            if state.modelo is not None and hasattr(state.modelo, "feature_names_in_")
+            else metadata.get("features", [])
+        )
+        state.encoding_map = metadata.get("encoding_map_distrito", {})
+        state.media_global = metadata.get("media_global_target", 0.0)
+        print(f"[ModelLoader][Venta] [OK] Metadata: {len(state.feature_cols)} features, {len(state.encoding_map)} distritos")
 
 
 def _cargar_artefactos_alquiler(state: ModelState, model_path_override: str | None = None) -> None:
@@ -239,31 +247,39 @@ def _cargar_artefactos_alquiler(state: ModelState, model_path_override: str | No
         )
 
         if not os.path.exists(model_path):
-            raise RuntimeError(
-                f"Modelo de alquiler no encontrado: {model_path}\n"
-                f"Verifica que el archivo exista en {models_dir}/"
+            print(
+                f"[ModelLoader][Alquiler] [Modo Cold-Start] No se encontró modelo en MLflow ni en local ({model_path}). "
+                "El servicio inicia a la espera del entrenamiento inicial (/api/v1/admin/entrenamiento/alquiler)."
             )
+            if os.path.exists(metadata_path):
+                with open(metadata_path, encoding="utf-8") as f:
+                    metadata = json.load(f)
+                state.feature_cols_alquiler = metadata.get("features", [])
+                state.encoding_map_alquiler = metadata.get("encoding_map_distrito", {})
+                state.media_global_alquiler = metadata.get("media_global_target", 0.0)
+            return
+
         print(f"[ModelLoader][Alquiler] Cargando modelo: {model_path} ...")
         state.modelo_alquiler = joblib.load(model_path)
         print(f"[ModelLoader][Alquiler] [OK] Modelo cargado ({os.path.getsize(model_path) / 1e6:.1f} MB)")
 
-    print("[ModelLoader][Alquiler] Inicializando SHAP TreeExplainer ...")
-    state.explainer_alquiler = shap.TreeExplainer(state.modelo_alquiler)
-    print("[ModelLoader][Alquiler] [OK] SHAP TreeExplainer listo")
+    if state.modelo_alquiler is not None:
+        print("[ModelLoader][Alquiler] Inicializando SHAP TreeExplainer ...")
+        state.explainer_alquiler = shap.TreeExplainer(state.modelo_alquiler)
+        print("[ModelLoader][Alquiler] [OK] SHAP TreeExplainer listo")
 
-    if not os.path.exists(metadata_path):
-        raise RuntimeError(f"Metadata de alquiler no encontrada: {metadata_path}")
-    with open(metadata_path, encoding="utf-8") as f:
-        metadata = json.load(f)
+    if os.path.exists(metadata_path):
+        with open(metadata_path, encoding="utf-8") as f:
+            metadata = json.load(f)
 
-    state.feature_cols_alquiler = (
-        list(state.modelo_alquiler.feature_names_in_)
-        if hasattr(state.modelo_alquiler, "feature_names_in_")
-        else metadata["features"]
-    )
-    state.encoding_map_alquiler = metadata["encoding_map_distrito"]
-    state.media_global_alquiler = metadata["media_global_target"]
-    print(f"[ModelLoader][Alquiler] [OK] Metadata: {len(state.feature_cols_alquiler)} features, {len(state.encoding_map_alquiler)} distritos")
+        state.feature_cols_alquiler = (
+            list(state.modelo_alquiler.feature_names_in_)
+            if state.modelo_alquiler is not None and hasattr(state.modelo_alquiler, "feature_names_in_")
+            else metadata.get("features", [])
+        )
+        state.encoding_map_alquiler = metadata.get("encoding_map_distrito", {})
+        state.media_global_alquiler = metadata.get("media_global_target", 0.0)
+        print(f"[ModelLoader][Alquiler] [OK] Metadata: {len(state.feature_cols_alquiler)} features, {len(state.encoding_map_alquiler)} distritos")
 
 
 def cargar_modelo(

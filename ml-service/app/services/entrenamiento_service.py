@@ -687,6 +687,14 @@ def _run_training_pipeline(
             recargado = True
             mensaje_progreso = f"[8/8] Entrenamiento de {tipo_operacion} completado y promovido a producción."
             estado_gob = "production"
+
+            # Limpiar binario local para que el contenedor permanezca ligero
+            try:
+                if os.path.exists(pkl_path):
+                    os.remove(pkl_path)
+                    print(f"[EntrenamientoService][{job_id}] [Clean-up] Binario local {pkl_path} eliminado del contenedor. El modelo reside en RAM y en Azure Storage.")
+            except Exception as e_del:
+                print(f"[EntrenamientoService][{job_id}] Advertencia al limpiar binario: {e_del}")
         else:
             recargado = False
             version_txt = f" v{mlflow_model_version}" if mlflow_model_version else ""
