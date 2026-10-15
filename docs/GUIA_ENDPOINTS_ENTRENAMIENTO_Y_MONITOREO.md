@@ -65,7 +65,7 @@ Para lanzar el reentrenamiento, **ningún campo es obligatorio**. El microservic
 
 | Campo | Tipo | ¿Obligatorio? | Default (Venta) | Default (Alquiler) | Descripción y Propósito |
 | :--- | :--- | :---: | :---: | :---: | :--- |
-| `nombre_modelo` | `string` | **Opcional** | `"xgboost_venta_v2"` | `"xgboost_alquiler_v1"` | Prefijo para nombrar el modelo y los archivos `.pkl` / `.json`. |
+| `nombre_modelo` | `string` | **Opcional** | `"xgboost_venta_v1"` | `"xgboost_alquiler_v1"` | Prefijo para nombrar el modelo y los archivos `.pkl` / `.json`. |
 | `max_depth` | `int` | **Opcional** | `6` | `6` | Profundidad máxima de los árboles (evita sobreajuste). |
 | `learning_rate` | `float` | **Opcional** | `0.040` | `0.035` | Tasa de aprendizaje o contracción por árbol. |
 | `n_estimators` | `int` | **Opcional** | `650` | `600` | Número total de estimadores (árboles). |
@@ -89,13 +89,59 @@ Para lanzar el reentrenamiento, **ningún campo es obligatorio**. El microservic
 
 ---
 
-### 3.1. Iniciar Reentrenamiento de Venta
+### 3.1. Entrenamiento Inicial (Bootstrap directo a Producción - @champion)
+- **Método / Ruta:** `POST /api/v1/admin/entrenamiento/inicial/{tipo_operacion}`
+- **Parámetro Path:** `tipo_operacion` (`venta` o `alquiler`)
+- **Headers:**
+  ```http
+  Content-Type: application/json
+  X-Admin-Token: <ADMIN_TOKEN_CONFIGURADO>
+  ```
+- **Propósito y Gobernanza:**  
+  Diseñado para el **primer despliegue** o reinicio en frío (*cold-start*) del servicio. A diferencia de los endpoints de reentrenamiento periódico (que generan un modelo en estado `Candidate` para revisión humana), este endpoint:
+  1. Entrena el modelo completo con la base histórica de PostgreSQL.
+  2. Registra los artefactos y métricas en **MLflow Tracking & Model Registry**.
+  3. Promueve **automáticamente** la versión a stage **`Production`** y le asigna el alias **`@champion`**.
+  4. Realiza **Hot-Reload en memoria RAM** en el servicio de inferencia de manera inmediata (*zero-downtime*).
+  5. Sube los artefactos a Azure Blob Storage y **elimina incondicionalmente el binario `.pkl` local** del contenedor para mantenerlo liviano.
+
+- **Request Body (Opcional — puedes enviar `{}` o personalizar hiperparámetros):**
+```json
+{
+  "nombre_modelo": "xgboost_venta_v1",
+  "max_depth": 6,
+  "learning_rate": 0.040,
+  "n_estimators": 650,
+  "min_child_weight": 8,
+  "factor_calibracion": null
+}
+```
+> **Nota de Configuración:**  
+> - Si se envía `{}` (vacío), el servicio toma automáticamente los hiperparámetros óptimos calibrados en la tesis y asigna el nombre canónico (`xgboost_venta_v1` o `xgboost_alquiler_v1`).  
+> - No incluye el flag `guardar_como_activo` en el payload porque este endpoint **siempre** lo activa como modelo de producción.
+
+- **Respuesta (HTTP 202 Accepted):**
+```json
+{
+  "job_id": "8f3b6151-9c33-4a11-8220-71eb24dd2a15",
+  "tipo_operacion": "venta",
+  "estado": "en_progreso",
+  "nombre_modelo": "xgboost_venta_v1",
+  "iniciado_en": "2026-10-15T12:00:00.000000Z",
+  "mensaje": "Job de entrenamiento inicial (venta) 'xgboost_venta_v1' iniciado. Al finalizar, se guardará en Azure Storage, se registrará como Producción (@champion) y se cargará en memoria RAM automáticamente.",
+  "consultar_estado_en": "/api/v1/admin/entrenamiento/estado/8f3b6151-9c33-4a11-8220-71eb24dd2a15"
+}
+```
+
+---
+
+### 3.2. Iniciar Reentrenamiento de Venta (Genera Candidato)
 - **Método / Ruta:** `POST /api/v1/admin/entrenamiento/venta`
 - **Descripción:** Lanza en segundo plano el pipeline de entrenamiento del modelo de venta sobre `dataset_inmuebles_venta` (PostgreSQL), aplicando target unitario $\ln(P/m^2)$, calibración estratificada IAAO y registro en MLflow.
 - **Request Body (Opcional — todos los campos tienen defaults óptimos validados):**
 ```json
 {
-  "nombre_modelo": "xgboost_venta_v2",
+  "nombre_modelo": "xgboost_venta_v1",
   "max_depth": 6,
   "learning_rate": 0.040,
   "n_estimators": 650,
@@ -122,7 +168,7 @@ Para lanzar el reentrenamiento, **ningún campo es obligatorio**. El microservic
   "job_id": "7dea5252-8f22-4f10-9330-80eb14dd1f16",
   "tipo_operacion": "venta",
   "estado": "en_progreso",
-  "nombre_modelo": "xgboost_venta_v2",
+  "nombre_modelo": "xgboost_venta_v1",
   "iniciado_en": "2026-10-06T04:39:41.123456Z",
   "mensaje": "Job de reentrenamiento de venta 'xgboost_venta_v2' iniciado. El pipeline corre en background y registrará el modelo en MLflow.",
   "consultar_estado_en": "/api/v1/admin/entrenamiento/estado/7dea5252-8f22-4f10-9330-80eb14dd1f16"
@@ -131,7 +177,7 @@ Para lanzar el reentrenamiento, **ningún campo es obligatorio**. El microservic
 
 ---
 
-### 3.2. Iniciar Reentrenamiento de Alquiler
+### 3.3. Iniciar Reentrenamiento de Alquiler (Genera Candidato)
 - **Método / Ruta:** `POST /api/v1/admin/entrenamiento/alquiler`
 - **Descripción:** Lanza en segundo plano el pipeline de entrenamiento del modelo de alquiler sobre `dataset_inmuebles_alquiler` con ponderación temporal `decay = 0.85`.
 - **Request Body (Opcional):**
@@ -159,7 +205,7 @@ Para lanzar el reentrenamiento, **ningún campo es obligatorio**. El microservic
 
 ---
 
-### 3.3. Consultar Estado y Métricas de un Job (Polling)
+### 3.4. Consultar Estado y Métricas de un Job (Polling)
 - **Método / Ruta:** `GET /api/v1/admin/entrenamiento/estado/{job_id}`
 - **Descripción:** Consulta el estado actual de un job en ejecución o finalizado.
 - **Respuesta durante ejecución (`en_progreso`):**
@@ -236,11 +282,11 @@ Para lanzar el reentrenamiento, **ningún campo es obligatorio**. El microservic
 
 ---
 
-### 3.4. Consultar Último Job y Disponibilidad
+### 3.5. Consultar Último Job y Disponibilidad
 - **Método / Ruta:** `GET /api/v1/admin/entrenamiento/estado`
 - **Descripción:** Permite saber rápidamente si el servicio está ocupado entrenando o si está disponible para un nuevo job.
 
-### 3.5. Listar Historial de Jobs de la Sesión
+### 3.6. Listar Historial de Jobs de la Sesión
 - **Método / Ruta:** `GET /api/v1/admin/entrenamiento/jobs`
 - **Descripción:** Retorna el array de todos los jobs lanzados en la sesión actual de FastAPI.
 
@@ -761,6 +807,51 @@ El modelo de Machine Learning predice en **Soles Constantes (Base Dic-2009=100)*
   ],
   "recargado_en_ram": true,
   "persistencia_disco": true
+}
+```
+
+---
+
+### 5.8. Historial y Estado del Pipeline ETL (db_dataset_valuo)
+- **Método / Ruta:** `GET /api/v1/admin/monitoreo/pipeline-ejecuciones`
+- **Query Params:**
+  - `limit`: `int` (Opcional, default: `50`, máx: `200`). Cantidad de ejecuciones recientes a retornar.
+- **Headers:**
+  ```http
+  X-Admin-Token: <ADMIN_TOKEN_CONFIGURADO>
+  ```
+- **Descripción:**  
+  Permite al backend de monitoreo y al administrador supervisar la salud del pipeline ETL de ingesta de datos consultando directamente la tabla `public.pipeline_ejecuciones` de PostgreSQL (`db_dataset_valuo`).  
+  Supervisa registros leídos, guardados limpios, descartados por filtros de calidad, duración en segundos, tasa de efectividad porcentual y excepciones antes de ejecutar reentrenamientos.
+
+- **Respuesta (HTTP 200 OK):**
+```json
+{
+  "total_ejecuciones": 12,
+  "ultima_ejecucion": "2026-10-15T08:30:00Z",
+  "tasa_exito_pct": 100.0,
+  "ejecuciones": [
+    {
+      "id": 12,
+      "tipo_ejecucion": "programada",
+      "ejecutado_por": "airflow_scheduler",
+      "iniciado_en": "2026-10-15T08:15:00Z",
+      "finalizado_en": "2026-10-15T08:30:00Z",
+      "duracion_segundos": 900.0,
+      "registros_leidos": 45200,
+      "registros_guardados": 42150,
+      "registros_filtrados": 3050,
+      "tasa_efectividad_pct": 93.25,
+      "estado": "COMPLETADO",
+      "observaciones": "Ingesta y limpieza de propiedades Q1-2026 completada sin anomalías",
+      "errores": null,
+      "metricas_salida": {
+        "outliers_removidos": 120,
+        "cobertura_distrital": 22
+      }
+    }
+  ],
+  "consultado_en": "2026-10-15T12:00:00Z"
 }
 ```
 
