@@ -769,6 +769,17 @@ def iniciar_entrenamiento(
     """
     Registra y lanza un job de reentrenamiento (venta o alquiler) en background.
     """
+    # Detección inteligente de Bootstrap / Primer entrenamiento:
+    # Si actualmente no existe un modelo activo en Producción en memoria,
+    # se promueve OBLIGATORIAMENTE a Producción (@champion).
+    modelo_actual = state.modelo if tipo_operacion == "venta" else state.modelo_alquiler
+    if modelo_actual is None and not guardar_como_activo:
+        print(
+            f"[EntrenamientoService] [Bootstrap Detectado] No existe modelo de {tipo_operacion} en Producción. "
+            "Forzando 'guardar_como_activo=True' para coronar este primer entrenamiento como Producción (@champion)."
+        )
+        guardar_como_activo = True
+
     if not _training_semaphore.acquire(blocking=False):
         raise HTTPException(
             status_code=409,
