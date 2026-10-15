@@ -18,9 +18,14 @@ RUN pip install --no-cache-dir \
 
 EXPOSE 5000
 
-# Script de arranque
+# Script de arranque optimizado para Cloud (Container Apps):
+# - workers 1: Evita sobrecarga de CPU/RAM (0.25 vCPU) y race conditions en PostgreSQL
+# - allowed-hosts / cors-allowed-origins: Desbloquea el middleware de seguridad en dominios *.azurecontainerapps.io
 CMD ["sh", "-c", "mlflow server \
     --backend-store-uri ${BACKEND_STORE_URI} \
     --default-artifact-root ${DEFAULT_ARTIFACT_ROOT} \
     --host 0.0.0.0 \
-    --port 5000"]
+    --port 5000 \
+    --workers 1 \
+    --allowed-hosts '*' \
+    --cors-allowed-origins '*'"]
