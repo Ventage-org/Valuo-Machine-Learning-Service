@@ -163,6 +163,18 @@ def _cargar_artefactos_venta(state: ModelState, model_path_override: str | None 
                 f"[ModelLoader][Venta] [Modo Cold-Start] No se encontró modelo en MLflow ni en local ({model_path}). "
                 "El servicio inicia a la espera del entrenamiento inicial (/api/v1/admin/entrenamiento/venta)."
             )
+            state.modelo = None
+            state.explainer = None
+            state.config = {
+                "modelo_version": "ninguno (esperando entrenamiento inicial)",
+                "modelo_archivo": "ninguno",
+                "mape_test": 0.0,
+                "r2_test": 0.0,
+                "mae_test": 0.0,
+                "rmse_test": 0.0,
+                "train_periodo": "N/A",
+                "test_periodo": "N/A",
+            }
             if os.path.exists(metadata_path):
                 with open(metadata_path, encoding="utf-8") as f:
                     metadata = json.load(f)
@@ -251,6 +263,18 @@ def _cargar_artefactos_alquiler(state: ModelState, model_path_override: str | No
                 f"[ModelLoader][Alquiler] [Modo Cold-Start] No se encontró modelo en MLflow ni en local ({model_path}). "
                 "El servicio inicia a la espera del entrenamiento inicial (/api/v1/admin/entrenamiento/alquiler)."
             )
+            state.modelo_alquiler = None
+            state.explainer_alquiler = None
+            state.config_alquiler = {
+                "modelo_version": "ninguno (esperando entrenamiento inicial)",
+                "modelo_archivo": "ninguno",
+                "mape_test": 0.0,
+                "r2_test": 0.0,
+                "mae_test": 0.0,
+                "rmse_test": 0.0,
+                "train_periodo": "N/A",
+                "test_periodo": "N/A",
+            }
             if os.path.exists(metadata_path):
                 with open(metadata_path, encoding="utf-8") as f:
                     metadata = json.load(f)
