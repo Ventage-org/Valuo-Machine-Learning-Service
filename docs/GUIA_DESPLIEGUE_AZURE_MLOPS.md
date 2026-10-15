@@ -3,7 +3,7 @@
 **Proyecto**: Valuo — Servicio de Tasación Inmobiliaria (Machine Learning & MLOps)  
 **Entorno**: Desarrollo (`rg-valuo-dev1`)  
 **Región de Azure**: `chilecentral` (Chile Central — Azure for Students)  
-**Fecha de registro**: Octubre 2026  
+**Fecha de actualización**: Octubre 2026  
 **Arquitecto**: Cloud & MLOps Solutions Architecture  
 **Estado Actual**: `mlflow-server` y `ml-service` 100% OPERATIVOS Y DESPLEGADOS EN AZURE  
 
@@ -16,20 +16,28 @@ Toda la solución se consolida dentro de un único Grupo de Recursos para optimi
 ```mermaid
 graph TD
     subgraph RG ["Resource Group: rg-valuo-dev1 (Chile Central)"]
-        ACR["Azure Container Registry\n(acrvaluodev - SKU Basic)"]
-        PG["Azure Database for PostgreSQL Flexible Server\n(psql-valuo-dev-01.postgres.database.azure.com)\nBD: db_operational_valuo & inmobiliaria_ml_db"]
-        SA["Azure Storage Account: stvaluodev (LRS Standard)\nContainers: mlflow-artifacts, datasets, reportes"]
+        ACR["Azure Container Registry
+(acrvaluodev - SKU Basic)"]
+        PG["Azure Database for PostgreSQL Flexible Server
+(psql-valuo-dev-01.postgres.database.azure.com)
+BD: db_operational_valuo & db_dataset_valuo"]
+        SA["Azure Storage Account: stvaluodev (LRS Standard)
+Containers: mlflow-artifacts, datasets, reportes"]
 
         subgraph CAE ["Container Apps Environment: cae-valuo-dev1"]
-            MLFLOW["Container App: mlflow-server [OPERATIVO]\n(0.25 vCPU / 0.5 GiB RAM)\nPuerto Ingress: 5000 (Público HTTPS)"]
-            MLSERVICE["Container App: ml-service [OPERATIVO :v1]\n(0.5 vCPU / 1.0 GiB RAM)\nPuerto Ingress: 8000 (Público HTTPS)"]
+            MLFLOW["Container App: mlflow-server [OPERATIVO :v3]
+(1.0 vCPU / 2.0 GiB RAM)
+Puerto Ingress: 5000 (Público HTTPS)"]
+            MLSERVICE["Container App: ml-service [OPERATIVO :v2]
+(0.5 vCPU / 1.0 GiB RAM)
+Puerto Ingress: 8000 (Público HTTPS)"]
         end
 
         ACR -.->|Docker Pull (Admin Auth)| CAE
-        MLFLOW -->|Metadatos / Runs| PG
+        MLFLOW -->|Metadatos / Runs / Model Registry| PG
         MLFLOW -->|Pesos / Modelos / Artifacts| SA
-        MLSERVICE -->|Tracking & Registry| MLFLOW
-        MLSERVICE -->|Contexto Distrital| PG
+        MLSERVICE -->|Tracking & Model Registry| MLFLOW
+        MLSERVICE -->|Dataset & Contexto Distrital| PG
     end
 ```
 
@@ -49,21 +57,18 @@ graph TD
 
 ### 2.1. Un solo ACR para todos los microservicios
 No se crean múltiples registros de contenedores. Un único ACR (`acrvaluodev.azurecr.io`) aloja los distintos repositorios:
-* `acrvaluodev.azurecr.io/mlflow:latest`
-* `acrvaluodev.azurecr.io/ml-service:v1`
-* `acrvaluodev.azurecr.io/valuo-data-pipeline:latest` *(job de ingesta)*
+* `acrvaluodev.azurecr.io/mlflow:v3`
+* `acrvaluodev.azurecr.io/ml-service:v2`
+* `acrvaluodev.azurecr.io/valuo-data-pipeline:latest` *(job de ingesta ETL)*
 
-### 2.2. Exclusión de secretos en imágenes (.dockerignore & 12-Factor App)
+### 2.2. Exclusión de secretos y binarios (.dockerignore & 12-Factor App)
 * Los archivos `.env` **nunca se compilan dentro de las imágenes Docker**.
 * Las credenciales se inyectan en tiempo de ejecución a través de las *Environment Variables* y *Secrets* de Azure Container Apps.
+* **Pure Cloud Registry (Sin modelos locales)**: La imagen de `ml-service` excluye mediante `.dockerignore` todos los archivos `models/*.pkl` y `models/*.joblib`. El contenedor es 100% desacoplado de los datos y pesos, descargándolos dinámicamente desde Azure Blob Storage vía MLflow.
 
 ### 2.3. Limitación Regional de `chilecentral` (ACR Tasks)
 * Al intentar ejecutar `az acr build`, Azure reportó que la función de compilación remota (ACR Tasks) no está habilitada en la región de Chile Central (`NoRegisteredProviderFound`).
 * **Solución adoptada**: Compilación local mediante Docker Desktop y publicación remota con `docker push`.
-
-### 2.4. Estrategia de Modelos en `ml-service` (Bootstrap vs Desacoplado)
-* **Fase 1 (Arranque / Bootstrap)**: Los modelos baseline iniciales (`xgboost_venta_v2.pkl` y `xgboost_alquiler_v1.pkl`) se incluyen dentro del contenedor para garantizar arranque inmediato y disponibilidad de inferencia sin depender de un MLflow preexistente.
-* **Fase 2 (Producción 100% Cloud Native)**: Una vez registrado el modelo en MLflow y almacenado en Blob Storage, las futuras revisiones de la imagen excluirán la carpeta `models/`, descargando los artefactos dinámicamente desde Azure Storage.
 
 ---
 
@@ -72,26 +77,30 @@ No se crean múltiples registros de contenedores. Un único ACR (`acrvaluodev.az
 Ejecutado desde la raíz del repositorio (`Valuo-Machine-Learning-Service`):
 
 ```powershell
-# 1. Autenticación en el registro de Azure
+# 1. Autenticación en el registro de Azure ACR
 az acr login --name acrvaluodev
 
-# 2. Compilación y subida de MLflow Server
-docker build -t acrvaluodev.azurecr.io/mlflow:latest ./mlflow-server
-docker push acrvaluodev.azurecr.io/mlflow:latest
+# 2. Compilación y subida de MLflow Server (con auto-migración y middleware desactivado)
+docker build -t acrvaluodev.azurecr.io/mlflow:v3 ./mlflow-server
+docker push acrvaluodev.azurecr.io/mlflow:v3
 
-# 3. Compilación y subida de ML Service (FastAPI + XGBoost + SHAP) con tag inmutable v1
-docker build -t acrvaluodev.azurecr.io/ml-service:v1 ./ml-service
-docker push acrvaluodev.azurecr.io/ml-service:v1
+# 3. Compilación y subida de ML Service (ultraliviano sin binarios locales y endpoint de auditoría)
+docker build -t acrvaluodev.azurecr.io/ml-service:v2 ./ml-service
+docker push acrvaluodev.azurecr.io/ml-service:v2
 ```
 
 ---
 
 ## 4. Despliegue de `mlflow-server` en Azure Container Apps
 
-### 4.1. Configuración de Cómputo y Entorno
+### 4.1. Configuración de Cómputo y Recursos
 * **Nombre de la App**: `mlflow-server`
 * **Entorno**: `cae-valuo-dev1`
-* **Asignación de recursos**: `0.25 vCPU` y `0.5 GiB de RAM` (Consumo real en reposo ~150 MB).
+* **Asignación de recursos**: **`1.0 vCPU` y `2.0 GiB de RAM`** *(Ajuste crítico respecto a 0.25 vCPU inicial)*.
+  * *Justificación Técnica*: En MLflow 3.x, la interfaz web React dispara entre 6 y 8 peticiones concurrentes de GraphQL y búsqueda (`/graphql`, `/logged-models/search`, `/runs/search`, `/experiments/search-datasets`) junto con dos schedulers periódicos cada 60s. En asignaciones menores (`0.25` o `0.5` vCPU), el contenedor experimentaba **100% CPU Throttling**, provocando timeout en el Ingress o caída de procesos hijos (`child process died`). Con 1.0 vCPU y 2.0 GiB, las consultas se resuelven en milisegundos.
+* **Estrategia de Optimización de Costos**:
+  * Configurar **Min Replicas: 0** y **Max Replicas: 1**.
+  * Tras 5 minutos de inactividad, Azure escala a 0 réplicas (costo S/ 0.00). Al recibir una petición, realiza un *cold-start* de ~15 segundos.
 
 ### 4.2. Autenticación de Imagen en el Asistente del Portal
 Para evitar el conflicto de identidades administradas en entornos Express de Azure:
@@ -99,12 +108,12 @@ Para evitar el conflicto de identidades administradas en entornos Express de Azu
 * **Servidor de registro**: `acrvaluodev.azurecr.io`
 * **Nombre de usuario**: `acrvaluodev`
 * **Contraseña**: Clave de acceso de administrador de `acrvaluodev`
-* **Imagen y etiqueta**: `mlflow:latest` *(Importante: no anteponer el dominio del servidor porque Azure lo duplica)*.
+* **Imagen y etiqueta**: `mlflow:v3` *(Importante: no anteponer el dominio del servidor porque Azure lo duplica)*.
 
 ### 4.3. Aislamiento de Esquema (Schema-per-Service) y Usuario Dedicado
-En el proyecto coexisten 7 módulos sobre una misma base de datos usando el patrón **Schema-per-Service** para ahorro presupuestal. 
+En el proyecto coexisten múltiples módulos sobre una misma base de datos usando el patrón **Schema-per-Service** para ahorro presupuestal. 
 
-Para evitar que MLflow contaminara el esquema `public`, y para **NO alterar el `search_path` del superadministrador `valuo_admin`** (lo cual afectaría a los otros 6 microservicios), se aprovisionó un usuario de base de datos exclusivo para MLflow:
+Para evitar que MLflow contaminara el esquema `public`, y para **NO alterar el `search_path` del superadministrador `valuo_admin`** (lo cual afectaría a los otros microservicios), se aprovisionó un usuario de base de datos exclusivo para MLflow:
 
 ```sql
 -- Ejecutado en PostgreSQL (db_operational_valuo):
@@ -131,12 +140,14 @@ ALTER USER mlflow_user SET search_path TO mlops;
 
 ### 4.4. Variables de Entorno de `mlflow-server` (Runtime)
 
-| Variable | Valor Configurado |
-| :--- | :--- |
-| `BACKEND_STORE_URI` | `postgresql://mlflow_user:MlflowPass2026!@psql-valuo-dev-01.postgres.database.azure.com:5432/db_operational_valuo?sslmode=require` |
-| `DEFAULT_ARTIFACT_ROOT` | `wasbs://mlflow-artifacts@stvaluodev.blob.core.windows.net/` |
-| `AZURE_STORAGE_CONNECTION_STRING` | `DefaultEndpointsProtocol=https;AccountName=stvaluodev;AccountKey=<TU_AZURE_STORAGE_KEY>;EndpointSuffix=core.windows.net` |
-| `AZURE_STORAGE_ACCESS_KEY` | `<TU_AZURE_STORAGE_KEY>` |
+| Variable | Valor Configurado | Propósito |
+| :--- | :--- | :--- |
+| `BACKEND_STORE_URI` | `postgresql://mlflow_user:MlflowPass2026!@psql-valuo-dev-01.postgres.database.azure.com:5432/db_operational_valuo?sslmode=require` | Conexión con PostgreSQL al esquema dedicado `mlops` |
+| `DEFAULT_ARTIFACT_ROOT` | `wasbs://mlflow-artifacts@stvaluodev.blob.core.windows.net/` | Ruta raíz en Azure Blob Storage para guardar modelos serializados |
+| `AZURE_STORAGE_CONNECTION_STRING` | `DefaultEndpointsProtocol=https;AccountName=stvaluodev;AccountKey=<KEY>;EndpointSuffix=core.windows.net` | Cadena de autenticación para Blob Storage |
+| `AZURE_STORAGE_ACCESS_KEY` | `<KEY>` | Llave simétrica de acceso a Azure Storage |
+| `MLFLOW_SERVER_DISABLE_SECURITY_MIDDLEWARE` | `true` | **CRÍTICO:** Desactiva el middleware local de FastAPI de MLflow 3.5+ que bloquea peticiones con `403 Forbidden` desde Azure Ingress |
+| `MLFLOW_SERVER_CORS_ALLOWED_ORIGINS` | `https://mlflow-server.delightfuldesert-51ebdce7.chilecentral.azurecontainerapps.io` | Origen explícito permitido para evitar advertencias de credenciales W3C CORS |
 
 ### 4.5. Configuración de Red e Ingress
 * **Entrada (Ingress)**: Habilitada
@@ -147,25 +158,31 @@ ALTER USER mlflow_user SET search_path TO mlops;
 * **URL Pública Asignada**: `https://mlflow-server.delightfuldesert-51ebdce7.chilecentral.azurecontainerapps.io/`
 
 ### 4.6. Lecciones y Troubleshooting Resueltos en MLflow
-1. **Error `ExpressEnvironmentManagedIdentityNotSupported`**:
-   * *Solución*: Usar la opción "Docker Hub or other registries" con credenciales de admin del ACR.
-2. **Error `BuildFailed: image was not found` (Duplicación FQDN)**:
-   * *Solución*: En el campo "Image and tag" colocar solo `mlflow:latest`.
-3. **Error `InvalidSchemaName: no schema has been selected to create in`**:
-   * *Causa*: Al no estar en `public`, PostgreSQL no sabía en qué esquema crear tablas. Si el usuario no es dueño del esquema, rechaza la operación.
-   * *Solución*: Ejecutar `ALTER SCHEMA mlops OWNER TO mlflow_user;` y fijar `ALTER USER mlflow_user SET search_path TO mlops;`.
-4. **Error `Got unexpected extra arguments (| | AZURE_STORAGE_CONNECTION_STRING)`**:
-   * *Solución*: Limpiar caracteres de tablas Markdown pegados accidentalmente en las cajas de variables.
+
+1. **Error `Blocked cross-origin request / 403 Forbidden` en búsqueda de modelos y corridas**:
+   * *Causa*: En MLflow 3.5.0+, el middleware `fastapi_security` bloquea las llamadas AJAX/POST si el header `Origin` no coincide con `localhost`. Al acceder desde el FQDN de Azure, respondía `403 Forbidden` en `/logged-models/search`.
+   * *Solución*: Inyectar `MLFLOW_SERVER_DISABLE_SECURITY_MIDDLEWARE=true` y pasar `--disable-security-middleware` en el arranque del servidor.
+2. **Error `relation "online_scoring_configs" does not exist` y `relation "experiments" does not exist`**:
+   * *Causa*: Al reiniciar o resetear tablas en PostgreSQL, MLflow 3.x requiere ejecutar las migraciones de Alembic (`mlflow db upgrade`) para crear tablas de scorers y linajes.
+   * *Solución*: En el script de arranque del `Dockerfile` se antepuso `mlflow db upgrade ${BACKEND_STORE_URI} && mlflow server ...`.
+3. **Advertencia de CORS `disabling credentialed CORS. Wildcard origins with credentials is a CORS spec violation`**:
+   * *Causa*: El estándar W3C prohíbe usar comodines (`*`) si la petición envía credenciales/cookies.
+   * *Solución*: Quitar el comodín `*` y usar el dominio FQDN explícito o deshabilitar el middleware interno en Azure.
+4. **Congelamiento de la interfaz tras promociones o rollbacks (White Screen of Death)**:
+   * *Causa*: CPU Throttling severo en instancias con 0.25 vCPU al procesar ráfagas de GraphQL.
+   * *Solución*: Elevar los recursos de `mlflow-server` a `1.0 vCPU` y `2.0 GiB de RAM`.
 
 ---
 
 ## 5. Despliegue de `ml-service` en Azure Container Apps
 
-### 5.1. Justificación de Dimensionamiento y Puerto 8000
-* **Memoria y Cómputo**: `0.5 vCPU` y `1.0 GiB de RAM`.
-  * *Motivo*: FastAPI en reposo consume ~120 MB, pero al instanciar simultáneamente en memoria los dos modelos XGBoost (`xgboost_venta_v2.pkl` y `xgboost_alquiler_v1.pkl`) junto con el explicador de árboles SHAP (*TreeExplainer*), el consumo en inferencia activa alcanza entre 350 MB y 450 MB. 1.0 GiB garantiza margen de seguridad del 100%.
+### 5.1. Justificación de Dimensionamiento y Recursos
+* **Memoria y Cómputo**: **`0.5 vCPU` y `1.0 GiB de RAM`**.
+  * *Estado en Reposo / Inferencia*: Consume ~250 MB a 320 MB de RAM (FastAPI + 2 modelos XGBoost + SHAP TreeExplainers + índice RNTP en memoria). Tiene más del 65% de holgura.
+  * *Pico de Reentrenamiento*: Al descargar el dataset desde PostgreSQL y ajustar los árboles de XGBoost, el consumo pico transitorio alcanza entre 550 MB y 650 MB. 1.0 GiB garantiza un **margen de seguridad del 35%** antes de cualquier intervención del OOM Killer de Kubernetes.
+  * *Semáforo de Seguridad*: El servicio cuenta con un semáforo de exclusión mutua (`_training_semaphore`) que impide reentrenar venta y alquiler al mismo tiempo, blindando la memoria.
 * **Puerto de Destino 8000**:
-  * *Motivo*: Es el puerto estándar de FastAPI/Uvicorn. En Azure Container Apps, cada contenedor posee su propio espacio de red aislado y subdominio público en HTTPS (puerto 443). **No existe conflicto de puertos** con los otros microservicios que también utilicen el puerto 8000.
+  * Es el puerto estándar de FastAPI/Uvicorn, expuesto de forma segura mediante HTTPS en el puerto 443 por Azure Ingress.
 
 ### 5.2. Configuración en el Portal de Azure
 * **Nombre de la App**: `ml-service`
@@ -173,7 +190,7 @@ ALTER USER mlflow_user SET search_path TO mlops;
 * **Origen de imagen**: `Docker Hub or other registries` (Privado)
   * Servidor: `acrvaluodev.azurecr.io`
   * Usuario: `acrvaluodev`
-  * Imagen y etiqueta: `ml-service:v1` *(Etiqueta inmutable)*
+  * Imagen y etiqueta: `ml-service:v2` *(Etiqueta inmutable sin modelos locales)*
 * **Asignación de recursos**: `0.5 vCPU` / `1.0 GiB RAM`
 
 ### 5.3. Variables de Entorno (Runtime)
@@ -183,39 +200,42 @@ ALTER USER mlflow_user SET search_path TO mlops;
 | `MLFLOW_TRACKING_URI` | `https://mlflow-server.delightfuldesert-51ebdce7.chilecentral.azurecontainerapps.io` | Conexión HTTPS hacia el servidor MLflow en Azure |
 | `DB_HOST` | `psql-valuo-dev-01.postgres.database.azure.com` | Host de Azure PostgreSQL |
 | `DB_PORT` | `5432` | Puerto estándar PostgreSQL |
-| `DB_USER` | `valuo_admin` | Usuario de conexión |
+| `DB_USER` | `valuo_admin` | Usuario de conexión a la BD |
 | `DB_PASSWORD` | `V@aluo_admin` | Contraseña de conexión |
-| `DB_NAME` | `inmobiliaria_ml_db` | Base de datos con tablas de contexto distrital e histórico |
-| `MLFLOW_EXPERIMENT_VENTA` | `experimento_tasacion_venta` | Nombre del experimento MLflow para modelos de venta |
-| `MLFLOW_EXPERIMENT_ALQUILER` | `experimento_tasacion_alquiler` | Nombre del experimento MLflow para modelos de alquiler |
-| `MLFLOW_MODEL_NAME_VENTA` | `xgboost_venta` | Modelo registrado en MLflow (Venta) |
-| `MLFLOW_MODEL_NAME_ALQUILER` | `xgboost_alquiler` | Modelo registrado en MLflow (Alquiler) |
+| `DB_NAME` | `db_dataset_valuo` | Base de datos con tablas de contexto distrital e histórico inmobiliario |
+| `MLFLOW_EXPERIMENT_VENTA` | `experimento_tasacion_venta` | Experimento de tasación de venta |
+| `MLFLOW_EXPERIMENT_ALQUILER` | `experimento_tasacion_alquiler` | Experimento de tasación de alquiler |
+| `MLFLOW_MODEL_NAME_VENTA` | `xgboost_venta` | Nombre del modelo en Model Registry (Venta) |
+| `MLFLOW_MODEL_NAME_ALQUILER` | `xgboost_alquiler` | Nombre del modelo en Model Registry (Alquiler) |
 | `ADMIN_TOKEN` | *(Vacío)* | Permite acceso libre a endpoints administrativos en fase DEV |
 
-### 5.4. Configuración de Red e Ingress
-* **Entrada (Ingress)**: Habilitada
-* **Tráfico**: Aceptación desde cualquier lugar (*Accepting traffic from anywhere*)
-* **Tipo**: HTTP / Transporte Automático
-* **Conexiones no seguras**: Deshabilitadas (Fuerza HTTPS en puerto 443)
-* **Puerto de destino**: `8000`
+### 5.4. Nuevo Endpoint de Auditoría del Pipeline ETL
+Se integró un endpoint administrativo exclusivo para que el administrador supervise las corridas del pipeline de datos:
+* **`GET /api/v1/admin/monitoreo/pipeline-ejecuciones`** (opcional: `limit=50`).
+* Lee directamente la tabla `public.pipeline_ejecuciones` en `db_dataset_valuo`.
+* Reporta: `id`, `tipo_ejecucion`, `ejecutado_por`, `iniciado_en`, `duracion_segundos`, `registros_leidos`, `registros_guardados`, `registros_filtrados`, `tasa_efectividad_pct`, `estado`, `errores` y `metricas_salida`.
 
 ### 5.5. Lecciones y Troubleshooting Resueltos en `ml-service`
-1. **Error `ModuleNotFoundError: No module named 'psutil'`**:
-   * *Causa*: `monitoreo_service.py` importa `psutil` para reportar métricas del host y memoria, pero no estaba incluido en `requirements.txt`.
-   * *Solución*: Se agregó `psutil>=5.9.0` a `requirements.txt` y se recompiló la imagen.
-2. **La Trampa de Caché de Kubernetes/ACA con la etiqueta `:latest`**:
-   * *Causa*: Azure Container Apps utiliza `ImagePullPolicy: IfNotPresent` en sus nodos subyacentes. Al hacer un reinicio simple manteniendo `:latest`, el nodo ejecutó la imagen en caché local sin descargar la nueva versión de ACR.
-   * *Solución y Buena Práctica*: Implementar versionamiento inmutable mediante etiquetas (e.g., `ml-service:v1`). Al desplegar una nueva revisión apuntando a `:v1`, Azure detectó un cambio real de imagen y forzó la descarga limpia desde el registro.
+1. **Modo Cold-Start Resiliente**:
+   * *Causa*: Si la imagen no empaqueta archivos `.pkl` locales y MLflow aún no tiene modelos en producción, el servicio antes arrojaba `RuntimeError` y crasheaba en el arranque.
+   * *Solución*: `model_loader.py` ahora entra en modo Cold-Start gracefully; `/health` responde `status: degraded`, los endpoints de predicción responden `HTTP 503` explicando la situación, y los endpoints de entrenamiento permanecen 100% operativos para recibir el primer reentrenamiento.
+2. **Clean-Up de Binarios Temporales**:
+   * *Causa*: Tras cada reentrenamiento, los `.pkl` quedaban ocupando espacio en el contenedor.
+   * *Solución*: En `entrenamiento_service.py`, tan pronto el modelo se carga en RAM y se sube a Azure Blob Storage, se ejecuta `os.remove(pkl_path)` para mantener el contenedor limpio.
 
 ---
 
 ## 6. Checklist de Validación y Verificación
 
-1. **Salud del Servicio (`/health`)**:
-   Verificar respuesta JSON con estado `healthy`, modelos cargados (`venta` y `alquiler`) y distritos disponibles.
-2. **Documentación Swagger / OpenAPI (`/docs`)**:
-   Acceso a la interfaz interactiva para realizar pruebas directas.
-3. **Predicción de Venta (`POST /api/v1/prediccion/venta`)**:
-   Enviar un payload de prueba con datos inmobiliarios de Lima Metropolitana y confirmar respuesta con:
-   * Precio en Soles constantes y nominales.
-   * Valores explicativos de SHAP (Top 10 variables explicativas).
+1. **Salud del Servidor MLflow**:
+   * Acceder a `https://mlflow-server.delightfuldesert-51ebdce7.chilecentral.azurecontainerapps.io/`.
+   * Verificar carga instantánea de experimentos y modelos sin errores 403.
+2. **Salud de ML Service (`/health`)**:
+   * Verificar respuesta JSON con estado `ok` (o `degraded` si está en cold-start).
+3. **Auditoría de Ingesta ETL (`/api/v1/admin/monitoreo/pipeline-ejecuciones`)**:
+   * Confirmar lectura de la tabla de ejecuciones del pipeline en `db_dataset_valuo`.
+4. **Entrenamiento Inicial y Promoción (`POST /api/v1/admin/entrenamiento/iniciar/venta`)**:
+   * Ejecutar con `guardar_como_activo: true`.
+   * En ~8 segundos se creará la versión `v1` oficial en MLflow, se guardará en Azure Blob Storage y se cargará en RAM con Hot-Reload.
+5. **Inferencia Activa con SHAP (`POST /api/v1/prediccion/venta`)**:
+   * Validar estimación en Soles constantes y nominales junto al Top 10 de variables explicativas SHAP y los 3 inmuebles comparables del RNTP.
