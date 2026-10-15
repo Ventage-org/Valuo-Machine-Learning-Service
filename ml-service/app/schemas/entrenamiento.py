@@ -99,15 +99,15 @@ class EntrenamientoBaseRequest(BaseModel):
 class EntrenamientoVentaRequest(EntrenamientoBaseRequest):
     """Parámetros para reentrenar el modelo de venta."""
     nombre_modelo: str = Field(
-        default="xgboost_venta_v2",
-        description="Nombre base del artefacto a generar (ej: 'xgboost_venta_v3').",
-        examples=["xgboost_venta_v2"],
+        default="xgboost_venta_v1",
+        description="Nombre base del artefacto a generar (ej: 'xgboost_venta_v2').",
+        examples=["xgboost_venta_v1"],
     )
 
     model_config = {
         "json_schema_extra": {
             "example": {
-                "nombre_modelo": "xgboost_venta_v2"
+                "nombre_modelo": "xgboost_venta_v1"
             }
         }
     }
@@ -171,7 +171,7 @@ class EntrenamientoInicialRequest(BaseModel):
     model_config = {
         "json_schema_extra": {
             "example": {
-                "nombre_modelo": "xgboost_venta_v2"
+                "nombre_modelo": "xgboost_venta_v1"
             }
         }
     }

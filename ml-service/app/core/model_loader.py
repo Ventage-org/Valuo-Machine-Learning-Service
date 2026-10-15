@@ -150,12 +150,12 @@ def _cargar_artefactos_venta(state: ModelState, model_path_override: str | None 
                 print(f"[ModelLoader][Venta] Advertencia: No se pudo cargar desde MLflow ({e}). Usando fallback local...")
 
     if not modelo_cargado:
-        config_model_file = state.config.get("modelo_archivo", "xgboost_venta_v2.pkl")
+        config_model_file = state.config.get("modelo_archivo", "xgboost_venta_v1.pkl")
         model_path = _resolver_ruta(
             model_path_override
             or os.getenv("MODEL_PATH")
             or os.path.join(models_dir, config_model_file)
-            or "models/xgboost_venta_v2.pkl"
+            or "models/xgboost_venta_v1.pkl"
         )
 
         if not os.path.exists(model_path) or config_model_file == "ninguno":

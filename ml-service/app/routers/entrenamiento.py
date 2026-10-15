@@ -90,7 +90,7 @@ def iniciar_entrenamiento_modelo_venta(
     request: EntrenamientoVentaRequest,
     _: None = Depends(_verificar_admin_token),
 ) -> EntrenamientoIniciadoResponse:
-    nombre = request.nombre_modelo or "xgboost_venta_v2"
+    nombre = request.nombre_modelo or "xgboost_venta_v1"
     job_id = iniciar_entrenamiento_venta(
         nombre_modelo=nombre,
         hiperparametros=request.hiperparametros,
@@ -265,7 +265,7 @@ def iniciar_entrenamiento_inicial(
     request: EntrenamientoInicialRequest = EntrenamientoInicialRequest(),
     _: None = Depends(_verificar_admin_token),
 ) -> EntrenamientoIniciadoResponse:
-    nombre = request.nombre_modelo or ("xgboost_venta_v2" if tipo_operacion == "venta" else "xgboost_alquiler_v1")
+    nombre = request.nombre_modelo or ("xgboost_venta_v1" if tipo_operacion == "venta" else "xgboost_alquiler_v1")
     job_id = iniciar_entrenamiento(
         tipo_operacion=tipo_operacion,
         nombre_modelo=nombre,

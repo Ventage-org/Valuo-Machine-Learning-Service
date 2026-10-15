@@ -68,8 +68,8 @@ def modelo_info(
         modelo_activo = model_state.modelo
         cfg = model_state.config
         encoding_map = model_state.encoding_map
-        default_version = "v2"
-        default_file = "xgboost_venta_v2.pkl"
+        default_version = "v1"
+        default_file = "xgboost_venta_v1.pkl"
 
     ipc_cfg = cfg.get("ipc_actual", {})
 

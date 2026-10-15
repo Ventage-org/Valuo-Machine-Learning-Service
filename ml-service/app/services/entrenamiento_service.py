@@ -534,7 +534,7 @@ def _run_training_pipeline(
 
         # 7d. Exportar config del modelo
         now_utc = datetime.now(timezone.utc)
-        version = nombre_modelo.split("_")[-1] if "_" in nombre_modelo else ("v2" if tipo_operacion == "venta" else "v1")
+        version = nombre_modelo.split("_")[-1] if "_" in nombre_modelo else "v1"
 
         config_modelo_actual = {
             "modelo_version":  version,
@@ -827,7 +827,7 @@ def iniciar_entrenamiento(
 
 
 def iniciar_entrenamiento_venta(
-    nombre_modelo: str = "xgboost_venta_v2",
+    nombre_modelo: str = "xgboost_venta_v1",
     hiperparametros: dict[str, Any] | None = None,
     shap_top_n: int = 10,
     state: "ModelState" | None = None,

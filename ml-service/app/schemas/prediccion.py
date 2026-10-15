@@ -366,7 +366,7 @@ class PrediccionVentaResponse(BaseModel):
                 "nota": "Los shap_values están en escala logarítmica.",
             },
             "modelo": {
-                "version": "v2",
+                "version": "v1",
                 "mape_test": 15.04,
                 "r2_test": 0.7469,
                 "ipc_factor": 169.18,
