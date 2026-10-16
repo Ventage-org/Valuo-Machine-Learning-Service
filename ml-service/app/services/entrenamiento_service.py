@@ -451,7 +451,6 @@ def _run_training_pipeline(
         modelo.fit(
             X_train, y_train,
             sample_weight=sample_weights,
-            eval_set=[(X_test, y_test)],
             verbose=False,
         )
 
@@ -459,14 +458,20 @@ def _run_training_pipeline(
         _update_job(job_id, progreso="[6/8] Evaluando métricas sobre test set 2024-2025...")
         print(f"[EntrenamientoService][{job_id}] Paso 6: Calculando métricas...")
 
-        pred_log_test = modelo.predict(X_test)
+        # 6a. Predecir sobre TRAIN para aprender los factores de calibración de escala y distrito (Sin Data Leakage)
+        pred_log_train = modelo.predict(X_train)
         if usar_target_m2:
-            pred_total_raw = np.exp(pred_log_test) * sup_test
+            pred_total_raw_train = np.exp(pred_log_train) * sup_train
         else:
-            pred_total_raw = np.expm1(pred_log_test)
+            pred_total_raw_train = np.expm1(pred_log_train)
 
-        ratios_test = pred_total_raw / (y_real_test + 1e-8)
-        median_ratio_global = float(np.median(ratios_test))
+        # Ventana temporal reciente de TRAIN (año 2023) para calibración de escala de mercado
+        mask_calibracion = (df_train["Anio"] == 2023).values
+        if mask_calibracion.sum() < 100:
+            mask_calibracion = np.ones(len(df_train), dtype=bool)
+
+        ratios_train_cal = pred_total_raw_train[mask_calibracion] / (y_real_train[mask_calibracion] + 1e-8)
+        median_ratio_global = float(np.median(ratios_train_cal))
 
         if factor_calibracion is not None:
             factor_usado_global = float(factor_calibracion)
@@ -475,21 +480,33 @@ def _run_training_pipeline(
         else:
             factor_usado_global = 1.0
 
-        # Calibración estratificada por distrito (IAAO Standard on Ratio Studies §5.4)
-        df_eval = pd.DataFrame({"distrito": df_test_raw["distrito"], "ratio": ratios_test})
+        # Calibración estratificada por distrito aprendida de TRAIN (IAAO Standard on Ratio Studies §5.4)
+        df_eval_train = pd.DataFrame({
+            "distrito": df_train.loc[mask_calibracion, "distrito"],
+            "ratio": ratios_train_cal
+        })
         factores_distrito: dict[str, float] = {}
-        for dist, group in df_eval.groupby("distrito"):
+        for dist, group in df_eval_train.groupby("distrito"):
             factores_distrito[str(dist)] = round(float(np.median(group["ratio"])), 4)
 
-        # Aplicar factores estratificados por distrito
-        factores_vector = df_test_raw["distrito"].map(factores_distrito).fillna(factor_usado_global).values
+        # 6b. Predecir sobre TEST y aplicar los factores fijos aprendidos de TRAIN (Evaluación honesta out-of-sample)
+        pred_log_test = modelo.predict(X_test)
+        if usar_target_m2:
+            pred_total_raw = np.exp(pred_log_test) * sup_test
+        else:
+            pred_total_raw = np.expm1(pred_log_test)
+
+        ratios_test_crudo = pred_total_raw / (y_real_test + 1e-8)
+        median_ratio_crudo = float(np.median(ratios_test_crudo))
+
+        factores_vector = df_test["distrito"].map(factores_distrito).fillna(factor_usado_global).values
         y_pred_calibrado = pred_total_raw / factores_vector
 
         metricas_iaao = _calcular_metricas_iaao(y_real_test, y_pred_calibrado)
         metricas_dict = _calcular_metricas(y_real_test, y_pred_calibrado)
         metricas_dict["factor_calibracion_iaao"] = factor_usado_global
         metricas_dict["factores_calibracion_distrito"] = factores_distrito
-        metricas_dict["median_ratio_crudo"] = round(median_ratio_global, 4)
+        metricas_dict["median_ratio_crudo"] = round(median_ratio_crudo, 4)
         metricas_dict["median_ratio_calibrado"] = metricas_iaao["median_ratio"]
         metricas_dict["cod_pct"] = metricas_iaao["cod_pct"]
         metricas_dict["cov_pct"] = metricas_iaao["cov_pct"]
