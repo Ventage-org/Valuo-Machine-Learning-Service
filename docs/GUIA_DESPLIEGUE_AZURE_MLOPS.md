@@ -25,8 +25,8 @@ BD: db_operational_valuo & db_dataset_valuo"]
 Containers: mlflow-artifacts, datasets, reportes"]
 
         subgraph CAE ["Container Apps Environment: cae-valuo-dev1"]
-            MLFLOW["Container App: mlflow-server [OPERATIVO :v3]
-(1.0 vCPU / 2.0 GiB RAM)
+            MLFLOW["Container App: mlflow-server [OPERATIVO :v4]
+(0.5 vCPU / 1.0 GiB RAM)
 Puerto Ingress: 5000 (Público HTTPS)"]
             MLSERVICE["Container App: ml-service [OPERATIVO :v2]
 (0.5 vCPU / 1.0 GiB RAM)
@@ -96,8 +96,8 @@ docker push acrvaluodev.azurecr.io/ml-service:v2
 ### 4.1. Configuración de Cómputo y Recursos
 * **Nombre de la App**: `mlflow-server`
 * **Entorno**: `cae-valuo-dev1`
-* **Asignación de recursos**: **`1.0 vCPU` y `2.0 GiB de RAM`** *(Ajuste crítico respecto a 0.25 vCPU inicial)*.
-  * *Justificación Técnica*: En MLflow 3.x, la interfaz web React dispara entre 6 y 8 peticiones concurrentes de GraphQL y búsqueda (`/graphql`, `/logged-models/search`, `/runs/search`, `/experiments/search-datasets`) junto con dos schedulers periódicos cada 60s. En asignaciones menores (`0.25` o `0.5` vCPU), el contenedor experimentaba **100% CPU Throttling**, provocando timeout en el Ingress o caída de procesos hijos (`child process died`). Con 1.0 vCPU y 2.0 GiB, las consultas se resuelven en milisegundos.
+* **Asignación de recursos**: **`0.5 vCPU` y `1.0 GiB de RAM`** *(Optimizado con MLflow 2.19.0 LTS)*.
+  * *Justificación Técnica*: Con la migración a MLflow 2.19.0 LTS (REST API liviana sin sobrecarga de GraphQL ni evaluadores pesados de GenAI), el servidor opera de manera estable con un consumo en reposo de ~250-350 MB de RAM. Con 0.5 vCPU y 1.0 GiB se elimina el 100% CPU Throttling y se reduce a la mitad el costo en Azure Container Apps manteniendo compatibilidad total con Model Registry y Azure Blob Storage.
 * **Estrategia de Optimización de Costos**:
   * Configurar **Min Replicas: 0** y **Max Replicas: 1**.
   * Tras 5 minutos de inactividad, Azure escala a 0 réplicas (costo S/ 0.00). Al recibir una petición, realiza un *cold-start* de ~15 segundos.

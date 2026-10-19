@@ -9,27 +9,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar MLflow, driver PostgreSQL y SDK de Azure Blob Storage
+# Instalar MLflow LTS estable, driver PostgreSQL y SDK de Azure Blob Storage
 RUN pip install --no-cache-dir \
-    mlflow==3.16.1 \
+    mlflow==2.19.0 \
     psycopg2-binary==2.9.9 \
     azure-storage-blob==12.19.1 \
     azure-identity==1.15.0
 
 EXPOSE 5000
 
-# Desactivar el middleware de seguridad interno de FastAPI de MLflow 3.5+
-# En Azure Container Apps, la seguridad y SSL ya son administrados por el Ingress (HTTPS)
-ENV MLFLOW_SERVER_DISABLE_SECURITY_MIDDLEWARE=true
-
-# Script de arranque optimizado para Cloud:
-# - mlflow db upgrade: auto-migración limpia del esquema en PostgreSQL
-# - workers 1: bajo consumo de RAM/CPU
-# - disable-security-middleware: elimina bloqueos 403 Forbidden de cross-origin en Azure
+# Script de arranque optimizado para Cloud (Bajo consumo de RAM y CPU):
+# - mlflow db upgrade: auto-migración/validación limpia del esquema en PostgreSQL
+# - workers 1: bajo consumo de RAM (~350 MB en reposo) y CPU
 CMD ["sh", "-c", "mlflow db upgrade ${BACKEND_STORE_URI} && mlflow server \
     --backend-store-uri ${BACKEND_STORE_URI} \
     --default-artifact-root ${DEFAULT_ARTIFACT_ROOT} \
     --host 0.0.0.0 \
     --port 5000 \
-    --workers 1 \
-    --disable-security-middleware"]
+    --workers 1"]
