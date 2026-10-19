@@ -57,8 +57,8 @@ Puerto Ingress: 8000 (Público HTTPS)"]
 
 ### 2.1. Un solo ACR para todos los microservicios
 No se crean múltiples registros de contenedores. Un único ACR (`acrvaluodev.azurecr.io`) aloja los distintos repositorios:
-* `acrvaluodev.azurecr.io/mlflow:v3`
-* `acrvaluodev.azurecr.io/ml-service:v2`
+* `acrvaluodev.azurecr.io/mlflow:v7` (MLflow 2.19.0 LTS con `--serve-artifacts`)
+* `acrvaluodev.azurecr.io/ml-service:v8` (Ultraliviano, `numpy<2.0`, `shap==0.45.1`)
 * `acrvaluodev.azurecr.io/valuo-data-pipeline:latest` *(job de ingesta ETL)*
 
 ### 2.2. Exclusión de secretos y binarios (.dockerignore & 12-Factor App)
@@ -80,13 +80,13 @@ Ejecutado desde la raíz del repositorio (`Valuo-Machine-Learning-Service`):
 # 1. Autenticación en el registro de Azure ACR
 az acr login --name acrvaluodev
 
-# 2. Compilación y subida de MLflow Server (con auto-migración y middleware desactivado)
-docker build -t acrvaluodev.azurecr.io/mlflow:v3 ./mlflow-server
-docker push acrvaluodev.azurecr.io/mlflow:v3
+# 2. Compilación y subida de MLflow Server (MLflow 2.19.0 LTS + Artifact Proxy)
+docker build -t acrvaluodev.azurecr.io/mlflow:v7 ./mlflow-server
+docker push acrvaluodev.azurecr.io/mlflow:v7
 
-# 3. Compilación y subida de ML Service (ultraliviano sin binarios locales y endpoint de auditoría)
-docker build -t acrvaluodev.azurecr.io/ml-service:v2 ./ml-service
-docker push acrvaluodev.azurecr.io/ml-service:v2
+# 3. Compilación y subida de ML Service (Fast build con pre-compiled wheels: NumPy 1.26 + SHAP 0.45)
+docker build -t acrvaluodev.azurecr.io/ml-service:v8 ./ml-service
+docker push acrvaluodev.azurecr.io/ml-service:v8
 ```
 
 ---
@@ -108,7 +108,7 @@ Para evitar el conflicto de identidades administradas en entornos Express de Azu
 * **Servidor de registro**: `acrvaluodev.azurecr.io`
 * **Nombre de usuario**: `acrvaluodev`
 * **Contraseña**: Clave de acceso de administrador de `acrvaluodev`
-* **Imagen y etiqueta**: `mlflow:v3` *(Importante: no anteponer el dominio del servidor porque Azure lo duplica)*.
+* **Imagen y etiqueta**: `mlflow:v7` *(Importante: no anteponer el dominio del servidor porque Azure lo duplica)*.
 
 ### 4.3. Aislamiento de Esquema (Schema-per-Service) y Usuario Dedicado
 En el proyecto coexisten múltiples módulos sobre una misma base de datos usando el patrón **Schema-per-Service** para ahorro presupuestal. 
@@ -159,18 +159,21 @@ ALTER USER mlflow_user SET search_path TO mlops;
 
 ### 4.6. Lecciones y Troubleshooting Resueltos en MLflow
 
-1. **Error `Blocked cross-origin request / 403 Forbidden` en búsqueda de modelos y corridas**:
-   * *Causa*: En MLflow 3.5.0+, el middleware `fastapi_security` bloquea las llamadas AJAX/POST si el header `Origin` no coincide con `localhost`. Al acceder desde el FQDN de Azure, respondía `403 Forbidden` en `/logged-models/search`.
-   * *Solución*: Inyectar `MLFLOW_SERVER_DISABLE_SECURITY_MIDDLEWARE=true` y pasar `--disable-security-middleware` en el arranque del servidor.
-2. **Error `relation "online_scoring_configs" does not exist` y `relation "experiments" does not exist`**:
-   * *Causa*: Al reiniciar o resetear tablas en PostgreSQL, MLflow 3.x requiere ejecutar las migraciones de Alembic (`mlflow db upgrade`) para crear tablas de scorers y linajes.
-   * *Solución*: En el script de arranque del `Dockerfile` se antepuso `mlflow db upgrade ${BACKEND_STORE_URI} && mlflow server ...`.
-3. **Advertencia de CORS `disabling credentialed CORS. Wildcard origins with credentials is a CORS spec violation`**:
-   * *Causa*: El estándar W3C prohíbe usar comodines (`*`) si la petición envía credenciales/cookies.
-   * *Solución*: Quitar el comodín `*` y usar el dominio FQDN explícito o deshabilitar el middleware interno en Azure.
-4. **Congelamiento de la interfaz tras promociones o rollbacks (White Screen of Death)**:
-   * *Causa*: CPU Throttling severo en instancias con 0.25 vCPU al procesar ráfagas de GraphQL.
-   * *Solución*: Elevar los recursos de `mlflow-server` a `1.0 vCPU` y `2.0 GiB de RAM`.
+1. **Error `Blocked cross-origin request / 403 Forbidden` en búsqueda de modelos y corridas (en MLflow 3.x)**:
+   * *Causa*: En MLflow 3.5.0+, el middleware `fastapi_security` bloquea las llamadas AJAX/POST si el header `Origin` no coincide con `localhost`.
+   * *Solución*: En MLflow 2.19.0 LTS este problema queda erradicado de raíz al utilizar la arquitectura Flask/Gunicorn liviana sin dicho middleware.
+2. **Incompatibilidad de Migraciones Alembic (`Can't locate revision identified by 'b7e2c1a4d9f3'`)**:
+   * *Causa*: La base de datos fue inicializada previamente por MLflow 3.x con una revisión de migración que no existe en MLflow 2.x.
+   * *Solución*: Limpiar el esquema `mlops` en PostgreSQL (`DROP SCHEMA mlops CASCADE; CREATE SCHEMA mlops;`) y reasignar permisos al usuario `mlflow_user` para que MLflow 2.19 inicialice sus 19 tablas limpias.
+3. **Error `relation "metrics" does not exist [SQL: ALTER TABLE metrics ADD COLUMN step ...]`**:
+   * *Causa*: `mlflow db upgrade` es un comando de migración incremental que falla si el esquema está vacío porque asume que las tablas base ya existen.
+   * *Solución*: En el script de arranque del `Dockerfile` se invoca directamente `mlflow server`. El servidor ejecuta internamente `SqlAlchemyStore._initialize_tables()` al detectar un esquema vacío, creando todas las tablas automáticamente.
+4. **Error `Status: FAILED` y ausencia de modelos en Azure Blob Storage (Falta de Artifact Proxy)**:
+   * *Causa*: En MLflow 2.x, el proxy de artefactos no viene activo por defecto; el servidor le ordenaba al cliente (`ml-service`) subir directamente a Azure Blob Storage (`wasbs://`), fallando por falta de credenciales directas.
+   * *Solución*: Agregar `--artifacts-destination ${DEFAULT_ARTIFACT_ROOT}` y `--serve-artifacts` en el `CMD` del `Dockerfile` de `mlflow-server`. De esta forma, el servidor actúa como proxy seguro centralizando la subida hacia Azure Blob Storage.
+5. **Optimización de Costos y Recursos**:
+   * Con MLflow 2.19.0 LTS, la app corre de manera óptima con **0.5 vCPU y 1.0 GiB RAM** (reduciendo el costo a la mitad).
+   * Configurando `minReplicas: 0`, la instancia se apaga automáticamente cuando no hay actividad ($0.00 de costo).
 
 ---
 
@@ -190,7 +193,7 @@ ALTER USER mlflow_user SET search_path TO mlops;
 * **Origen de imagen**: `Docker Hub or other registries` (Privado)
   * Servidor: `acrvaluodev.azurecr.io`
   * Usuario: `acrvaluodev`
-  * Imagen y etiqueta: `ml-service:v2` *(Etiqueta inmutable sin modelos locales)*
+  * Imagen y etiqueta: `ml-service:v8` *(Etiqueta inmutable sin modelos locales)*
 * **Asignación de recursos**: `0.5 vCPU` / `1.0 GiB RAM`
 
 ### 5.3. Variables de Entorno (Runtime)
@@ -222,6 +225,23 @@ Se integró un endpoint administrativo exclusivo para que el administrador super
 2. **Clean-Up de Binarios Temporales**:
    * *Causa*: Tras cada reentrenamiento, los `.pkl` quedaban ocupando espacio en el contenedor.
    * *Solución*: En `entrenamiento_service.py`, tan pronto el modelo se carga en RAM y se sube a Azure Blob Storage, se ejecuta `os.remove(pkl_path)` para mantener el contenedor limpio.
+3. **Paridad de Protocolo MLflow (Error 404 en `/api/2.0/mlflow/logged-models`)**:
+   * *Causa*: Si `ml-service` usa MLflow 3.x y el servidor corre en MLflow 2.x, el cliente intenta invocar endpoints REST que no existen en la versión 2, abortando el registro con error 404.
+   * *Solución*: Se fijó `mlflow==2.19.0` en `requirements.txt` asegurando paridad estricta entre cliente y servidor.
+4. **Incompatibilidad de NumPy 2.0 (`AttributeError: np.obj2sctype was removed`)**:
+   * *Causa*: NumPy 2.0+ eliminó métodos obsoletos como `np.obj2sctype`, provocando que `shap` crasheara en el arranque al importar módulos de color y visualización.
+   * *Solución*: Se restringió la dependencia a `numpy<2.0.0,>=1.24.0` (instalando la versión LTS estable `numpy 1.26.4`).
+5. **Optimización de Tiempos de Build Docker (De 40 minutos a 1.5 minutos)**:
+   * *Causa*: `shap>=0.44.0` sin límite superior forzaba la descarga de código fuente en `.tar.gz` sin ruedas binarias para Linux, obligando a GCC a compilar C++ durante más de 30 minutos.
+   * *Solución*: Se fijó `shap==0.45.1` (con ruedas binarias oficiales `.whl`) y se añadió el flag `--prefer-binary` en el comando `pip install` del Dockerfile.
+6. **Eliminación Total de Data Leakage en el Pipeline de Entrenamiento**:
+   * *Causa*: Anteriormente, los factores de calibración por distrito se calculaban usando las etiquetas reales de test (`y_real_test`) y `eval_set` recibía el conjunto de prueba durante `.fit()`.
+   * *Solución*: 
+     - La calibración por distrito se aprende estrictamente de `X_train` (ventana temporal 2023) y se aplica out-of-sample en `X_test`.
+     - Se retiró `eval_set` de `modelo.fit(...)`, garantizando aislamiento metodológico 100% defendible ante jurado de tesis.
+     - **Métricas Oficiales Cloud Certificadas**:
+       * **Venta (v1)**: MAPE = **14.72%** (< 15.00%), R² = **0.7491** (> 0.70), COD = **14.20%**.
+       * **Alquiler (v1)**: MAPE = **13.65%** (< 17.89% lit.), R² = **0.6728** (> 0.65), COD = **13.79%**.
 
 ---
 

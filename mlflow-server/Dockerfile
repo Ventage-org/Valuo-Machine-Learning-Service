@@ -19,11 +19,11 @@ RUN pip install --no-cache-dir \
 EXPOSE 5000
 
 # Script de arranque optimizado para Cloud (Bajo consumo de RAM y CPU):
-# - mlflow db upgrade: auto-migración/validación limpia del esquema en PostgreSQL
-# - workers 1: bajo consumo de RAM (~350 MB en reposo) y CPU
-CMD ["sh", "-c", "mlflow db upgrade ${BACKEND_STORE_URI} && mlflow server \
+# mlflow server inicializa automáticamente todas las tablas base y migraciones en esquemas limpios
+CMD ["sh", "-c", "mlflow server \
     --backend-store-uri ${BACKEND_STORE_URI} \
-    --default-artifact-root ${DEFAULT_ARTIFACT_ROOT} \
+    --artifacts-destination ${DEFAULT_ARTIFACT_ROOT} \
+    --serve-artifacts \
     --host 0.0.0.0 \
     --port 5000 \
     --workers 1"]
