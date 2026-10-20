@@ -80,6 +80,46 @@ _training_semaphore = threading.Semaphore(1)
 
 # ─── Acceso al registry ───────────────────────────────────────────────────────
 
+def _sincronizar_gobernanza_con_mlflow(job: dict[str, Any]) -> None:
+    """Sincroniza dinámicamente el estado de gobernanza del job con MLflow Model Registry."""
+    job_ver = job.get("mlflow_model_version")
+    tipo_op = job.get("tipo_operacion", "venta")
+    if not job_ver or not mlflow_manager.check_connection():
+        return
+    try:
+        model_name = os.getenv(f"MLFLOW_MODEL_NAME_{tipo_op.upper()}", f"xgboost_{tipo_op}")
+        prod_ver = mlflow_manager.get_production_version(model_name)
+        if prod_ver:
+            if str(job_ver) == str(prod_ver.version):
+                job["estado_gobernanza"] = "production"
+            elif str(job_ver).isdigit() and str(prod_ver.version).isdigit():
+                if int(job_ver) < int(prod_ver.version):
+                    job["estado_gobernanza"] = "archived"
+                else:
+                    job["estado_gobernanza"] = "candidate"
+    except Exception:
+        pass
+
+
+def actualizar_estado_gobernanza_job(
+    tipo_operacion: str,
+    version_promovida: str,
+    version_anterior: str | None = None,
+) -> None:
+    """Actualiza en caliente el estado de gobernanza en el registro de jobs."""
+    with _job_lock:
+        for job_id, job in _job_registry.items():
+            if job.get("tipo_operacion") == tipo_operacion:
+                job_ver = str(job.get("mlflow_model_version") or "")
+                if job_ver == str(version_promovida):
+                    job["estado_gobernanza"] = "production"
+                    job["progreso"] = f"[Producción] Modelo v{version_promovida} activo en Producción (@champion)."
+                elif version_anterior and job_ver == str(version_anterior):
+                    job["estado_gobernanza"] = "archived"
+                elif job.get("estado_gobernanza") == "production" and job_ver != str(version_promovida):
+                    job["estado_gobernanza"] = "archived"
+
+
 def get_job_status(job_id: str) -> dict[str, Any]:
     """Retorna el estado de un job. HTTPException 404 si no existe."""
     with _job_lock:
@@ -88,7 +128,9 @@ def get_job_status(job_id: str) -> dict[str, Any]:
                 status_code=404,
                 detail={"error": "job_no_encontrado", "job_id": job_id},
             )
-        return dict(_job_registry[job_id])
+        job_copy = dict(_job_registry[job_id])
+    _sincronizar_gobernanza_con_mlflow(job_copy)
+    return job_copy
 
 
 def get_latest_job() -> dict[str, Any] | None:
@@ -97,13 +139,18 @@ def get_latest_job() -> dict[str, Any] | None:
         if not _job_registry:
             return None
         ultimo_id = list(_job_registry.keys())[-1]
-        return dict(_job_registry[ultimo_id])
+        job_copy = dict(_job_registry[ultimo_id])
+    _sincronizar_gobernanza_con_mlflow(job_copy)
+    return job_copy
 
 
 def list_all_jobs() -> list[dict[str, Any]]:
-    """Retorna la lista de todos los jobs registrados."""
+    """Retorna la lista de todos los jobs registrados sincronizados con gobernanza."""
     with _job_lock:
-        return [dict(j) for j in _job_registry.values()]
+        jobs_copies = [dict(j) for j in _job_registry.values()]
+    for j in jobs_copies:
+        _sincronizar_gobernanza_con_mlflow(j)
+    return jobs_copies
 
 
 def _update_job(job_id: str, **kwargs: Any) -> None:

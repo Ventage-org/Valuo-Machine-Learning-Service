@@ -60,10 +60,12 @@ def _build_version_info(
     run_id: str | None = None,
     tags: dict[str, str] | None = None,
     created_at_timestamp: int | float | None = None,
+    aliases: list[str] | None = None,
 ) -> VersionModeloInfo:
     """Construye un VersionModeloInfo consultando las métricas del run en MLflow."""
     metricas = MetricasModelo()
     tags_dict = tags or {}
+    aliases_list = list(aliases) if aliases else []
 
     if run_id and mlflow_manager.check_connection():
         try:
@@ -90,13 +92,23 @@ def _build_version_info(
         except Exception:
             pass
 
+    # Normalización exhaustiva de Stage
+    stage_str = str(stage).strip() if stage is not None else ""
+    if "champion" in aliases_list or stage_str.lower() in ("production", "prod") or tags_dict.get("estado_gobernanza") == "production":
+        stage_final = "Production"
+    elif stage_str.lower() in ("archived", "archivado") or tags_dict.get("estado_gobernanza") == "archived":
+        stage_final = "Archived"
+    else:
+        stage_final = "Candidate"
+
     return VersionModeloInfo(
         nombre_modelo=model_name,
         version=str(version),
-        stage=stage,
+        stage=stage_final,
         run_id=run_id,
         metricas=metricas,
         tags=tags_dict,
+        aliases=aliases_list,
         creado_en=creado_en,
         fuente_artefacto=f"models:/{model_name}/{version}",
     )
@@ -128,6 +140,7 @@ def obtener_benchmark(
                 run_id=prod_ver.run_id,
                 tags=getattr(prod_ver, "tags", {}),
                 created_at_timestamp=getattr(prod_ver, "creation_timestamp", None),
+                aliases=getattr(prod_ver, "aliases", []),
             )
 
     # Si MLflow no tiene aún una versión en Production, usar la configuración activa en memoria
@@ -169,6 +182,7 @@ def obtener_benchmark(
                 run_id=cand_ver.run_id,
                 tags=getattr(cand_ver, "tags", {}),
                 created_at_timestamp=getattr(cand_ver, "creation_timestamp", None),
+                aliases=getattr(cand_ver, "aliases", []),
             )
 
             # Calcular deltas frente a Producción
@@ -268,6 +282,7 @@ def obtener_historial_versiones(
             run_id=v.run_id,
             tags=getattr(v, "tags", {}),
             created_at_timestamp=getattr(v, "creation_timestamp", None),
+            aliases=getattr(v, "aliases", []),
         )
         for v in all_versions
     ]
@@ -364,6 +379,11 @@ def promover_modelo_a_produccion(
         nuevo_explainer = shap.TreeExplainer(nuevo_modelo)
 
         # 3. Hot-reload atómico en memoria
+        import json
+        from app.core.model_loader import _resolver_ruta
+        config_path_env = os.getenv("CONFIG_PATH" if tipo_operacion == "venta" else "CONFIG_ALQUILER_PATH")
+        config_path = _resolver_ruta(config_path_env or f"config/model_{'alquiler_' if tipo_operacion == 'alquiler' else ''}config.json")
+
         if tipo_operacion == "venta":
             state.modelo = nuevo_modelo
             state.explainer = nuevo_explainer
@@ -371,6 +391,7 @@ def promover_modelo_a_produccion(
                 state.feature_cols = list(nuevo_modelo.feature_names_in_)
             state.config["modelo_version"] = f"v{version_str}_mlflow"
             state.config["promoted_at"] = datetime.now(timezone.utc).isoformat()
+            cfg_to_persist = dict(state.config)
         else:
             state.modelo_alquiler = nuevo_modelo
             state.explainer_alquiler = nuevo_explainer
@@ -378,6 +399,25 @@ def promover_modelo_a_produccion(
                 state.feature_cols_alquiler = list(nuevo_modelo.feature_names_in_)
             state.config_alquiler["modelo_version"] = f"v{version_str}_mlflow"
             state.config_alquiler["promoted_at"] = datetime.now(timezone.utc).isoformat()
+            cfg_to_persist = dict(state.config_alquiler)
+
+        try:
+            if os.path.exists(config_path):
+                with open(config_path, "w", encoding="utf-8") as fp:
+                    json.dump(cfg_to_persist, fp, indent=2, ensure_ascii=False)
+        except Exception as e_cfg:
+            print(f"[ModelRegistryService] Advertencia al persistir config: {e_cfg}")
+
+        # Sincronizar gobernanza en jobs de entrenamiento
+        try:
+            from app.services.entrenamiento_service import actualizar_estado_gobernanza_job
+            actualizar_estado_gobernanza_job(
+                tipo_operacion=tipo_operacion,
+                version_promovida=version_str,
+                version_anterior=ver_anterior_str,
+            )
+        except Exception as e_sync:
+            print(f"[ModelRegistryService] Advertencia al sincronizar estado_gobernanza_job: {e_sync}")
 
         print(f"[ModelRegistryService] [OK] Hot-Reload completado en RAM para {tipo_operacion} (versión {version_str}).")
 
@@ -397,6 +437,7 @@ def promover_modelo_a_produccion(
         version=version_str,
         stage="Production",
         run_id=ver_nueva.run_id if ver_nueva else None,
+        aliases=["champion"],
     ) if ver_nueva else None
 
     deltas = None

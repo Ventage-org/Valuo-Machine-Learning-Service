@@ -124,30 +124,46 @@ def _cargar_artefactos_venta(state: ModelState, model_path_override: str | None 
 
     if not model_path_override and mlflow_manager.check_connection():
         prod_ver = mlflow_manager.get_production_version(model_name_mlflow)
+        uris_to_try: list[tuple[str, str, str | None]] = []
         if prod_ver:
+            uris_to_try.append((f"models:/{model_name_mlflow}/{prod_ver.version}", str(prod_ver.version), prod_ver.run_id))
+        uris_to_try.append((f"models:/{model_name_mlflow}@champion", "champion", None))
+        uris_to_try.append((f"models:/{model_name_mlflow}/Production", "Production", None))
+
+        for uri, ver_label, run_id_hint in uris_to_try:
             try:
-                uri = f"models:/{model_name_mlflow}/Production"
-                print(f"[ModelLoader][Venta] Cargando modelo en RAM desde MLflow: {uri} (v{prod_ver.version})...")
+                print(f"[ModelLoader][Venta] Intentando cargar modelo en RAM desde MLflow URI: {uri}...")
                 import mlflow.xgboost
                 state.modelo = mlflow.xgboost.load_model(uri)
                 modelo_cargado = True
-                state.config["modelo_version"] = f"v{prod_ver.version}_mlflow"
-                try:
-                    run_info = mlflow_manager.client.get_run(prod_ver.run_id)
-                    m = run_info.data.metrics
-                    if "mape_pct" in m:
-                        state.config["mape_test"] = round(m["mape_pct"], 4)
-                    if "r2" in m:
-                        state.config["r2_test"] = round(m["r2"], 4)
-                    if "mae" in m:
-                        state.config["mae_test"] = round(m["mae"], 2)
-                    if "rmse" in m:
-                        state.config["rmse_test"] = round(m["rmse"], 2)
-                except Exception as ex_m:
-                    print(f"[ModelLoader][Venta] No se pudieron sincronizar métricas de MLflow: {ex_m}")
-                print(f"[ModelLoader][Venta] [OK] Modelo cargado desde MLflow Registry a RAM.")
-            except Exception as e:
-                print(f"[ModelLoader][Venta] Advertencia: No se pudo cargar desde MLflow ({e}). Usando fallback local...")
+                state.config["modelo_version"] = f"v{ver_label}_mlflow"
+                print(f"[ModelLoader][Venta] [OK] Modelo cargado exitosamente en RAM desde {uri}.")
+
+                target_run_id = run_id_hint
+                if not target_run_id:
+                    try:
+                        resolved = mlflow_manager.get_model_version(model_name_mlflow, ver_label)
+                        if resolved:
+                            target_run_id = resolved.run_id
+                    except Exception:
+                        pass
+
+                if target_run_id:
+                    try:
+                        run_info = mlflow_manager.client.get_run(target_run_id)
+                        m = run_info.data.metrics
+                        if "mape_pct" in m: state.config["mape_test"] = round(m["mape_pct"], 4)
+                        if "r2" in m: state.config["r2_test"] = round(m["r2"], 4)
+                        if "mae" in m: state.config["mae_test"] = round(m["mae"], 2)
+                        if "rmse" in m: state.config["rmse_test"] = round(m["rmse"], 2)
+                    except Exception as ex_m:
+                        print(f"[ModelLoader][Venta] No se pudieron sincronizar métricas de MLflow: {ex_m}")
+                break
+            except Exception as e_load:
+                print(f"[ModelLoader][Venta] No se pudo cargar desde URI {uri}: {e_load}")
+
+        if not modelo_cargado:
+            print("[ModelLoader][Venta] Advertencia: No se pudo cargar ninguna versión activa desde MLflow. Usando fallback local...")
 
     if not modelo_cargado:
         config_model_file = state.config.get("modelo_archivo", "xgboost_venta_v1.pkl")
@@ -224,30 +240,46 @@ def _cargar_artefactos_alquiler(state: ModelState, model_path_override: str | No
 
     if not model_path_override and mlflow_manager.check_connection():
         prod_ver = mlflow_manager.get_production_version(model_name_mlflow)
+        uris_to_try: list[tuple[str, str, str | None]] = []
         if prod_ver:
+            uris_to_try.append((f"models:/{model_name_mlflow}/{prod_ver.version}", str(prod_ver.version), prod_ver.run_id))
+        uris_to_try.append((f"models:/{model_name_mlflow}@champion", "champion", None))
+        uris_to_try.append((f"models:/{model_name_mlflow}/Production", "Production", None))
+
+        for uri, ver_label, run_id_hint in uris_to_try:
             try:
-                uri = f"models:/{model_name_mlflow}/Production"
-                print(f"[ModelLoader][Alquiler] Cargando modelo en RAM desde MLflow: {uri} (v{prod_ver.version})...")
+                print(f"[ModelLoader][Alquiler] Intentando cargar modelo en RAM desde MLflow URI: {uri}...")
                 import mlflow.xgboost
                 state.modelo_alquiler = mlflow.xgboost.load_model(uri)
                 modelo_cargado = True
-                state.config_alquiler["modelo_version"] = f"v{prod_ver.version}_mlflow"
-                try:
-                    run_info = mlflow_manager.client.get_run(prod_ver.run_id)
-                    m = run_info.data.metrics
-                    if "mape_pct" in m:
-                        state.config_alquiler["mape_test"] = round(m["mape_pct"], 4)
-                    if "r2" in m:
-                        state.config_alquiler["r2_test"] = round(m["r2"], 4)
-                    if "mae" in m:
-                        state.config_alquiler["mae_test"] = round(m["mae"], 2)
-                    if "rmse" in m:
-                        state.config_alquiler["rmse_test"] = round(m["rmse"], 2)
-                except Exception as ex_m:
-                    print(f"[ModelLoader][Alquiler] No se pudieron sincronizar métricas de MLflow: {ex_m}")
-                print(f"[ModelLoader][Alquiler] [OK] Modelo cargado desde MLflow Registry a RAM.")
-            except Exception as e:
-                print(f"[ModelLoader][Alquiler] Advertencia: No se pudo cargar desde MLflow ({e}). Usando fallback local...")
+                state.config_alquiler["modelo_version"] = f"v{ver_label}_mlflow"
+                print(f"[ModelLoader][Alquiler] [OK] Modelo cargado exitosamente en RAM desde {uri}.")
+
+                target_run_id = run_id_hint
+                if not target_run_id:
+                    try:
+                        resolved = mlflow_manager.get_model_version(model_name_mlflow, ver_label)
+                        if resolved:
+                            target_run_id = resolved.run_id
+                    except Exception:
+                        pass
+
+                if target_run_id:
+                    try:
+                        run_info = mlflow_manager.client.get_run(target_run_id)
+                        m = run_info.data.metrics
+                        if "mape_pct" in m: state.config_alquiler["mape_test"] = round(m["mape_pct"], 4)
+                        if "r2" in m: state.config_alquiler["r2_test"] = round(m["r2"], 4)
+                        if "mae" in m: state.config_alquiler["mae_test"] = round(m["mae"], 2)
+                        if "rmse" in m: state.config_alquiler["rmse_test"] = round(m["rmse"], 2)
+                    except Exception as ex_m:
+                        print(f"[ModelLoader][Alquiler] No se pudieron sincronizar métricas de MLflow: {ex_m}")
+                break
+            except Exception as e_load:
+                print(f"[ModelLoader][Alquiler] No se pudo cargar desde URI {uri}: {e_load}")
+
+        if not modelo_cargado:
+            print("[ModelLoader][Alquiler] Advertencia: No se pudo cargar ninguna versión activa desde MLflow. Usando fallback local...")
 
     if not modelo_cargado:
         config_model_file = state.config_alquiler.get("modelo_archivo", "xgboost_alquiler_v1.pkl")

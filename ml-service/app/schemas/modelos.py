@@ -36,6 +36,7 @@ class VersionModeloInfo(BaseModel):
     run_id: str | None = Field(default=None, description="ID de corrida en MLflow Tracking")
     metricas: MetricasModelo = Field(default_factory=MetricasModelo)
     tags: dict[str, str] = Field(default_factory=dict)
+    aliases: list[str] = Field(default_factory=list, description="Aliases de MLflow (ej. ['champion'])")
     creado_en: datetime | None = None
     fuente_artefacto: str | None = None
 
