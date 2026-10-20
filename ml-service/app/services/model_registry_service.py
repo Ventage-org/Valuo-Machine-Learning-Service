@@ -370,11 +370,40 @@ def promover_modelo_a_produccion(
         )
 
     # 2. Descargar y Cargar en RAM
-    model_uri = f"models:/{model_name}/{version_str}"
-    print(f"[ModelRegistryService] Cargando modelo en RAM desde {model_uri}...")
+    target_run = ver_nueva.run_id if 'ver_nueva' in locals() and ver_nueva else None
+    if not target_run:
+        try:
+            v_obj = mlflow_manager.get_model_version(model_name, version_str)
+            target_run = v_obj.run_id if v_obj else None
+        except Exception:
+            pass
+
+    nuevo_modelo = None
+    # Prioridad 1: Descarga ultrarrápida vía HTTP proxy de MLflow (sin depender de Azure Credentials en el cliente)
+    if target_run:
+        from app.core.model_loader import _descargar_modelo_mlflow_http
+        print(f"[ModelRegistryService] Descargando modelo v{version_str} vía proxy HTTP de MLflow (run_id: {target_run})...")
+        nuevo_modelo = _descargar_modelo_mlflow_http(mlflow_manager.tracking_uri, target_run)
+
+    # Prioridad 2: Carga nativa mlflow.load_model si falla el proxy
+    if nuevo_modelo is None:
+        try:
+            model_uri = f"models:/{model_name}/{version_str}"
+            print(f"[ModelRegistryService] Intentando carga nativa desde {model_uri}...")
+            nuevo_modelo = mlflow.xgboost.load_model(model_uri)
+        except Exception as e_load:
+            print(f"[ModelRegistryService] Fallo carga nativa: {e_load}")
+
+    if nuevo_modelo is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": "error_carga_ram",
+                "message": f"El modelo se promovió en MLflow pero falló al cargarse en RAM.",
+            },
+        )
 
     try:
-        nuevo_modelo = mlflow.xgboost.load_model(model_uri)
         print("[ModelRegistryService] Construyendo SHAP TreeExplainer en RAM...")
         nuevo_explainer = shap.TreeExplainer(nuevo_modelo)
 
