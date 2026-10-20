@@ -421,13 +421,15 @@ Prefijo: `/api/v1/admin/modelos`
 
 ### 4.3. Promover Modelo Candidato a Producción (Aprobación Humana)
 - **Método / Ruta:** `POST /api/v1/admin/modelos/promover`
-- **Descripción:** Acción definitiva de gobernanza de MLOps:
-  1. Marca en MLflow la versión elegida como `Production` y archiva (`Archived`) la versión previa.
-  2. Si `version` no se envía (o es `null`), **resuelve automáticamente el último candidato activo**.
-  3. Soporta formatos `"8"`, `8` o `"v8"` mediante sanitización automática.
-  4. Descarga y carga el artefacto binario directamente en la **memoria RAM** de `ml-service`.
-  5. Reconstruye en caliente el `TreeExplainer` de SHAP en RAM sin reiniciar el servidor (*Zero Downtime*).
-  6. **Calcula y retorna los deltas de métricas ($\Delta\text{MAPE}$, $\Delta R^2$, $\Delta\text{MAE}$)** frente a la versión previamente activa.
+- **Descripción:** Acción definitiva de gobernanza de MLOps con sincronización total de estado:
+  1. **Transición en MLflow**: Asigna a la versión elegida el stage `Production`, el alias canónico `@champion` y los tags de auditoría.
+  2. **Archivado Automático**: Transiciona explícitamente todas las versiones previas en producción a `Archived` con tag `estado_gobernanza: "archived"`.
+  3. **Resolución Inteligente de Versión**: Si `version` no se envía (o es `null`), resuelve automáticamente el último candidato activo. Soporta `"8"`, `8` o `"v8"`.
+  4. **Hot-Reload Desacoplado en RAM (Proxy HTTP en ~1.5s)**: Descarga el artefacto binario `model.xgb` directamente a través del proxy HTTP de MLflow sin requerir credenciales de Azure Storage en el cliente y lo precarga en memoria RAM.
+  5. **SHAP TreeExplainer en Caliente**: Reconstruye el explicador SHAP en RAM sin reiniciar el servidor (*Zero Downtime*).
+  6. **Sincronización de Gobernanza de Jobs**: Actualiza en tiempo real el registro en memoria (`GET /jobs` y `/estado/{job_id}`), pasando el job correspondiente de `"candidate"` a `"production"`, y los anteriores a `"archived"`.
+  7. **Persistencia para Reinicios**: Guarda la versión promovida en `model_config.json` para que ante cualquier reinicio o cold-start de Azure Container Apps, el modelo se precargue en memoria automáticamente.
+  8. **Cálculo de Deltas**: Retorna la comparativa oficial ($\Delta\text{MAPE}$, $\Delta R^2$, $\Delta\text{MAE}$, $\Delta\text{RMSE}$) frente a la versión archivada.
 - **Request Body (Simplificado — `version` y `motivo` son opcionales):**
 ```json
 {

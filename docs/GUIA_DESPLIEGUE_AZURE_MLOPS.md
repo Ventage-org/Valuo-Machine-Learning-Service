@@ -242,6 +242,21 @@ Se integró un endpoint administrativo exclusivo para que el administrador super
      - **Métricas Oficiales Cloud Certificadas**:
        * **Venta (v1)**: MAPE = **14.72%** (< 15.00%), R² = **0.7491** (> 0.70), COD = **14.20%**.
        * **Alquiler (v1)**: MAPE = **13.65%** (< 17.89% lit.), R² = **0.6728** (> 0.65), COD = **13.79%**.
+7. **Carga Resiliente y Ultrarrápida de Modelos en RAM al Inicio (HTTP Proxy vs Direct Storage)**:
+   * *Causa*: Al reiniciar el contenedor de `ml-service` en Azure Container Apps, `mlflow.xgboost.load_model` leía la ruta `source` (`wasbs://mlflow-artifacts@stvaluodev.blob.core.windows.net/...`) e intentaba autenticarse directamente contra Azure Storage usando `DefaultAzureCredential()`. Como `ml-service` no disponía de claves directas de Azure Storage en sus variables de entorno, la llamada fallaba por timeout/credenciales inválidas y el servicio entraba en modo degraded (`state.modelo = None`). Asimismo, llamar a `models:/{model_name}/Production` fallaba si la versión activa fue coronada mediante el alias `@champion` pero su stage literal en base de datos era `None`.
+   * *Solución*:
+     - **Proxy HTTP Desacoplado**: Se desarrollaron los métodos `_descargar_modelo_mlflow_http` y `_descargar_json_mlflow_http` en `model_loader.py`. `ml-service` solicita directamente a `mlflow-server` los artefactos binarios (`/get-artifact?path=model/model.xgb&run_uuid=...`).
+     - **Arranque en ~1.5 segundos**: El modelo binario y los metadatos (`features_metadata.json`, `model_config.json`) se transmiten por streaming HTTP estándar y se deserializan en RAM con `xgb.XGBRegressor().load_model(bytearray(model_bytes))`.
+     - **Cero Dependencia de Credenciales**: `ml-service` no requiere secretos ni claves de Azure Storage; el servidor MLflow actúa como proxy seguro de descarga.
+     - **Prueba en Vivo Certificada**: Modelo v2 cargado en RAM en 1.51s, SHAP TreeExplainer en 0.42s y metadatos en 1.64s (Total arranque < 4.5s).
+8. **Sincronización Atómica de Stages, Aliases (`@champion`) y Gobernanza en Memoria**:
+   * *Causa*: Al promover un modelo candidato a producción (ej: versión 2), el job de entrenamiento original en `GET /api/v1/admin/entrenamiento/jobs` permanecía con `"estado_gobernanza": "candidate"`, la versión base previa 1 continuaba como `"production"`, y la configuración activa no se persistía en disco para el siguiente reinicio.
+   * *Solución*:
+     - **Promoción Completa en MLflow**: Al promover (`POST /api/v1/admin/modelos/promover`), la nueva versión recibe `stage="Production"`, alias `@champion`, y tags `estado_gobernanza="production"` y `stage="Production"`.
+     - **Archivado Explícito de Versiones Previas**: Todas las demás versiones en estado `Production` se transicionan a `stage="Archived"` y se actualizan sus tags a `estado_gobernanza="archived"`.
+     - **Sincronización en Caliente de Jobs**: Se implementó `actualizar_estado_gobernanza_job()` y `_sincronizar_gobernanza_con_mlflow()` en `entrenamiento_service.py`. Los endpoints de consulta de jobs sincronizan dinámicamente con MLflow, garantizando que el job promovido pase a `production` y los anteriores a `archived`.
+     - **Persistencia de Configuración**: Se guarda `model_config.json` en disco para mantener la coherencia tras reinicios de pod.
+     - **Rollback Transparente**: El endpoint `POST /api/v1/admin/modelos/rollback` ejecuta el mismo ciclo atómico restaurando la versión archivada previa a `Production` y demotando la actual.
 
 ---
 
