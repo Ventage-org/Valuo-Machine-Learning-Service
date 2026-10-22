@@ -2,9 +2,10 @@
 
 **Proyecto de Tesis:** Aplicación Web para el Sector Inmobiliario con Predicción de Precios y Rentabilidad mediante Inteligencia Artificial Explicable (XAI).  
 **Metodología:** CRISP-DM (Fases 1 a 6 consolidadas)  
-**Fuente de Datos Primaria:** Dataset Transaccional de Alquiler BCRP / Urbania (`dataset_entrenamineto_alquiler_2025.xlsx` / PostgreSQL) — 41,921 contratos Train 2016–2023 / 19,682 contratos Test 2024–2025. Total: 61,603 contratos depurados.  
-**Tabla Maestra de Contexto Distrital:** `distrito_anio_contexto` (PostgreSQL / CSV) integrada anualmente por distrito (2016–2025): ENAHO (INEI - Nivel Socioeconómico), tasas criminalidad PNP (Robo y Hurto), demografía y densidad INEI, y distancias a equipamientos clave (OpenStreetMap).  
-**Fecha de corte:** 2016–2025  
+**Fuente de Datos Primaria:** Dataset Transaccional de Alquiler BCRP / Urbania integrado en PostgreSQL (`inmobiliaria_ml_db`) — 83,842 contratos Train (2016–2023) / 39,364 contratos Test (2024–2025).  
+**Tabla Maestra de Contexto Distrital:** `distrito_anio_contexto` (PostgreSQL) integrada anualmente por distrito (2016–2025): ENAHO (INEI - Nivel Socioeconómico), tasas criminalidad PNP (Robo y Hurto), demografía y densidad INEI, y distancias a equipamientos clave (OpenStreetMap).  
+**Protocolo de Evaluación:** *Zero-Leakage Out-of-Time* (Aislamiento total de test, calibración post-hoc aprendida exclusivamente en Train 2023).  
+**Fecha de corte y experimentación:** Octubre 2026  
 **Autor:** Joaquín Cortez  
 **Repositorio Oficial:** `Valuo-Machine-Learning-Service`  
 
@@ -16,22 +17,23 @@ El presente documento consolida la arquitectura de datos, decisiones metodológi
 
 Este componente modela el flujo de caja por alquiler en paralelo al modelo de venta, posibilitando que el sistema web inmobiliario calcule de forma desacoplada y simultánea indicadores financieros de inversión como el **Cap Rate (Tasa de Capitalización Bruta y Neta con OER al 15%)**, el **NOI (Ingreso Operativo Neto)** y el **PER (Ratio Precio/Alquiler o *Price to Rent*)**, fundamentales para la toma de decisiones informada de inversionistas, compradores y agentes inmobiliarios.
 
-| **Parámetro / Componente** | Especificación Técnica Oficial |
+| **Parámetro / Componente** | Especificación Técnica Oficial (Experimento Actualizado) |
 | :--- | :--- |
 | **Algoritmo Base** | **XGBoost Regressor** (`v1.7.6+`) con regularización $L_1$ (Lasso) y $L_2$ (Ridge), y algoritmo de histogramas `tree_method='hist'` |
 | **Variable Target Original** | `Alquiler_Soles_Const` (Alquiler mensual deflactado a Soles Constantes, IPC Base Dic 2009 = 100, BCRP) |
 | **Optimización de Target Unitario** | Modelado sobre el canon unitario por metro cuadrado: $y = \ln(\text{Alquiler\_Soles\_Const} / \text{Superficie})$ |
 | **Inferencia y Reconstrucción** | $\hat{P}_{\text{alq}} = \left(\frac{\exp(\hat{y})}{\text{factor\_calibracion\_distrital}}\right) \times \text{Superficie}$ |
-| **Volumen Muestral Total** | **61,603 observaciones** depuradas y validadas (BCRP 2016–2025) |
-| **Partición Temporal (Split)** | Temporal Estricto (*Out-of-Time*): **Train (2016–2023): 41,921 contratos** / **Test (2024–2025): 19,682 contratos** |
-| **Tratamiento Outliers** | Recorte percentiles p0.5% – p99.5% en `Superficie` y `Alquiler_Soles_Const` en Train (41,203 filas finales); **Test 100% intacto** |
+| **Volumen Muestral Evaluado** | **83,842 contratos Train** (2016–2023) / **39,364 contratos Test** (2024–2025) en PostgreSQL |
+| **Partición Temporal (Split)** | Temporal Estricto (*Out-of-Time*): Train 2016–2023 / Test 2024–2025 |
+| **Protocolo Anti-Leakage** | Cero fuga de datos: `eval_set` aislado; factores distritales aprendidos 100% en Train (2023) y aplicados a ciegas en Test |
 | **Ponderación Temporal (E1)** | Decaimiento exponencial interanual hacia 2023 ($\delta = 0.85$): $w_i = \delta^{(2023 - \text{Anio}_i)}$ (año 2023 $\rightarrow$ 1.00; año 2016 $\rightarrow$ 0.321) |
 | **Features Predictivas** | **33 variables continuas y discretas** (100% simétricas con el modelo de venta) |
 | **Codificación Espacial** | Target Encoding Bayesiano suavizado ($m=10.0$) sobre el canon $/m^2$ calculado estrictamente sobre Train |
 | **Cobertura Geográfica** | **22 distritos representativos de Lima Metropolitana** (100% homólogos al modelo de venta) |
-| **Métricas Econométricas (Test)** | **MAPE: 13.59% – 13.73%** — **R²: 0.6865** — **MAE: S/. 233.16/mes** — **RMSE: S/. 355.24/mes** |
-| **Estándares Internacionales IAAO** | **Median Ratio: 1.0000** (Óptimo) — **COD: 13.73%** (Norma $\le 15.0\%$) — **PRD: 1.0371** |
-| **Benchmark Académico** | Oporto et al. (2024): 17.89% de error — El modelo de alquiler lo supera ampliamente en **-4.16 puntos porcentuales** |
+| **Métricas Econométricas (Test)** | **MAPE: 13.68%** — **R²: 0.6761** — **MAE: S/. 235.28/mes** — **RMSE: S/. 361.10/mes** |
+| **Estándares Internacionales IAAO** | **Median Ratio: 0.9900** (Crudo: 0.9961) — **COD: 13.79%** (Norma $\le 15.0\%$) — **PRD: 1.0387** — **PRB: -0.1233** |
+| **Tolerancia AVM Bancaria** | **$PE_{10} = 47.49\%$** — **$PE_{20} = 77.41\%$** (Supera con creces el umbral bancario $\ge 70.0\%$) |
+| **Benchmark Académico** | Oporto et al. (2024): 17.89% de error — El modelo reduce el error en **-4.21 puntos porcentuales** |
 | **Gobernanza MLOps** | Registro en **MLflow 2.19.0** bajo el nombre `xgboost_alquiler`, promovido con alias `@champion` (etapa `Production`) |
 | **Infraestructura de Despliegue** | Microservicio FastAPI (`ml-service`) en **Azure Container Apps**, carga dinámica en memoria RAM y proxy HTTP de artefactos |
 
@@ -66,52 +68,24 @@ flowchart LR
 ## 3. Dataset y Hallazgos del EDA (CRISP-DM Fase 2)
 
 ### 3.1 Dimensiones y Depuración de Distritos
-* **Volumen inicial BCRP:** 61,605 observaciones $\times$ 16 columnas.
+* **Dataset en PostgreSQL (`inmobiliaria_ml_db`):** 83,842 contratos Train (2016–2023) y 39,364 contratos Test (2024–2025).
 * **Diagnóstico de Distritos con Muestra No Representativa:**
-  Al analizar la distribución distrital del alquiler, se identificaron 2 distritos con un único registro en todo el horizonte temporal:
-  - `San Juan de Miraflores`: 1 registro.
-  - `Santa Anita`: 1 registro.
-  - *Criterio de exclusión:* Se descartaron por falta de representatividad estadística (igual que se descartaron Callao, SJL, San Luis y SMP en venta, los cuales tenían $n = 1$).
-* **Volumen depurado:** **61,603 observaciones** distribuidas de forma continua en **22 distritos representativos**.
+  Se identificaron 2 distritos con un único registro ($n=1$) en todo el horizonte temporal (`San Juan de Miraflores` y `Santa Anita`), los cuales fueron descartados por falta de significancia estadística, garantizando paridad con los 22 distritos del modelo de venta.
+* **Cobertura Distrital:** **22 distritos representativos** continuos de Lima Metropolitana.
 
-### 3.2 Distribución Temporal de las Observaciones
-La distribución de registros trimestrales de alquiler evidencia una maduración del mercado formal registrado por el BCRP a partir del 2021:
-
-| Año | Trimestre 1 | Trimestre 2 | Trimestre 3 | Trimestre 4 | Total Anual | Partición |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **2016** | 1,133 | 1,178 | 1,157 | 1,128 | 4,596 | Train |
-| **2017** | 1,117 | 1,049 | 1,102 | 1,111 | 4,379 | Train |
-| **2018** | 1,039 | 1,028 | 1,052 | 996 | 4,115 | Train |
-| **2019** | 1,068 | 1,148 | 1,248 | 1,252 | 4,716 | Train |
-| **2020** | 1,268 | 1,095 | 1,320 | 1,320 | 5,003 | Train |
-| **2021** | 1,355 | 1,305 | 1,482 | 1,090 | 5,232 | Train |
-| **2022** | 1,165 | 1,498 | 1,340 | 1,373 | 5,376 | Train |
-| **2023** | 1,678 | 1,997 | 2,512 | 2,317 | 8,504 | Train |
-| **2024** | 2,763 | 3,098 | 2,700 | 2,375 | 10,936 | **Test (Out-of-Time)** |
-| **2025** | 2,134 | 1,658 | 2,870 | 2,084 | 8,746 | **Test (Out-of-Time)** |
-| **Total** | **14,720** | **15,054** | **16,783** | **15,046** | **61,603** | **100.0%** |
-
-* **Total Train (2016–2023):** 41,921 contratos (68.05%).
-* **Total Test (2024–2025):** 19,682 contratos (31.95%).
-
-### 3.3 Diagnóstico de Nulos e Imputación Física
-A diferencia del archivo de venta, el dataset de alquiler del BCRP presentaba campos vacíos y valores tipificados como `N/D` o ceros no informados:
-
-| Columna | Registros Faltantes / Cero | Porcentaje | Protocolo de Imputación Aplicado |
-| :--- | :---: | :---: | :--- |
-| **`Piso de ubicación`** | 14,614 vacíos + 36,211 con valor 0.0 | 23.7% vacíos | Imputado con la **mediana por distrito** de pisos válidos ($\ge 1$). |
-| **`Vista al exterior`** | 6,410 nulos | 10.4% | Imputado con la **moda distrital** ($1.0$ en todos los distritos urbanos). |
-| **`Años de antigüedad`** | 1,982 nulos | 3.2% | Imputado con la **mediana distrital** de antigüedad. |
-| **`Habitaciones`, `Baños`, `Garajes`** | < 50 nulos | < 0.1% | Imputados con la mediana distrital correspondiente. |
+### 3.2 Diagnóstico de Nulos e Imputación Física
+* **`Piso de ubicación`:** Imputado con la mediana por distrito de pisos válidos ($\ge 1$).
+* **`Vista al exterior`:** Imputado con la moda distrital ($1.0$ en distritos urbanos).
+* **`Años de antigüedad`:** Imputado con la mediana distrital de antigüedad.
+* **`Habitaciones`, `Baños`, `Garajes`:** Imputados con la mediana distrital correspondiente.
 
 ---
 
 ## 4. Preprocesamiento e Ingeniería de Características (CRISP-DM Fase 3)
 
 ### 4.1 Arquitectura Desacoplada: Tabla Maestra `distrito_anio_contexto` (PostgreSQL)
-En concordancia con las mejores prácticas de MLOps y el principio de *Single Source of Truth*:
-* La base contextual relacional `distrito_anio_contexto` contiene **202 filas** (22 distritos $\times$ años 2016–2025).
-* **Fusión Dinámica:** `INNER JOIN` por clave compuesta `["Distrito", "Anio"]`, logrando **100% de coincidencia (61,603 filas conservadas)**.
+* Contiene **202 filas** (22 distritos $\times$ años 2016–2025).
+* **Fusión Dinámica:** `INNER JOIN` por clave compuesta `["Distrito", "Anio"]`, logrando **100% de coincidencia**.
 
 | Dimensión | Fuente Oficial | Período Nativo | Regla de Imputación Aplicada | Flag de Trazabilidad |
 | :--- | :--- | :---: | :--- | :---: |
@@ -119,13 +93,7 @@ En concordancia con las mejores prácticas de MLOps y el principio de *Single So
 | **Criminalidad (Robo y Hurto)** | Policía Nacional del Perú (PNP) | 2019 – 2025 | Años 2016, 2017 y 2018 imputados con datos de 2019 del mismo distrito | `tasas_criminalidad_imputada` |
 | **Demografía (Población y Densidad)** | INEI (Proyecciones Anuales) | 2018 – 2025 | Años 2016 y 2017 imputados con cifras de 2018 del mismo distrito | `poblacion_imputada` |
 
-* **Tratamiento de NSE (ENAHO):**  
-  - **`LINCE` $\rightarrow$ Imputado con `JESUS MARIA`** (`nse_imputado = True`).
-  - **`BARRANCO` $\rightarrow$ Imputado con `MIRAFLORES`** (`nse_imputado = True`).
-  - **`MAGDALENA DEL MAR` $\rightarrow$ Imputado con `PUEBLO LIBRE`** (`nse_imputado = True`).
-  - **`SAN LUIS` $\rightarrow$ Imputado con `LA VICTORIA`** (excluido del modelado por $n=1$).
-* **Exclusión de Flags en Entrenamiento:**  
-  Los flags de imputación tienen peso cero y se eliminan antes de entrenar para prevenir *data leakage* metodológico.
+* **Exclusión de Flags en Entrenamiento:** Los flags de imputación tienen peso cero y se eliminan antes de entrenar para prevenir *data leakage* metodológico.
 
 ### 4.2 Deflactación Económica del Target (BCRP)
 El canon mensual se normalizó en términos reales a través del IPC de Lima Metropolitana:
@@ -149,12 +117,6 @@ $$\text{distrito\_encoded}_k = \frac{n_k \cdot \bar{y}_k + m \cdot \bar{y}_{\tex
 
 * Regularización empírica: $m = 10.0$.
 * Estimado **exclusivamente con los registros de Train (2016–2023)** sobre el canon por $m^2$.
-
-### 4.5 Recorte Estadístico de Outliers en Train
-Para evitar el sobreajuste ante penthouses o contratos con canon subsidiado, se recortaron las observaciones fuera del rango interpercentil **0.5% – 99.5%** en `Superficie` y `Alquiler_Soles_Const` en Train:
-* Filas filtradas: 718 observaciones (1.7% del Train).
-* Tamaño final de Train para modelado: **41,203 contratos**.
-* **El conjunto de Test (19,682 contratos) permaneció 100% inalterado.**
 
 ---
 
@@ -232,35 +194,37 @@ XGBRegressor(
 
 ## 7. Resultados, Calibración IAAO y Evaluación (CRISP-DM Fase 5)
 
-### 7.1 Métricas Finales en Partición Temporal Out-of-Time (Test 2024–2025)
+### 7.1 Protocolo de Corrección de Fuga de Datos (*Data Leakage Resolution*)
+Para asegurar total reproducibilidad y validez científica:
+1. **Aislamiento Total del Test Set:** El entrenamiento se efectúa sin ningún `eval_set` que contenga la partición Test (2024–2025).
+2. **Factores de Calibración Extraídos de Train:** El factor de calibración global ($\text{Factor}_{\text{global}} = 1.0062$) y los 22 factores distritales se calculan **únicamente a partir de las observaciones de Train del año 2023**.
+3. **Inferencia Ciega:** La partición Test es evaluada de manera honesta e independiente, garantizando métricas robustas frente a datos futuros no vistos.
 
-Evaluado sobre los **19,682 contratos de prueba** (sin contaminar con Train):
+### 7.2 Métricas Oficiales en Partición Temporal Out-of-Time (Test 2024–2025)
 
-| Métrica | Train (2016–2023) | Test (2024–2025) | Benchmark Académico | Estado para Tesis |
-| :--- | :---: | :---: | :---: | :---: |
-| **MAPE** | **11.85%** | **13.59% – 13.73%** | **< 17.89%** (Oporto et al., 2024) | ✅ Supera ampliamente (-4.16 pts) |
-| **MAE** | S/. 218.40 | **S/. 233.16** | Minimizar | ✅ Error < S/. 235/mes |
-| **RMSE** | S/. 322.10 | **S/. 355.24** | Minimizar | ✅ Sin desvíos extremos |
-| **R²** | 0.8510 | **0.6865** | > 0.65 (Out-of-Time) | ✅ Nivel de ajuste óptimo |
+Evaluado sobre los **39,364 contratos de prueba en PostgreSQL**:
 
-### 7.2 Diagnóstico de Brecha Train-Test (*Gap Analysis*)
-* **Brecha en MAPE:** $\Delta = 13.73\% - 11.85\% = \mathbf{1.88\%}$.
-* Una brecha inferior a 2.0% entre el histórico y los datos no vistos del futuro demuestra que el modelo no sufre de memorización ni sobreajuste.
-* **MAE en Test de S/. 233.16:** Para alquileres que en Lima promedian entre S/. 1,800 y S/. 2,800, una tolerancia de S/. 233 representa un margen comercialmente viable y preciso para la negociación de contratos.
+| Métrica de Evaluación | Valor Oficial Obtenido (Zero-Leak) | Benchmark Académico | Estado para Tesis |
+| :--- | :---: | :---: | :---: |
+| **MAPE (%)** | **13.68%** | **< 17.89%** (Oporto et al., 2024) | ✅ Supera ampliamente (-4.21 pts) |
+| **R² (Poder Explicativo)** | **0.6761** | > 0.65 (Out-of-Time) | ✅ Nivel de ajuste óptimo |
+| **MAE (Error Absoluto Medio)** | **S/. 235.28/mes** | Minimizar | ✅ Margen comercial excelente (< S/. 240) |
+| **RMSE (Error Cuadrático Medio)** | **S/. 361.10/mes** | Minimizar | ✅ Sin desvíos extremos |
 
 ### 7.3 Calibración Bajo Estándares Internacionales de Valuación (IAAO)
-Evaluado sobre los **19,682 contratos de alquiler en Test (2024–2025)** bajo la norma *Standard on Ratio Studies* de la IAAO:
+Evaluado sobre los **39,364 contratos de alquiler en Test (2024–2025)** bajo la norma *Standard on Ratio Studies* de la IAAO:
 
 El análisis toma como base el **Ratio de Canon de Arrendamiento** ($R_i = \widehat{P}_i / P_i = \text{Alquiler Predicho} / \text{Alquiler Real}$):
 
 | Métrica IAAO | Valor Obtenido (Test) | Estándar Oficial IAAO | Diagnóstico de Calidad Inmobiliaria |
 | :--- | :---: | :---: | :--- |
-| **Median Ratio ($\tilde{R}$)** | **`1.0000`** | **0.90 – 1.10** | ✅ **CALIBRACIÓN PERFECTA.** Nivel central óptimo con factor de ratio distrital ($\text{Factor} \approx 1.015$). |
-| **COD (Coeficiente de Dispersión)** | **`13.73%`** | **$\le 15.0\%$** (residencial homogéneo) | ✅ **CUMPLE ESTÁNDAR EXIGENTE.** Dispersión relativa sobresaliente para modelos masivos. |
-| **PRD (Diferencial por Precio)** | **`1.0371`** | **0.98 – 1.03** | ⚠️ Leve regresividad marginal en tramos extremos de alquiler corporativo en distritos Top. |
-| **PRB (Sesgo por Precio)** | **`-0.1121`** | **$-0.10 \text{ a } +0.10$** | ⚠️ Tolerable, reflejo de la compresión de márgenes en alquileres corporativos premium. |
-| **Tasa dentro de $\pm$10% ($PE_{10}$)** | **`47.85%`** | Informativo | Casi 1 de cada 2 contratos se predice con un margen de error menor al 10%. |
-| **Tasa dentro de $\pm$20% ($PE_{20}$)** | **`77.20%`** | **$\ge 70.0\%$** (Umbral AVM bancario) | ✅ **APROBADO.** Más del 77% de las predicciones caen dentro de la tolerancia estándar del sector. |
+| **Median Ratio ($\tilde{R}$)** | **`0.9900`** (Crudo: 0.9961) | **0.90 – 1.10** (Ideal: 1.00) | ✅ **CALIBRACIÓN PERFECTA.** Nivel central insesgado dentro del rango óptimo. |
+| **COD (Coeficiente de Dispersión)** | **`13.79%`** | **$\le 15.0\%$** (residencial homogéneo) | ✅ **CUMPLE ESTÁNDAR EXIGENTE.** Dispersión relativa sobresaliente para modelos masivos. |
+| **COV (Coeficiente de Variación)** | **`19.74%`** | Informativo | Control de variabilidad cuadrática relativa. |
+| **PRD (Diferencial por Precio)** | **`1.0387`** | **0.98 – 1.03** | ⚠️ Leve regresividad marginal en tramos extremos de alquiler corporativo en distritos Top. |
+| **PRB (Sesgo por Precio)** | **`-0.1233`** | **$-0.10 \text{ a } +0.10$** | ⚠️ Tolerable, reflejo de la compresión de márgenes en alquileres corporativos premium. |
+| **Tasa dentro de $\pm$10% ($PE_{10}$)** | **`47.49%`** | Informativo | Casi 1 de cada 2 contratos se predice con un margen de error menor al 10%. |
+| **Tasa dentro de $\pm$20% ($PE_{20}$)** | **`77.41%`** | **$\ge 70.0\%$** (Umbral AVM bancario) | ✅ **APROBADO.** Más del 77% de las predicciones caen dentro de la tolerancia estándar del sector. |
 
 ---
 
@@ -295,14 +259,18 @@ Adaptando el principio del método comparativo del RNTP para el mercado de arren
 | :--- | :---: | :---: | :---: |
 | **Algoritmo Base** | XGBoost Regressor | XGBoost Regressor | **100% Idéntico** |
 | **Fuente Primaria** | BCRP / Urbania Venta | BCRP / Urbania Alquiler | **Equivalente** |
+| **Base de Datos** | PostgreSQL (`inmobiliaria_ml_db`) | PostgreSQL (`inmobiliaria_ml_db`) | **Misma BD relacional** |
+| **Observaciones en Train** | 88,346 transacciones | 83,842 contratos | **Volumen análogo** |
+| **Observaciones en Test** | 47,474 transacciones | 39,364 contratos | **Volumen análogo** |
 | **Cobertura Distrital** | 22 distritos representativos | 22 distritos representativos | **100% Coincidente** |
-| **Base de Datos Contextual** | `distrito_anio_contexto` (PostgreSQL) | `distrito_anio_contexto` (PostgreSQL) | **Misma tabla única (202 filas)** |
+| **Base de Datos Contextual** | `distrito_anio_contexto` | `distrito_anio_contexto` | **Misma tabla única (202 filas)** |
 | **Número de Variables** | 33 features predictivas | 33 features predictivas | **100% Simétrico** |
 | **Formulación de Target** | $\ln(\text{Precio} / \text{Superficie})$ por $m^2$ | $\ln(\text{Alquiler} / \text{Superficie})$ por $m^2$ | **Idéntica formulación unitaria** |
 | **Partición Temporal** | Train 2016–2023 / Test 2024–2025 | Train 2016–2023 / Test 2024–2025 | **Mismo corte temporal estricto** |
+| **Protocolo Anti-Fuga** | Cero fuga (calibración en Train 2023) | Cero fuga (calibración en Train 2023) | **100% Zero-Leakage** |
 | **Deflactación Monetaria** | Soles Constantes (IPC Dic 2009=100) | Soles Constantes (IPC Dic 2009=100) | **Misma base de valor real** |
-| **Desempeño MAPE Test** | **14.16%** | **13.59% – 13.73%** | **Ambos superan Oporto et al. (17.89%)** |
-| **Estándar IAAO (COD)** | **14.16%** ($\le 15.0\%$) | **13.73%** ($\le 15.0\%$) | **Ambos satisfacen la norma IAAO** |
+| **Desempeño MAPE Test** | **14.86%** | **13.68%** | **Ambos superan Oporto et al. (17.89%)** |
+| **Estándar IAAO (COD)** | **14.20%** ($\le 15.0\%$) | **13.79%** ($\le 15.0\%$) | **Ambos satisfacen la norma IAAO** |
 | **Muestras RNTP** | 3 comparables con K-NN | 3 comparables con K-NN | **Cumple R.M. N° 172-2016-VIVIENDA** |
 | **Registro MLOps** | MLflow `@champion` | MLflow `@champion` | **Misma gobernanza de modelos** |
 
@@ -310,6 +278,6 @@ Adaptando el principio del método comparativo del RNTP para el mercado de arren
 
 ## 11. Conclusiones para la Sustentación de Tesis
 
-1. **Robustez y Precisión:** El modelo de alquiler alcanza un **MAPE de 13.59% – 13.73%** y un **COD de 13.73%**, superando el estado del arte publicado para Lima Metropolitana (Oporto et al., 2024: $17.89\%$) y situándose dentro de los límites más exigentes de la IAAO para tasación masiva urbana ($\le 15\%$).
-2. **Homogeneización por Metro Cuadrado:** El modelado sobre el canon unitario estabiliza la varianza residual y responde a los preceptos del Reglamento Nacional de Tasaciones del Perú (RNTP).
+1. **Robustez y Precisión:** El modelo de alquiler alcanza un **MAPE de 13.68%** y un **COD de 13.79%**, superando el estado del arte publicado para Lima Metropolitana (Oporto et al., 2024: $17.89\%$) y situándose dentro de los límites más exigentes de la IAAO para tasación masiva urbana ($\le 15\%$).
+2. **Aislamiento de Fuga Metodológica:** La evaluación rigurosa sin señales del conjunto Test garantiza que las métricas obtenidas reflejan la verdadera capacidad de generalización en producción.
 3. **Pilar del Módulo de Rentabilidad:** Junto al modelo de venta, proporciona una base fiduciaria sólida para la estimación automatizada de la rentabilidad inmobiliaria (**Cap Rate** y **PER**), dotando a la aplicación web de una funcionalidad analítica diferenciadora para inversionistas y agentes del sector.
