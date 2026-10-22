@@ -2,7 +2,7 @@
 
 **Proyecto de Tesis:** Aplicación Web para el Sector Inmobiliario con Predicción de Precios y Rentabilidad mediante Inteligencia Artificial Explicable (XAI).  
 **Metodología:** CRISP-DM (Fases 1 a 6 consolidadas)  
-**Fuente de Datos Primaria:** Dataset Transaccional de Venta BCRP / Urbania integrado en PostgreSQL (`inmobiliaria_ml_db`) — 88,346 registros Train (2016–2023) / 47,474 registros Test (2024–2025).  
+**Fuente de Datos Primaria:** Dataset Transaccional de Venta BCRP / Urbania (`train.csv` 44,173 registros Train 2016–2023 / `test.csv` 23,737 registros Test 2024–2025). Total: 67,910 transacciones únicas registradas en PostgreSQL (`inmobiliaria_ml_db`).  
 **Tabla Maestra de Contexto Distrital:** `distrito_anio_contexto` (PostgreSQL) integrada anualmente por distrito (2016–2025): ENAHO (INEI - Nivel Socioeconómico), tasas criminalidad PNP (Robo y Hurto), demografía y densidad INEI, y distancias a equipamientos clave (OpenStreetMap).  
 **Protocolo de Evaluación:** *Zero-Leakage Out-of-Time* (Aislamiento total de test, calibración post-hoc aprendida exclusivamente en Train 2023).  
 **Fecha de corte y experimentación:** Octubre 2026  
@@ -23,8 +23,8 @@ El modelo opera de manera sinérgica y desacoplada con el modelo de predicción 
 | **Variable Target Original** | `Precio_Soles_Const` (Precio transaccional deflactado a Soles Constantes, IPC Base Dic 2009 = 100, BCRP) |
 | **Optimización de Target Unitario** | Modelado sobre el valor por metro cuadrado: $y = \ln(\text{Precio\_Soles\_Const} / \text{Superficie})$ |
 | **Inferencia y Reconstrucción** | $\hat{P} = \left(\frac{\exp(\hat{y})}{\text{factor\_calibracion\_distrital}}\right) \times \text{Superficie}$ |
-| **Volumen Muestral Evaluado** | **88,346 observaciones Train** (2016–2023) / **47,474 observaciones Test** (2024–2025) en PostgreSQL |
-| **Partición Temporal (Split)** | Temporal Estricto (*Out-of-Time*): Train 2016–2023 / Test 2024–2025 |
+| **Volumen Muestral Canónico** | **67,910 transacciones únicas** (Train: 44,173 obs / Test: 23,737 obs) |
+| **Partición Temporal (Split)** | Temporal Estricto (*Out-of-Time*): Train 2016–2023 (65.05%) / Test 2024–2025 (34.95%) |
 | **Protocolo Anti-Leakage** | Cero fuga de datos: `eval_set` aislado; factores distritales aprendidos 100% en Train (2023) y aplicados a ciegas en Test |
 | **Ponderación Temporal (E1)** | Decaimiento exponencial interanual hacia 2023 ($\delta = 0.85$): $w_i = \delta^{(2023 - \text{Anio}_i)}$ (año 2023 $\rightarrow$ 1.00; año 2016 $\rightarrow$ 0.321) |
 | **Features Predictivas** | **33 variables continuas y discretas** (físicas, ratios arquitectónicos, temporales, NSE, criminalidad, demografía y accesibilidad OSM) |
@@ -101,16 +101,16 @@ La fuente transaccional primaria corresponde a la serie histórica consolidada d
 * **Almacenamiento:** Tabla relacional en PostgreSQL (`inmobiliaria_ml_db`).
 * **Tratamiento de distritos no representativos:**  
   Se identificaron 4 distritos con una sola transacción ($n=1$) en todo el horizonte decenal (`Callao`, `San Juan de Lurigancho`, `San Luis` y `San Martín de Porres`). Se descartaron del modelado por carecer de representatividad estadística, delimitando el universo a **22 distritos continuos de alta liquidez formal**, idéntico criterio aplicado al modelo de alquiler.
-* **Volumen evaluado en base de datos:** **88,346 registros Train / 47,474 registros Test**.
+* **Volumen canónico en base de datos:** **44,173 registros Train / 23,737 registros Test** (Total: **67,910 observaciones únicas**).
 
 ### 3.2 Partición Temporal Estricta (*Out-of-Time Split*)
 A diferencia de un split aleatorio (*k-fold cross-validation*) que introduce fuga temporal (*look-ahead bias*), se fijó una partición cronológica:
-* **Conjunto de Entrenamiento (Train):** 2016 a 2023 $\rightarrow$ **88,346 observaciones** (65.05%).
-* **Conjunto de Evaluación (Test):** 2024 a 2025 $\rightarrow$ **47,474 observaciones** (34.95%).
+* **Conjunto de Entrenamiento (Train):** 2016 a 2023 $\rightarrow$ **44,173 observaciones** (65.05%).
+* **Conjunto de Evaluación (Test):** 2024 a 2025 $\rightarrow$ **23,737 observaciones** (34.95%).
 
 ```
 Horizontal Temporal (2016 — 2025):
-[================== TRAIN (2016–2023): 88,346 obs ==================] [====== TEST (2024–2025): 47,474 obs ======]
+[================== TRAIN (2016–2023): 44,173 obs ==================] [====== TEST (2024–2025): 23,737 obs ======]
                                                                         ^
                                                             Punto de corte ciego
 ```
@@ -242,7 +242,7 @@ En iteraciones tempranas del proyecto, se identificó un riesgo de *data leakage
 
 ### 7.2 Métricas Oficiales en Evaluación Out-of-Time (Test Set 2024–2025)
 
-Evaluado sobre las **47,474 transacciones del conjunto Test**:
+Evaluado sobre las **23,737 transacciones del conjunto Test**:
 
 | Métrica de Evaluación | Valor Obtenido en Test (Zero-Leak) | Benchmark Académico | Veredicto de Tesis |
 | :--- | :---: | :---: | :---: |
@@ -253,7 +253,7 @@ Evaluado sobre las **47,474 transacciones del conjunto Test**:
 
 ### 7.3 Calibración Post-Hoc y Estándares Oficiales IAAO (*Standard on Ratio Studies*)
 
-Evaluación de los ratios de tasación ($R_i = \widehat{P}_i / P_i$) sobre las 47,474 observaciones del Test Set:
+Evaluación de los ratios de tasación ($R_i = \widehat{P}_i / P_i$) sobre las 23,737 observaciones del Test Set:
 
 | Métrica IAAO | Valor Oficial Obtenido | Rango Normativo IAAO | Diagnóstico de Calidad Catastral / AVM |
 | :--- | :---: | :---: | :--- |

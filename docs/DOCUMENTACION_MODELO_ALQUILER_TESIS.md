@@ -2,7 +2,7 @@
 
 **Proyecto de Tesis:** Aplicación Web para el Sector Inmobiliario con Predicción de Precios y Rentabilidad mediante Inteligencia Artificial Explicable (XAI).  
 **Metodología:** CRISP-DM (Fases 1 a 6 consolidadas)  
-**Fuente de Datos Primaria:** Dataset Transaccional de Alquiler BCRP / Urbania integrado en PostgreSQL (`inmobiliaria_ml_db`) — 83,842 contratos Train (2016–2023) / 39,364 contratos Test (2024–2025).  
+**Fuente de Datos Primaria:** Dataset Transaccional de Alquiler BCRP / Urbania (`train_alquiler.csv` 41,921 contratos Train 2016–2023 / `test_alquiler.csv` 19,682 contratos Test 2024–2025). Total: 61,603 contratos únicos registrados en PostgreSQL (`inmobiliaria_ml_db`).  
 **Tabla Maestra de Contexto Distrital:** `distrito_anio_contexto` (PostgreSQL) integrada anualmente por distrito (2016–2025): ENAHO (INEI - Nivel Socioeconómico), tasas criminalidad PNP (Robo y Hurto), demografía y densidad INEI, y distancias a equipamientos clave (OpenStreetMap).  
 **Protocolo de Evaluación:** *Zero-Leakage Out-of-Time* (Aislamiento total de test, calibración post-hoc aprendida exclusivamente en Train 2023).  
 **Fecha de corte y experimentación:** Octubre 2026  
@@ -23,8 +23,8 @@ Este componente modela el flujo de caja por alquiler en paralelo al modelo de ve
 | **Variable Target Original** | `Alquiler_Soles_Const` (Alquiler mensual deflactado a Soles Constantes, IPC Base Dic 2009 = 100, BCRP) |
 | **Optimización de Target Unitario** | Modelado sobre el canon unitario por metro cuadrado: $y = \ln(\text{Alquiler\_Soles\_Const} / \text{Superficie})$ |
 | **Inferencia y Reconstrucción** | $\hat{P}_{\text{alq}} = \left(\frac{\exp(\hat{y})}{\text{factor\_calibracion\_distrital}}\right) \times \text{Superficie}$ |
-| **Volumen Muestral Evaluado** | **83,842 contratos Train** (2016–2023) / **39,364 contratos Test** (2024–2025) en PostgreSQL |
-| **Partición Temporal (Split)** | Temporal Estricto (*Out-of-Time*): Train 2016–2023 / Test 2024–2025 |
+| **Volumen Muestral Canónico** | **61,603 contratos únicos** (Train: 41,921 obs / Test: 19,682 obs) |
+| **Partición Temporal (Split)** | Temporal Estricto (*Out-of-Time*): Train 2016–2023 (68.05%) / Test 2024–2025 (31.95%) |
 | **Protocolo Anti-Leakage** | Cero fuga de datos: `eval_set` aislado; factores distritales aprendidos 100% en Train (2023) y aplicados a ciegas en Test |
 | **Ponderación Temporal (E1)** | Decaimiento exponencial interanual hacia 2023 ($\delta = 0.85$): $w_i = \delta^{(2023 - \text{Anio}_i)}$ (año 2023 $\rightarrow$ 1.00; año 2016 $\rightarrow$ 0.321) |
 | **Features Predictivas** | **33 variables continuas y discretas** (100% simétricas con el modelo de venta) |
@@ -68,7 +68,7 @@ flowchart LR
 ## 3. Dataset y Hallazgos del EDA (CRISP-DM Fase 2)
 
 ### 3.1 Dimensiones y Depuración de Distritos
-* **Dataset en PostgreSQL (`inmobiliaria_ml_db`):** 83,842 contratos Train (2016–2023) y 39,364 contratos Test (2024–2025).
+* **Volumen canónico en base de datos:** **41,921 contratos Train / 19,682 contratos Test** (Total: **61,603 observaciones únicas**).
 * **Diagnóstico de Distritos con Muestra No Representativa:**
   Se identificaron 2 distritos con un único registro ($n=1$) en todo el horizonte temporal (`San Juan de Miraflores` y `Santa Anita`), los cuales fueron descartados por falta de significancia estadística, garantizando paridad con los 22 distritos del modelo de venta.
 * **Cobertura Distrital:** **22 distritos representativos** continuos de Lima Metropolitana.
@@ -202,7 +202,7 @@ Para asegurar total reproducibilidad y validez científica:
 
 ### 7.2 Métricas Oficiales en Partición Temporal Out-of-Time (Test 2024–2025)
 
-Evaluado sobre los **39,364 contratos de prueba en PostgreSQL**:
+Evaluado sobre los **19,682 contratos de prueba en Test**:
 
 | Métrica de Evaluación | Valor Oficial Obtenido (Zero-Leak) | Benchmark Académico | Estado para Tesis |
 | :--- | :---: | :---: | :---: |
@@ -212,7 +212,7 @@ Evaluado sobre los **39,364 contratos de prueba en PostgreSQL**:
 | **RMSE (Error Cuadrático Medio)** | **S/. 361.10/mes** | Minimizar | ✅ Sin desvíos extremos |
 
 ### 7.3 Calibración Bajo Estándares Internacionales de Valuación (IAAO)
-Evaluado sobre los **39,364 contratos de alquiler en Test (2024–2025)** bajo la norma *Standard on Ratio Studies* de la IAAO:
+Evaluado sobre los **19,682 contratos de alquiler en Test (2024–2025)** bajo la norma *Standard on Ratio Studies* de la IAAO:
 
 El análisis toma como base el **Ratio de Canon de Arrendamiento** ($R_i = \widehat{P}_i / P_i = \text{Alquiler Predicho} / \text{Alquiler Real}$):
 
@@ -287,8 +287,8 @@ En la respuesta JSON del endpoint `POST /prediccion/alquiler`, el objeto `compar
 | **Algoritmo Base** | XGBoost Regressor | XGBoost Regressor | **100% Idéntico** |
 | **Fuente Primaria** | BCRP / Urbania Venta | BCRP / Urbania Alquiler | **Equivalente** |
 | **Base de Datos** | PostgreSQL (`inmobiliaria_ml_db`) | PostgreSQL (`inmobiliaria_ml_db`) | **Misma BD relacional** |
-| **Observaciones en Train** | 88,346 transacciones | 83,842 contratos | **Volumen análogo** |
-| **Observaciones en Test** | 47,474 transacciones | 39,364 contratos | **Volumen análogo** |
+| **Observaciones en Train** | 44,173 transacciones | 41,921 contratos | **Volumen análogo** |
+| **Observaciones en Test** | 23,737 transacciones | 19,682 contratos | **Volumen análogo** |
 | **Cobertura Distrital** | 22 distritos representativos | 22 distritos representativos | **100% Coincidente** |
 | **Base de Datos Contextual** | `distrito_anio_contexto` | `distrito_anio_contexto` | **Misma tabla única (202 filas)** |
 | **Número de Variables** | 33 features predictivas | 33 features predictivas | **100% Simétrico** |
