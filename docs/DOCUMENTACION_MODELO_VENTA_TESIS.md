@@ -270,15 +270,45 @@ Evaluación de los ratios de tasación ($R_i = \widehat{P}_i / P_i$) sobre las 4
 ## 8. Cumplimiento Normativo Nacional (RNTP y Dictamen SBS)
 
 ### 8.1 Regla de las 3 Muestras de Mercado (RNTP — R.M. N° 172-2016-VIVIENDA)
-El Reglamento Nacional de Tasaciones del Perú estipula que toda valuación comercial debe sustentarse en al menos 3 testigos comparables de mercado debidamente homologados.
+El Reglamento Nacional de Tasaciones del Perú (Artículos 3 y 4 de la R.M. N° 172-2016-VIVIENDA) exige que toda valuación mediante el **Método de Comparación de Mercado** debe sustentarse obligatoriamente en al menos **tres (3) muestras o testigos de mercado análogos** debidamente verificados y homologados frente al predio tasado.
 
-El microservicio implementa el algoritmo **K-NN ponderado en RAM** (`comparables_service.py`), el cual filtra el distrito objetivo y localiza en $<0.5\,\text{ms}$ los 3 departamentos más análogos en superficie, antigüedad, piso y distribución:
+Para dar cumplimiento fiduciario estricto a esta exigencia legal sin penalizar la latencia del sistema web, se implementó el servicio de comparables (`comparables_service.py`), el cual opera de forma desacoplada y ultra-rápida ($< 0.5\,\text{ms}$) en memoria RAM:
 
-```python
-# Algoritmo de Vecinos Más Cercanos (K-NN) en Inferencia
-features_knn = ["Superficie", "Habitaciones", "Banios", "Antiguedad", "Piso"]
-# Búsqueda euclidiana normalizada en el espacio de testigos históricos del distrito
-```
+#### A. Arquitectura de Alta Velocidad e Indexación en RAM
+* **Estructura de Datos Contigua:** Los testigos de transacciones se precargan en memoria al iniciar el servicio como arreglos continuos de **NumPy (`float64`)** particionados por distrito y zona homogénea.
+* **Eliminación de Contención en BD:** La búsqueda no ejecuta queries lentas en disco (`SELECT ... ORDER BY`) en el momento de la inferencia, permitiendo procesar cientos de solicitudes por segundo.
+
+#### B. Formulación de la Distancia Euclidiana Ponderada con Penalización por Recencia
+Para seleccionar los tres inmuebles físicamente más representativos, se normalizan y ponderan las diferencias en las características arquitectónicas esenciales:
+
+$$d_i = \sqrt{1.0 \left(\frac{S_i - S_{\text{target}}}{25}\right)^2 + 0.8 (\text{Hab}_i - \text{Hab}_{\text{target}})^2 + 0.6 (\text{Baños}_i - \text{Baños}_{\text{target}})^2 + 0.5 \left(\frac{\text{Ant}_i - \text{Ant}_{\text{target}}}{5}\right)^2 + 0.4 (\text{Gar}_i - \text{Gar}_{\text{target}})^2 + 0.3 \left(\frac{\text{Piso}_i - \text{Piso}_{\text{target}}}{3}\right)^2}$$
+
+Adicionalmente, se aplica un factor de **descuento por antigüedad de transacción** para priorizar testigos del mercado inmobiliario más reciente (2023–2025):
+
+$$\text{Score}_i = d_i + 0.02 \cdot (\text{Año}_{\max} - \text{Año}_i)$$
+
+#### C. Estrategia de Selección Jerárquica en Cascada (Fallback Metodológico)
+Si un predio se ubica en un micro-sector con bajo dinamismo reciente, el algoritmo desciende ordenadamente por tres niveles garantizando siempre el hallazgo de 3 testigos válidos:
+1. **Nivel 1 (Mismo Distrito):** Evalúa candidatos en el distrito exacto del inmueble (condición primaria del RNTP).
+2. **Nivel 2 (Zona Homogénea Socioeconómica):** Si el distrito cuenta con $< 3$ registros análogos, recurre a la **Zona Homogénea** por perfil socioeconómico y dinamismo inmobiliario:
+   - *Lima Top:* Miraflores, San Isidro, San Borja, Surco, La Molina, Barranco.
+   - *Lima Moderna:* Jesús María, Lince, Magdalena, Pueblo Libre, San Miguel, Surquillo.
+   - *Lima Centro:* Cercado de Lima, Breña, La Victoria.
+   - *Lima Este:* Ate Vitarte.
+   - *Lima Norte:* Los Olivos, Comas, Carabayllo.
+   - *Lima Sur:* Chorrillos.
+   - *Callao:* Bellavista, La Perla.
+3. **Nivel 3 (Mercado Metropolitano General):** Fallback sobre el universo consolidado de 22 distritos.
+
+#### D. Selección Top-3 Lineal $O(N)$ y Homologación de Diferencias
+* **Algoritmo de Selección:** Se emplea `np.argpartition` para aislar los 3 menores scores en complejidad lineal $O(N)$, seguido de un ordenamiento $O(K \log K)$ sobre $K=3$.
+* **Métricas y Diferenciales Retornados en API:**
+  Cada testigo comparable acompaña la respuesta del endpoint `POST /prediccion/venta` conteniendo:
+  - Identificador único de transacción y fecha (`Anio`, `Trimestre`).
+  - Precios transaccionales en Soles Constantes, Soles corrientes y Dólares americanos.
+  - Valor unitario real por metro cuadrado ($/m^2$).
+  - Vector de diferencias físicas: $\Delta \text{superficie } (m^2)$, $\Delta \text{habitaciones}$, $\Delta \text{baños}$, $\Delta \text{antigüedad}$, $\Delta \text{piso}$.
+  - Resumen estadístico: Promedio de los comparables, mediana y dispersión porcentual frente a la predicción del modelo XGBoost.
 
 ### 8.2 Separación Terreno / Edificación (Ley N° 27157)
 El RNTP establece la fórmula $VE = VSN - D$ para edificaciones independientes. En el caso de departamentos residenciales, el proyecto sustenta la predicción del valor integral unitario al amparo de la **Ley N° 27157 (Régimen de Propiedad Exclusiva y Común)**, donde el mercado transa indisolublemente el área útil junto con la cuota ideal de participación en el terreno y bienes comunes.

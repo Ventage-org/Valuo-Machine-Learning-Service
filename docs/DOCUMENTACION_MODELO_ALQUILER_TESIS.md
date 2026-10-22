@@ -231,7 +231,34 @@ El análisis toma como base el **Ratio de Canon de Arrendamiento** ($R_i = \wide
 ## 8. Cumplimiento Normativo Nacional (RNTP y Dictamen SBS)
 
 ### 8.1 Regla de las 3 Muestras de Mercado (RNTP — R.M. N° 172-2016-VIVIENDA)
-Adaptando el principio del método comparativo del RNTP para el mercado de arrendamiento, el sistema acompaña cada predicción de alquiler mensual con las **3 muestras más cercanas de contratos históricos** en el mismo distrito mediante el servicio K-NN en RAM (`comparables_service.py`), permitiendo al tasador u operador validar la renta frente a testigos directos.
+Adaptando los principios del **Método de Comparación de Mercado** del Reglamento Nacional de Tasaciones del Perú (Artículos 3 y 4 de la R.M. N° 172-2016-VIVIENDA) al mercado de arrendamiento habitacional, cada inferencia de canon mensual se acompaña de las **tres (3) muestras o testigos de contratos reales más análogos** registrados en el histórico del distrito o zona homogénea.
+
+Este procedimiento permite al perito, analista o arrendador corroborar la predicción algorítmica de XGBoost frente a transacciones empíricas de mercado concretas.
+
+#### A. Arquitectura y Rendimiento en Memoria RAM (< 0.5 ms)
+* **Indexación Vectorizada:** Los contratos históricos de alquiler se estructuran en arreglos contiguos de **NumPy (`float64`)** cargados en la memoria RAM del servicio (`comparables_service.py`), garantizando latencias ultra-bajas ($< 0.5\,\text{ms}$) sin degradar la respuesta del API.
+
+#### B. Métrica de Distancia Euclidiana Ponderada con Recencia Temporal
+El grado de analogía entre el predio objetivo y cada contrato histórico se determina mediante una distancia normalizada por variables arquitectónicas:
+
+$$d_i = \sqrt{1.0 \left(\frac{S_i - S_{\text{target}}}{25}\right)^2 + 0.8 (\text{Hab}_i - \text{Hab}_{\text{target}})^2 + 0.6 (\text{Baños}_i - \text{Baños}_{\text{target}})^2 + 0.5 \left(\frac{\text{Ant}_i - \text{Ant}_{\text{target}}}{5}\right)^2 + 0.4 (\text{Gar}_i - \text{Gar}_{\text{target}})^2 + 0.3 \left(\frac{\text{Piso}_i - \text{Piso}_{\text{target}}}{3}\right)^2}$$
+
+Para que la selección priorice las condiciones de mercado contemporáneas (2023–2025), se adiciona una penalización lineal por antigüedad del contrato:
+
+$$\text{Score}_i = d_i + 0.02 \cdot (\text{Año}_{\max} - \text{Año}_i)$$
+
+#### C. Cascada de Selección en Tres Niveles
+1. **Nivel 1 (Mismo Distrito):** Búsqueda de testigos dentro del mismo distrito donde se sitúa el departamento.
+2. **Nivel 2 (Zona Homogénea Socioeconómica):** En distritos con baja densidad transaccional reciente, se realiza un fallback hacia la zona homogénea análoga (*Lima Top, Lima Moderna, Lima Centro, Lima Este, Lima Norte, Lima Sur, Callao*).
+3. **Nivel 3 (Mercado Metropolitano):** Resiliencia sobre los 22 distritos agregados.
+
+#### D. Vector de Homologación Retornado al Usuario
+En la respuesta JSON del endpoint `POST /prediccion/alquiler`, el objeto `comparables_rntp` provee para cada uno de los 3 testigos:
+- Identificador y fecha del contrato (`Anio`, `Trimestre`).
+- Canon mensual en Soles Constantes, Soles corrientes y Dólares.
+- Canon unitario por metro cuadrado ($/m^2/\text{mes}$).
+- Matriz de diferencias físicas: $\Delta \text{superficie } (m^2)$, $\Delta \text{habitaciones}$, $\Delta \text{baños}$, $\Delta \text{antigüedad}$, $\Delta \text{piso}$.
+- Dispersión porcentual respecto al canon mensual predicho por XGBoost.
 
 ### 8.2 Delimitación Legal de Responsabilidad (Resolución SBS N° 03225-2021)
 > *"El presente módulo proporciona una estimación de canon de arrendamiento comercial con base en inteligencia artificial y modelos masivos (AVM). Constituye una herramienta de apoyo a la prospección y análisis de rentabilidad, sin reemplazar las cláusulas contractuales privadas ni las tasaciones periciales oficiales suscritas por peritos REPEV."*
