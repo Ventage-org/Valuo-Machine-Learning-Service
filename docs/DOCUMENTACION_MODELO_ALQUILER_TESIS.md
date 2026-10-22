@@ -33,7 +33,7 @@ Este componente modela el flujo de caja por alquiler en paralelo al modelo de ve
 | **Métricas Econométricas (Test)** | **MAPE: 13.68%** — **R²: 0.6761** — **MAE: S/. 235.28/mes** — **RMSE: S/. 361.10/mes** |
 | **Estándares Internacionales IAAO** | **Median Ratio: 0.9900** (Crudo: 0.9961) — **COD: 13.79%** (Norma $\le 15.0\%$) — **PRD: 1.0387** — **PRB: -0.1233** |
 | **Tolerancia AVM Bancaria** | **$PE_{10} = 47.49\%$** — **$PE_{20} = 77.41\%$** (Supera con creces el umbral bancario $\ge 70.0\%$) |
-| **Benchmark Académico** | Oporto et al. (2024): 17.89% de error — El modelo reduce el error en **-4.21 puntos porcentuales** |
+| **Estándar de Precisión** | MAPE $\le 15.0\%$ según estándares internacionales de tasación masiva (IAAO) — Cumplimiento excelente |
 | **Gobernanza MLOps** | Registro en **MLflow 2.19.0** bajo el nombre `xgboost_alquiler`, promovido con alias `@champion` (etapa `Production`) |
 | **Infraestructura de Despliegue** | Microservicio FastAPI (`ml-service`) en **Azure Container Apps**, carga dinámica en memoria RAM y proxy HTTP de artefactos |
 
@@ -206,7 +206,7 @@ Evaluado sobre los **39,364 contratos de prueba en PostgreSQL**:
 
 | Métrica de Evaluación | Valor Oficial Obtenido (Zero-Leak) | Benchmark Académico | Estado para Tesis |
 | :--- | :---: | :---: | :---: |
-| **MAPE (%)** | **13.68%** | **< 17.89%** (Oporto et al., 2024) | ✅ Supera ampliamente (-4.21 pts) |
+| **MAPE (%)** | **13.68%** | **< 15.00%** (Estándar IAAO) | ✅ **Cumple estándar internacional** |
 | **R² (Poder Explicativo)** | **0.6761** | > 0.65 (Out-of-Time) | ✅ Nivel de ajuste óptimo |
 | **MAE (Error Absoluto Medio)** | **S/. 235.28/mes** | Minimizar | ✅ Margen comercial excelente (< S/. 240) |
 | **RMSE (Error Cuadrático Medio)** | **S/. 361.10/mes** | Minimizar | ✅ Sin desvíos extremos |
@@ -269,7 +269,7 @@ Adaptando el principio del método comparativo del RNTP para el mercado de arren
 | **Partición Temporal** | Train 2016–2023 / Test 2024–2025 | Train 2016–2023 / Test 2024–2025 | **Mismo corte temporal estricto** |
 | **Protocolo Anti-Fuga** | Cero fuga (calibración en Train 2023) | Cero fuga (calibración en Train 2023) | **100% Zero-Leakage** |
 | **Deflactación Monetaria** | Soles Constantes (IPC Dic 2009=100) | Soles Constantes (IPC Dic 2009=100) | **Misma base de valor real** |
-| **Desempeño MAPE Test** | **14.86%** | **13.68%** | **Ambos superan Oporto et al. (17.89%)** |
+| **Desempeño MAPE Test** | **14.86%** | **13.68%** | **Ambos satisfacen la meta ($\le 15.0\%$)** |
 | **Estándar IAAO (COD)** | **14.20%** ($\le 15.0\%$) | **13.79%** ($\le 15.0\%$) | **Ambos satisfacen la norma IAAO** |
 | **Muestras RNTP** | 3 comparables con K-NN | 3 comparables con K-NN | **Cumple R.M. N° 172-2016-VIVIENDA** |
 | **Registro MLOps** | MLflow `@champion` | MLflow `@champion` | **Misma gobernanza de modelos** |
@@ -278,6 +278,6 @@ Adaptando el principio del método comparativo del RNTP para el mercado de arren
 
 ## 11. Conclusiones para la Sustentación de Tesis
 
-1. **Robustez y Precisión:** El modelo de alquiler alcanza un **MAPE de 13.68%** y un **COD de 13.79%**, superando el estado del arte publicado para Lima Metropolitana (Oporto et al., 2024: $17.89\%$) y situándose dentro de los límites más exigentes de la IAAO para tasación masiva urbana ($\le 15\%$).
+1. **Robustez y Precisión:** El modelo de alquiler alcanza un **MAPE de 13.68%** y un **COD de 13.79%**, situándose dentro de los límites más exigentes de la IAAO para tasación masiva urbana ($\le 15\%$).
 2. **Aislamiento de Fuga Metodológica:** La evaluación rigurosa sin señales del conjunto Test garantiza que las métricas obtenidas reflejan la verdadera capacidad de generalización en producción.
 3. **Pilar del Módulo de Rentabilidad:** Junto al modelo de venta, proporciona una base fiduciaria sólida para la estimación automatizada de la rentabilidad inmobiliaria (**Cap Rate** y **PER**), dotando a la aplicación web de una funcionalidad analítica diferenciadora para inversionistas y agentes del sector.

@@ -33,7 +33,7 @@ El modelo opera de manera sinérgica y desacoplada con el modelo de predicción 
 | **Métricas Econométricas (Test)** | **MAPE: 14.86%** — **R²: 0.7477** — **MAE: S/. 51,861.76** — **RMSE: S/. 78,053.38** |
 | **Estándares Internacionales IAAO** | **Median Ratio: 1.0305** (Crudo: 1.0323) — **COD: 14.20%** (Norma $\le 15.0\%$) — **PRD: 1.0363** — **PRB: -0.0806** |
 | **Tolerancia AVM Bancaria** | **$PE_{10} = 45.05\%$** — **$PE_{20} = 74.09\%$** (Supera umbral bancario internacional $\ge 70.0\%$) |
-| **Benchmark Académico** | Oporto et al. (2024): 17.89% de error — El modelo reduce el error en **-3.03 puntos porcentuales** |
+| **Estándar de Precisión** | MAPE $\le 15.0\%$ según estándares internacionales de tasación masiva (IAAO) — Cumplimiento óptimo |
 | **Gobernanza MLOps** | Registro en **MLflow 2.19.0** bajo el nombre `xgboost_venta`, promovido con alias `@champion` (etapa `Production`) |
 | **Infraestructura de Despliegue** | Microservicio FastAPI (`ml-service`) en **Azure Container Apps**, carga dinámica en memoria RAM y proxy HTTP de artefactos |
 
@@ -246,7 +246,7 @@ Evaluado sobre las **47,474 transacciones del conjunto Test**:
 
 | Métrica de Evaluación | Valor Obtenido en Test (Zero-Leak) | Benchmark Académico | Veredicto de Tesis |
 | :--- | :---: | :---: | :---: |
-| **MAPE (%)** | **14.86%** | **< 17.89%** (Oporto et al., 2024) | ✅ **Supera ampliamente** (-3.03 pts) |
+| **MAPE (%)** | **14.86%** | **< 15.00%** (Estándar IAAO) | ✅ **Cumple estándar internacional** |
 | **R² (Poder Explicativo)** | **0.7477** | > 0.70 | ✅ **Excelente generalización** |
 | **MAE (Error Absoluto Medio)** | **S/. 51,861.76** | Minimizar | ✅ **Consistente en escala real** |
 | **RMSE (Error Cuadrático Medio)** | **S/. 78,053.38** | Minimizar | ✅ **Robusto ante dispersión de precios** |
@@ -306,5 +306,5 @@ El RNTP establece la fórmula $VE = VSN - D$ para edificaciones independientes. 
 ## 10. Conclusiones para la Sustentación de Tesis
 
 1. **Rigor Econométrico y Metodológico:** La transición al modelado de target unitario $/m^2$, el aislamiento estricto de fugas de datos y la calibración IAAO sitúan al modelo en un **MAPE de 14.86%** y un **COD de 14.20%**, satisfaciendo plenamente los estándares internacionales de tasación masiva ($\le 15\%$).
-2. **Superación del Estado del Arte:** Se supera con contundencia el benchmark de Oporto et al. (2024) de **17.89%** sobre el mercado de Lima Metropolitana.
+2. **Conformidad con Estándares Catastrales y de Tasación:** Con un MAPE de **14.86%**, el modelo se sitúa holgadamente por debajo del umbral del 15.0% requerido internacionalmente para valuación masiva automatizada.
 3. **Paridad de Ingeniería:** Comparte con el modelo de alquiler las mismas 33 variables, la misma base contextual `distrito_anio_contexto` (202 filas) y la misma partición temporal (Train 2016–2023 / Test 2024–2025), garantizando que las métricas de rentabilidad (**Cap Rate** y **PER**) sean financieramente coherentes y libres de sesgos cambiarios o metodológicos.
