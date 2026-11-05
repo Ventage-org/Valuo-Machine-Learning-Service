@@ -218,6 +218,10 @@ class PrediccionVentaResponse(BaseModel):
     intervalo_confianza: IntervaloConfianza
     explicabilidad: Explicabilidad
     modelo: InfoModelo
+    alerta_contexto: str | None = Field(
+        default=None,
+        description="Advertencia de incertidumbre si el distrito cuenta con contexto socioeconómico imputado.",
+    )
 
     model_config = {"json_schema_extra": {
         "example": {

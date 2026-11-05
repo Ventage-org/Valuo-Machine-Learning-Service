@@ -1,5 +1,31 @@
 {
   "target": "Alquiler_Soles_Const",
+  "target_tipo": "m2",
+  "factor_calibracion": 0.9965,
+  "factores_calibracion_distrito": {
+    "Ate Vitarte": 0.9752,
+    "Barranco": 1.0045,
+    "Bellavista": 0.9865,
+    "Breña": 1.0098,
+    "Carabayllo": 1.1067,
+    "Cercado de Lima": 1.0219,
+    "Chorrillos": 1.0048,
+    "Comas": 1.0091,
+    "Jesús María": 0.9963,
+    "La Molina": 1.0355,
+    "La Perla": 0.9761,
+    "La Victoria": 0.981,
+    "Lince": 0.9924,
+    "Los Olivos": 1.0285,
+    "Magdalena": 0.9858,
+    "Miraflores": 0.9901,
+    "Pueblo Libre": 1.0101,
+    "San Borja": 0.973,
+    "San Isidro": 0.999,
+    "San Miguel": 1.0149,
+    "Surco": 0.9744,
+    "Surquillo": 1.0023
+  },
   "features": [
     "Anio",
     "Trimestre",
@@ -36,7 +62,7 @@
     "distrito_encoded"
   ],
   "encoding_map_distrito": {
-    "Ate Vitarte": 13.090995068074438,
+    "Ate Vitarte": 13.09099506807444,
     "Barranco": 27.620063490614502,
     "Bellavista": 13.612386696540941,
     "Breña": 16.36889198549562,
@@ -59,7 +85,7 @@
     "Surco": 19.02618872743572,
     "Surquillo": 21.454402288038498
   },
-  "media_global_target": 20.7776410764465,
-  "transformacion": "log1p",
-  "updated_at": "2026-10-06T04:35:34.207948+00:00"
+  "media_global_target": 20.777641076446503,
+  "transformacion": "log_m2",
+  "updated_at": "2026-11-05T19:10:51.284184+00:00"
 }

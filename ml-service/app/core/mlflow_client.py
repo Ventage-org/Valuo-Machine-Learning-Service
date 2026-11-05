@@ -10,10 +10,20 @@ from __future__ import annotations
 
 import os
 from typing import Any
-import mlflow
-from mlflow.entities.model_registry import ModelVersion
-from mlflow.exceptions import MlflowException
-from mlflow.tracking import MlflowClient
+
+try:
+    import mlflow
+    from mlflow.entities.model_registry import ModelVersion
+    from mlflow.exceptions import MlflowException
+    from mlflow.tracking import MlflowClient
+    MLFLOW_AVAILABLE = True
+except ImportError:
+    mlflow = None
+    ModelVersion = Any  # type: ignore[misc,assignment]
+    MlflowException = Exception  # type: ignore[misc,assignment]
+    MlflowClient = Any  # type: ignore[misc,assignment]
+    MLFLOW_AVAILABLE = False
+
 import requests
 
 
@@ -22,12 +32,15 @@ class MLflowManager:
 
     def __init__(self, tracking_uri: str | None = None) -> None:
         self.tracking_uri = tracking_uri or os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
-        mlflow.set_tracking_uri(self.tracking_uri)
-        self._client: MlflowClient | None = None
+        if MLFLOW_AVAILABLE and mlflow is not None:
+            mlflow.set_tracking_uri(self.tracking_uri)
+        self._client: Any | None = None
 
     @property
-    def client(self) -> MlflowClient:
+    def client(self) -> Any:
         """Instancia lazy de MlflowClient."""
+        if not MLFLOW_AVAILABLE:
+            raise RuntimeError("mlflow no está instalado en este entorno.")
         if self._client is None:
             self._client = MlflowClient(tracking_uri=self.tracking_uri)
         return self._client
@@ -37,6 +50,8 @@ class MLflowManager:
         Verifica si el servidor MLflow está accesible.
         Retorna True si responde HTTP 200, False si no está disponible.
         """
+        if not MLFLOW_AVAILABLE:
+            return False
         try:
             url = self.tracking_uri.rstrip("/")
             # Si es URL HTTP/HTTPS

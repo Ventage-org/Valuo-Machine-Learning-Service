@@ -22,7 +22,6 @@ import os
 from abc import ABC, abstractmethod
 
 import psycopg2
-import pandas as pd
 
 
 # ─── Interfaz abstracta ───────────────────────────────────────────────────────
@@ -73,6 +72,10 @@ SELECT
     c.pct_nse_c                  AS "pct_NSE_C",
     c.pct_nse_d                  AS "pct_NSE_D",
     c.pct_nse_e                  AS "pct_NSE_E",
+    EXISTS (
+        SELECT 1 FROM auditoria_flags_imputacion f
+        WHERE f.distrito_id = d.id AND f.nse_imputado = TRUE
+    )                            AS nse_imputado,
     c.tasa_robo,
     c.tasa_hurto,
     c.poblacion_proyectada,
@@ -124,7 +127,7 @@ class PostgreSQLContextProvider(IContextDataProvider):
         self._cargar()
 
     def _cargar(self) -> None:
-        """Ejecuta la consulta y carga el contexto en memoria."""
+        """Ejecuta la consulta y carga el contexto en memoria desde PostgreSQL."""
         conn = psycopg2.connect(**self._conn_params)
         try:
             cur = conn.cursor()

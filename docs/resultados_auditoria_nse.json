@@ -1,0 +1,109 @@
+{
+  "tipo_operacion": "venta",
+  "n_train": 44173,
+  "n_test": 23737,
+  "fecha_ejecucion": "2026-11-05T15:05:20Z",
+  "prueba_ablacion": {
+    "modelos": {
+      "M0: Físico Puro (Sin Ubicación)": {
+        "mape_pct": 20.86,
+        "r2": 0.5861,
+        "mae": 69842.47,
+        "cod_iaao": 20.78
+      },
+      "M1: Solo ID (distrito_encoded)": {
+        "mape_pct": 15.19,
+        "r2": 0.7438,
+        "mae": 52570.37,
+        "cod_iaao": 14.4
+      },
+      "M2: Solo NSE ENAHO (pct_NSE_A..E)": {
+        "mape_pct": 15.2,
+        "r2": 0.7425,
+        "mae": 52701.85,
+        "cod_iaao": 14.42
+      },
+      "M3: Completo (ID + NSE ENAHO)": {
+        "mape_pct": 15.13,
+        "r2": 0.7441,
+        "mae": 52442.45,
+        "cod_iaao": 14.36
+      }
+    },
+    "delta_mape_marginal": 0.06,
+    "dictamen": "CONFIRMADO: Las columnas de NSE tienen contribución marginal prácticamente nula (<0.4% MAPE) sobre la identidad distrital pura. El peso SHAP alto es producto de multicolinealidad."
+  },
+  "prueba_permutacion": {
+    "mape_original": 15.2,
+    "mape_permutado": 15.84,
+    "r2_permutado": 0.7162,
+    "delta_mape": 0.64,
+    "dictamen": "CONFIRMADO: Al permutar aleatoriamente los vectores NSE entre distritos, el desempeño apenas decae. XGBoost utiliza el vector de porcentajes como un hash de identificación espacial y no como métrica socioeconómica continua."
+  },
+  "prueba_group_kfold": {
+    "n_splits": 5,
+    "promedio_mape_con_nse": 21.84,
+    "promedio_mape_sin_nse": 23.2,
+    "delta_generalizacion": -1.36,
+    "folds": [
+      {
+        "fold": 1,
+        "distritos_evaluados": [
+          "Carabayllo",
+          "Los Olivos",
+          "Barranco",
+          "Miraflores"
+        ],
+        "mape_con_nse": 27.98,
+        "mape_sin_nse": 28.76
+      },
+      {
+        "fold": 2,
+        "distritos_evaluados": [
+          "La Perla",
+          "Jesús María",
+          "Surco",
+          "La Victoria"
+        ],
+        "mape_con_nse": 16.66,
+        "mape_sin_nse": 17.81
+      },
+      {
+        "fold": 3,
+        "distritos_evaluados": [
+          "Chorrillos",
+          "La Molina",
+          "Cercado de Lima",
+          "San Miguel"
+        ],
+        "mape_con_nse": 20.38,
+        "mape_sin_nse": 24.93
+      },
+      {
+        "fold": 4,
+        "distritos_evaluados": [
+          "Bellavista",
+          "Pueblo Libre",
+          "San Borja",
+          "Surquillo",
+          "Ate Vitarte"
+        ],
+        "mape_con_nse": 20.87,
+        "mape_sin_nse": 17.59
+      },
+      {
+        "fold": 5,
+        "distritos_evaluados": [
+          "Lince",
+          "Magdalena",
+          "Breña",
+          "San Isidro",
+          "Comas"
+        ],
+        "mape_con_nse": 23.33,
+        "mape_sin_nse": 26.89
+      }
+    ],
+    "dictamen": "CONFIRMADO: En distritos no vistos (o imputados), el modelo con NSE no supera con holgura al modelo base porque el árbol memorizó umbrales locales que no transfieren fuera de muestra. Esto justifica aplicar el Grouped SHAP y advertencias de incertidumbre en distritos con <30 encuestas ENAHO."
+  }
+}

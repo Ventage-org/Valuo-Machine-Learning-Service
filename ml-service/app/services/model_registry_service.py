@@ -18,8 +18,13 @@ import re
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Literal
 
-import mlflow
-import mlflow.xgboost
+try:
+    import mlflow
+    import mlflow.xgboost
+    MLFLOW_AVAILABLE = True
+except ImportError:
+    mlflow = None
+    MLFLOW_AVAILABLE = False
 import shap
 from fastapi import HTTPException, status
 

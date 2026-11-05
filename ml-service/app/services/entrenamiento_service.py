@@ -48,8 +48,13 @@ if hasattr(sys.stdout, "reconfigure"):
         pass
 
 import joblib
-import mlflow
-import mlflow.xgboost
+try:
+    import mlflow
+    import mlflow.xgboost
+    MLFLOW_AVAILABLE = True
+except ImportError:
+    mlflow = None
+    MLFLOW_AVAILABLE = False
 import numpy as np
 import pandas as pd
 import shap
@@ -600,7 +605,7 @@ def _run_training_pipeline(
         mlflow_model_version = None
         mlflow_model_uri = None
 
-        if mlflow_manager.check_connection():
+        if MLFLOW_AVAILABLE and mlflow_manager.check_connection():
             try:
                 exp_name = os.getenv(
                     f"MLFLOW_EXPERIMENT_{tipo_operacion.upper()}",
