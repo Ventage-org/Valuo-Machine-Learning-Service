@@ -14,6 +14,10 @@ from typing import Literal
 from fastapi import APIRouter, Query
 
 from app.core.model_loader import model_state
+from app.schemas.contexto_distrital import ContextoDistritalResponse
+from app.services.contexto_service import obtener_contexto_distrital_enriquecido
+from typing import Optional
+from fastapi import HTTPException, status
 from app.schemas.modelo_info import (
     DistritosResponse,
     IpcInfo,
@@ -145,3 +149,41 @@ def listar_distritos() -> DistritosResponse:
     )
     return DistritosResponse(distritos=distritos, total=len(distritos))
 
+
+
+@router.get(
+    "/api/v1/distritos/{distrito}/contexto",
+    response_model=ContextoDistritalResponse,
+    summary="Micro-entorno y contexto enriquecido del distrito",
+    description=(
+        "Retorna la información socioeconómica (INEI), seguridad ciudadana (PNP) "
+        "y distancias geodésicas a los hitos urbanos más cercanos (parques, transporte, salud, educación, comercio). "
+        "Si se envían coordenadas (lat, lon), calcula las distancias reales en metros; de lo contrario, "
+        "utiliza el centroide distrital por defecto."
+    ),
+)
+def get_contexto_distrital(
+    distrito: str,
+    lat: Optional[float] = Query(default=None, description="Latitud WGS84 del inmueble (opcional)"),
+    lon: Optional[float] = Query(default=None, description="Longitud WGS84 del inmueble (opcional)"),
+) -> ContextoDistritalResponse:
+    distritos_validos = (
+        model_state.data_provider.listar_distritos()
+        if model_state.data_provider
+        else sorted(model_state.encoding_map.keys())
+    )
+    if distrito not in distritos_validos:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "error": "distrito_no_encontrado",
+                "message": f"El distrito '{distrito}' no forma parte de los 22 distritos modelados.",
+                "distritos_disponibles": distritos_validos,
+            },
+        )
+    return obtener_contexto_distrital_enriquecido(
+        distrito=distrito,
+        lat=lat,
+        lon=lon,
+        state=model_state,
+    )

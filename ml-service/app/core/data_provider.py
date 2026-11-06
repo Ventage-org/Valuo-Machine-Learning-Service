@@ -75,6 +75,7 @@ SELECT
     c.pct_nse_e                  AS "pct_NSE_E",
     c.tasa_robo,
     c.tasa_hurto,
+    c.tasa_denuncias,
     c.poblacion_proyectada,
     c.densidad_hab_km2,
     c.distancia_centro_km,

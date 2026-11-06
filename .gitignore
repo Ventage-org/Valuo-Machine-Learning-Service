@@ -21,6 +21,7 @@ dist/
 .pytest_cache/
 .coverage
 htmlcov/
+scripts
 
 # IDE & Editor
 .vscode/
@@ -34,3 +35,4 @@ htmlcov/
 mlflow-server/mlruns/
 mlflow-server/artifacts/*
 !mlflow-server/artifacts/.gitkeep
+reports/figures/distribucion_target_venta.png
