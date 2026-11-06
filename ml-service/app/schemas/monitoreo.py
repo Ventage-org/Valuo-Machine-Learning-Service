@@ -94,3 +94,34 @@ class LatenciaP95Response(BaseModel):
     )
     all_artifacts_ready: bool = Field(description="True si todos los artefactos requeridos están presentes")
     measured_at: datetime = Field(description="Timestamp UTC de la medición")
+
+
+# ─── 5. Auditoría y Ejecuciones del Pipeline ETL ──────────────────────────────
+
+class PipelineEjecucionItem(BaseModel):
+    """Resumen de los datos relevantes de una ejecución del pipeline de datos ETL."""
+    id: int | str = Field(description="Identificador único de la ejecución")
+    tipo_ejecucion: str | None = Field(None, description="Tipo de ejecución (ej. manual, programada, backfill)")
+    ejecutado_por: str | None = Field(None, description="Usuario, servicio o trigger que ejecutó el pipeline")
+    iniciado_en: datetime | None = Field(None, description="Fecha y hora de inicio UTC")
+    finalizado_en: datetime | None = Field(None, description="Fecha y hora de finalización UTC")
+    duracion_segundos: float | None = Field(None, description="Duración total de la ejecución en segundos")
+    registros_leidos: int | None = Field(0, description="Total de registros extraídos de la fuente")
+    registros_guardados: int | None = Field(0, description="Total de registros limpios persistidos")
+    registros_filtrados: int | None = Field(0, description="Total de registros descartados por filtros de calidad")
+    tasa_efectividad_pct: float | None = Field(
+        None, description="Porcentaje de registros útiles guardados respecto a los leídos"
+    )
+    estado: str = Field(description="Estado de la ejecución (ej: COMPLETADO, EXITOSO, FALLIDO)")
+    observaciones: str | None = Field(None, description="Notas u observaciones del pipeline")
+    errores: Any | None = Field(None, description="Detalle de errores o excepciones capturadas")
+    metricas_salida: Any | None = Field(None, description="Métricas de salida generadas por el pipeline")
+
+
+class PipelineEjecucionesResponse(BaseModel):
+    """Historial de ejecuciones del pipeline de datos con metadatos de supervisión."""
+    total_ejecuciones: int = Field(description="Total de ejecuciones registradas retornadas")
+    ultima_ejecucion: datetime | None = Field(None, description="Fecha y hora de la corrida más reciente")
+    tasa_exito_pct: float | None = Field(None, description="Porcentaje de ejecuciones con estado exitoso/completado")
+    ejecuciones: list[PipelineEjecucionItem] = Field(description="Listado cronológico inverso de ejecuciones")
+    consultado_en: datetime = Field(description="Timestamp UTC de la consulta")

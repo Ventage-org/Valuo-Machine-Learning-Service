@@ -60,10 +60,12 @@ def _build_version_info(
     run_id: str | None = None,
     tags: dict[str, str] | None = None,
     created_at_timestamp: int | float | None = None,
+    aliases: list[str] | None = None,
 ) -> VersionModeloInfo:
     """Construye un VersionModeloInfo consultando las métricas del run en MLflow."""
     metricas = MetricasModelo()
     tags_dict = tags or {}
+    aliases_list = list(aliases) if aliases else []
 
     if run_id and mlflow_manager.check_connection():
         try:
@@ -90,13 +92,23 @@ def _build_version_info(
         except Exception:
             pass
 
+    # Normalización exhaustiva de Stage
+    stage_str = str(stage).strip() if stage is not None else ""
+    if "champion" in aliases_list or stage_str.lower() in ("production", "prod") or tags_dict.get("estado_gobernanza") == "production":
+        stage_final = "Production"
+    elif stage_str.lower() in ("archived", "archivado") or tags_dict.get("estado_gobernanza") == "archived":
+        stage_final = "Archived"
+    else:
+        stage_final = "Candidate"
+
     return VersionModeloInfo(
         nombre_modelo=model_name,
         version=str(version),
-        stage=stage,
+        stage=stage_final,
         run_id=run_id,
         metricas=metricas,
         tags=tags_dict,
+        aliases=aliases_list,
         creado_en=creado_en,
         fuente_artefacto=f"models:/{model_name}/{version}",
     )
@@ -128,6 +140,7 @@ def obtener_benchmark(
                 run_id=prod_ver.run_id,
                 tags=getattr(prod_ver, "tags", {}),
                 created_at_timestamp=getattr(prod_ver, "creation_timestamp", None),
+                aliases=getattr(prod_ver, "aliases", []),
             )
 
     # Si MLflow no tiene aún una versión en Production, usar la configuración activa en memoria
@@ -169,6 +182,7 @@ def obtener_benchmark(
                 run_id=cand_ver.run_id,
                 tags=getattr(cand_ver, "tags", {}),
                 created_at_timestamp=getattr(cand_ver, "creation_timestamp", None),
+                aliases=getattr(cand_ver, "aliases", []),
             )
 
             # Calcular deltas frente a Producción
@@ -268,6 +282,7 @@ def obtener_historial_versiones(
             run_id=v.run_id,
             tags=getattr(v, "tags", {}),
             created_at_timestamp=getattr(v, "creation_timestamp", None),
+            aliases=getattr(v, "aliases", []),
         )
         for v in all_versions
     ]
@@ -355,15 +370,49 @@ def promover_modelo_a_produccion(
         )
 
     # 2. Descargar y Cargar en RAM
-    model_uri = f"models:/{model_name}/{version_str}"
-    print(f"[ModelRegistryService] Cargando modelo en RAM desde {model_uri}...")
+    target_run = ver_nueva.run_id if 'ver_nueva' in locals() and ver_nueva else None
+    if not target_run:
+        try:
+            v_obj = mlflow_manager.get_model_version(model_name, version_str)
+            target_run = v_obj.run_id if v_obj else None
+        except Exception:
+            pass
+
+    nuevo_modelo = None
+    # Prioridad 1: Descarga ultrarrápida vía HTTP proxy de MLflow (sin depender de Azure Credentials en el cliente)
+    if target_run:
+        from app.core.model_loader import _descargar_modelo_mlflow_http
+        print(f"[ModelRegistryService] Descargando modelo v{version_str} vía proxy HTTP de MLflow (run_id: {target_run})...")
+        nuevo_modelo = _descargar_modelo_mlflow_http(mlflow_manager.tracking_uri, target_run)
+
+    # Prioridad 2: Carga nativa mlflow.load_model si falla el proxy
+    if nuevo_modelo is None:
+        try:
+            model_uri = f"models:/{model_name}/{version_str}"
+            print(f"[ModelRegistryService] Intentando carga nativa desde {model_uri}...")
+            nuevo_modelo = mlflow.xgboost.load_model(model_uri)
+        except Exception as e_load:
+            print(f"[ModelRegistryService] Fallo carga nativa: {e_load}")
+
+    if nuevo_modelo is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": "error_carga_ram",
+                "message": f"El modelo se promovió en MLflow pero falló al cargarse en RAM.",
+            },
+        )
 
     try:
-        nuevo_modelo = mlflow.xgboost.load_model(model_uri)
         print("[ModelRegistryService] Construyendo SHAP TreeExplainer en RAM...")
         nuevo_explainer = shap.TreeExplainer(nuevo_modelo)
 
         # 3. Hot-reload atómico en memoria
+        import json
+        from app.core.model_loader import _resolver_ruta
+        config_path_env = os.getenv("CONFIG_PATH" if tipo_operacion == "venta" else "CONFIG_ALQUILER_PATH")
+        config_path = _resolver_ruta(config_path_env or f"config/model_{'alquiler_' if tipo_operacion == 'alquiler' else ''}config.json")
+
         if tipo_operacion == "venta":
             state.modelo = nuevo_modelo
             state.explainer = nuevo_explainer
@@ -371,6 +420,7 @@ def promover_modelo_a_produccion(
                 state.feature_cols = list(nuevo_modelo.feature_names_in_)
             state.config["modelo_version"] = f"v{version_str}_mlflow"
             state.config["promoted_at"] = datetime.now(timezone.utc).isoformat()
+            cfg_to_persist = dict(state.config)
         else:
             state.modelo_alquiler = nuevo_modelo
             state.explainer_alquiler = nuevo_explainer
@@ -378,6 +428,25 @@ def promover_modelo_a_produccion(
                 state.feature_cols_alquiler = list(nuevo_modelo.feature_names_in_)
             state.config_alquiler["modelo_version"] = f"v{version_str}_mlflow"
             state.config_alquiler["promoted_at"] = datetime.now(timezone.utc).isoformat()
+            cfg_to_persist = dict(state.config_alquiler)
+
+        try:
+            if os.path.exists(config_path):
+                with open(config_path, "w", encoding="utf-8") as fp:
+                    json.dump(cfg_to_persist, fp, indent=2, ensure_ascii=False)
+        except Exception as e_cfg:
+            print(f"[ModelRegistryService] Advertencia al persistir config: {e_cfg}")
+
+        # Sincronizar gobernanza en jobs de entrenamiento
+        try:
+            from app.services.entrenamiento_service import actualizar_estado_gobernanza_job
+            actualizar_estado_gobernanza_job(
+                tipo_operacion=tipo_operacion,
+                version_promovida=version_str,
+                version_anterior=ver_anterior_str,
+            )
+        except Exception as e_sync:
+            print(f"[ModelRegistryService] Advertencia al sincronizar estado_gobernanza_job: {e_sync}")
 
         print(f"[ModelRegistryService] [OK] Hot-Reload completado en RAM para {tipo_operacion} (versión {version_str}).")
 
@@ -397,6 +466,7 @@ def promover_modelo_a_produccion(
         version=version_str,
         stage="Production",
         run_id=ver_nueva.run_id if ver_nueva else None,
+        aliases=["champion"],
     ) if ver_nueva else None
 
     deltas = None

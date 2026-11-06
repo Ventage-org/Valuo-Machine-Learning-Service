@@ -29,7 +29,7 @@ class FactorSensibilidad(BaseModel):
 
 class SensibilidadFactoresResponse(BaseModel):
     """Respuesta canónica de GET /api/v1/modelos/sensibilidad-factores."""
-    modelo: str = Field(description="Nombre del modelo activo en producción (ej: 'xgboost_venta_v2').")
+    modelo: str = Field(description="Nombre del modelo activo en producción (ej: 'xgboost_venta_v1').")
     tipo_operacion: Literal["venta", "alquiler"] = Field(description="Tipo de operación inmobiliaria analizada.")
     version: str = Field(description="Versión del modelo.")
     metodo: str = Field(

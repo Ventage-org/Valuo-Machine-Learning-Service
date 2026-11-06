@@ -1,0 +1,64 @@
+{
+  "timestamp_evaluacion": "2026-10-22T04:31:50Z",
+  "evaluacion_tipo": "Zero-Leakage (Calibration factors from Train 2023, Test 2024-2025 blind)",
+  "venta": {
+    "tipo": "venta",
+    "n_train_canonico": 44173,
+    "n_test_canonico": 23737,
+    "total_inmuebles_unicos": 67910,
+    "tiempo_seg": 6.14,
+    "factor_global_train_2023": 1.0017,
+    "n_factores_distrito": 22,
+    "metricas_ml": {
+      "mape_pct": 14.86,
+      "mae": 51861.76,
+      "rmse": 78053.38,
+      "r2": 0.7477
+    },
+    "metricas_iaao": {
+      "median_ratio_crudo": 1.0323,
+      "median_ratio_calibrado": 1.0305,
+      "mean_ratio": 1.0456,
+      "weighted_mean_ratio": 1.009,
+      "cod_pct": 14.2,
+      "cov_pct": 19.73,
+      "prd": 1.0363,
+      "prb": -0.0806,
+      "pe10_pct": 45.05,
+      "pe20_pct": 74.09,
+      "cumple_iaao_cod": true,
+      "cumple_iaao_nivel": true,
+      "cumple_iaao_prd": false
+    }
+  },
+  "alquiler": {
+    "tipo": "alquiler",
+    "n_train_canonico": 41921,
+    "n_test_canonico": 19682,
+    "total_contratos_unicos": 61603,
+    "tiempo_seg": 5.08,
+    "factor_global_train_2023": 1.0062,
+    "n_factores_distrito": 22,
+    "metricas_ml": {
+      "mape_pct": 13.68,
+      "mae": 235.28,
+      "rmse": 361.1,
+      "r2": 0.6761
+    },
+    "metricas_iaao": {
+      "median_ratio_crudo": 0.9961,
+      "median_ratio_calibrado": 0.99,
+      "mean_ratio": 0.9984,
+      "weighted_mean_ratio": 0.9612,
+      "cod_pct": 13.79,
+      "cov_pct": 19.74,
+      "prd": 1.0387,
+      "prb": -0.1233,
+      "pe10_pct": 47.49,
+      "pe20_pct": 77.41,
+      "cumple_iaao_cod": true,
+      "cumple_iaao_nivel": true,
+      "cumple_iaao_prd": false
+    }
+  }
+}

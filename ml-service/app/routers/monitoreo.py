@@ -20,8 +20,10 @@ from app.schemas.monitoreo import (
     DriftAnalisisResponse,
     FluctuacionTemporalResponse,
     LatenciaP95Response,
+    PipelineEjecucionesResponse,
     RecursosSistemaResponse,
 )
+from app.services.pipeline_service import obtener_historial_pipeline
 from app.services.monitoreo_service import (
     calcular_data_drift_psi,
     medir_latencia_p95,
@@ -108,3 +110,20 @@ def get_latencia_p95(
     _: None = Depends(_verificar_admin_token),
 ) -> LatenciaP95Response:
     return medir_latencia_p95(tipo_operacion=tipo_operacion, state=model_state)
+
+
+@router.get(
+    "/pipeline-ejecuciones",
+    response_model=PipelineEjecucionesResponse,
+    summary="Historial y Estado del Pipeline ETL (db_dataset_valuo)",
+    description=(
+        "Consulta la tabla public.pipeline_ejecuciones en PostgreSQL para que el administrador "
+        "supervise el estado de las corridas, registros procesados (leídos/guardados/filtrados), "
+        "duración en segundos, métricas y excepciones del pipeline de datos."
+    ),
+)
+def get_pipeline_ejecuciones(
+    limit: int = 50,
+    _: None = Depends(_verificar_admin_token),
+) -> PipelineEjecucionesResponse:
+    return obtener_historial_pipeline(limit=limit)

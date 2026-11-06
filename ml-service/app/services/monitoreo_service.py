@@ -343,9 +343,9 @@ def medir_latencia_p95(
     if tipo_operacion == "venta":
         modelo = state.modelo
         version = state.config.get("modelo_version", "v2")
-        pkl_name = state.config.get("modelo_archivo", "xgboost_venta_v2.pkl")
-        params_file = "models/xgboost_venta_v2_params.json"
-        metricas_file = "models/xgboost_venta_v2_metricas.json"
+        pkl_name = state.config.get("modelo_archivo", "xgboost_venta_v1.pkl")
+        params_file = "models/xgboost_venta_v1_params.json"
+        metricas_file = "models/xgboost_venta_v1_metricas.json"
         config_file = "config/model_config.json"
     else:
         modelo = state.modelo_alquiler
@@ -360,7 +360,7 @@ def medir_latencia_p95(
     pkl_path = os.path.join(models_dir, pkl_name)
 
     artifacts = {
-        "model_pkl": os.path.exists(pkl_path),
+        "model_pkl": (modelo is not None) or os.path.exists(pkl_path),
         "params_json": os.path.exists(params_file),
         "metrics_json": os.path.exists(metricas_file),
         "model_config_json": os.path.exists(config_file),

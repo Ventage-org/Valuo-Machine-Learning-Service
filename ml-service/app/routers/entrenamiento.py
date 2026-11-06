@@ -24,6 +24,8 @@ from fastapi import APIRouter, Depends, Header, HTTPException, status
 
 from app.core.model_loader import model_state
 from app.schemas.entrenamiento import (
+    EntrenamientoBaseRequest,
+    EntrenamientoInicialRequest,
     ArtifactosGenerados,
     EntrenamientoAlquilerRequest,
     EntrenamientoIniciadoResponse,
@@ -35,6 +37,7 @@ from app.schemas.entrenamiento import (
 from app.services.entrenamiento_service import (
     get_job_status,
     get_latest_job,
+    iniciar_entrenamiento,
     iniciar_entrenamiento_alquiler,
     iniciar_entrenamiento_venta,
     list_all_jobs,
@@ -72,7 +75,7 @@ def _verificar_admin_token(x_admin_token: str | None = Header(None)) -> None:
     "/venta",
     response_model=EntrenamientoIniciadoResponse,
     status_code=status.HTTP_202_ACCEPTED,
-    summary="Iniciar reentrenamiento del modelo de venta",
+    summary="Reentrenamiento periódico de venta (Genera Candidato para validación)",
     description=(
         "Lanza el pipeline de reentrenamiento del modelo XGBoost de venta "
         "utilizando los datos actuales de `dataset_inmuebles_venta` en PostgreSQL.\n\n"
@@ -88,7 +91,7 @@ def iniciar_entrenamiento_modelo_venta(
     request: EntrenamientoVentaRequest,
     _: None = Depends(_verificar_admin_token),
 ) -> EntrenamientoIniciadoResponse:
-    nombre = request.nombre_modelo or "xgboost_venta_v2"
+    nombre = request.nombre_modelo or "xgboost_venta_v1"
     job_id = iniciar_entrenamiento_venta(
         nombre_modelo=nombre,
         hiperparametros=request.hiperparametros,
@@ -121,7 +124,7 @@ def iniciar_entrenamiento_modelo_venta(
     "/alquiler",
     response_model=EntrenamientoIniciadoResponse,
     status_code=status.HTTP_202_ACCEPTED,
-    summary="Iniciar reentrenamiento del modelo de alquiler",
+    summary="Reentrenamiento periódico de alquiler (Genera Candidato para validación)",
     description=(
         "Lanza el pipeline de reentrenamiento del modelo XGBoost de alquiler "
         "utilizando los datos actuales de `dataset_inmuebles_alquiler` en PostgreSQL.\n\n"
@@ -239,4 +242,56 @@ def estado_entrenamiento(
         metricas=metricas,
         artefactos=artefactos,
         error=job_data.get("error"),
+    )
+
+
+@router.post(
+    "/inicial/{tipo_operacion}",
+    response_model=EntrenamientoIniciadoResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Entrenamiento Inicial (Bootstrap directo a Producción - @champion)",
+    description=(
+        "Ejecuta el entrenamiento inicial para el modelo de venta o alquiler y lo corona "
+        "automáticamente como la versión activa en Producción con el alias @champion en MLflow "
+        "y Hot-Reload inmediato en memoria RAM sin necesidad de aprobación manual posterior."
+    ),
+    responses={
+        202: {"description": "Job de entrenamiento inicial iniciado exitosamente."},
+        401: {"description": "Token de administrador inválido."},
+        409: {"description": "Ya hay un job de entrenamiento en curso."},
+    },
+)
+def iniciar_entrenamiento_inicial(
+    tipo_operacion: Literal["venta", "alquiler"],
+    request: EntrenamientoInicialRequest = EntrenamientoInicialRequest(),
+    _: None = Depends(_verificar_admin_token),
+) -> EntrenamientoIniciadoResponse:
+    nombre = request.nombre_modelo or ("xgboost_venta_v1" if tipo_operacion == "venta" else "xgboost_alquiler_v1")
+    job_id = iniciar_entrenamiento(
+        tipo_operacion=tipo_operacion,
+        nombre_modelo=nombre,
+        hiperparametros=None,
+        shap_top_n=10,
+        state=model_state,
+        guardar_como_activo=True,  # Siempre True: entrenamiento inicial directo a Producción (@champion)
+        max_depth=request.max_depth,
+        learning_rate=request.learning_rate,
+        n_estimators=request.n_estimators,
+        min_child_weight=request.min_child_weight,
+        usar_target_m2=True,
+        factor_calibracion=request.factor_calibracion,
+    )
+
+    return EntrenamientoIniciadoResponse(
+        job_id=job_id,
+        tipo_operacion=tipo_operacion,
+        estado=EstadoJob.EN_PROGRESO,
+        nombre_modelo=nombre,
+        iniciado_en=datetime.utcnow(),
+        mensaje=(
+            f"Job de entrenamiento inicial ({tipo_operacion}) '{nombre}' iniciado. "
+            "Al finalizar, se guardará en Azure Storage, se registrará como Producción (@champion) "
+            "y se cargará en memoria RAM automáticamente."
+        ),
+        consultar_estado_en=f"/api/v1/admin/entrenamiento/estado/{job_id}",
     )

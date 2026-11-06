@@ -80,6 +80,46 @@ _training_semaphore = threading.Semaphore(1)
 
 # ─── Acceso al registry ───────────────────────────────────────────────────────
 
+def _sincronizar_gobernanza_con_mlflow(job: dict[str, Any]) -> None:
+    """Sincroniza dinámicamente el estado de gobernanza del job con MLflow Model Registry."""
+    job_ver = job.get("mlflow_model_version")
+    tipo_op = job.get("tipo_operacion", "venta")
+    if not job_ver or not mlflow_manager.check_connection():
+        return
+    try:
+        model_name = os.getenv(f"MLFLOW_MODEL_NAME_{tipo_op.upper()}", f"xgboost_{tipo_op}")
+        prod_ver = mlflow_manager.get_production_version(model_name)
+        if prod_ver:
+            if str(job_ver) == str(prod_ver.version):
+                job["estado_gobernanza"] = "production"
+            elif str(job_ver).isdigit() and str(prod_ver.version).isdigit():
+                if int(job_ver) < int(prod_ver.version):
+                    job["estado_gobernanza"] = "archived"
+                else:
+                    job["estado_gobernanza"] = "candidate"
+    except Exception:
+        pass
+
+
+def actualizar_estado_gobernanza_job(
+    tipo_operacion: str,
+    version_promovida: str,
+    version_anterior: str | None = None,
+) -> None:
+    """Actualiza en caliente el estado de gobernanza en el registro de jobs."""
+    with _job_lock:
+        for job_id, job in _job_registry.items():
+            if job.get("tipo_operacion") == tipo_operacion:
+                job_ver = str(job.get("mlflow_model_version") or "")
+                if job_ver == str(version_promovida):
+                    job["estado_gobernanza"] = "production"
+                    job["progreso"] = f"[Producción] Modelo v{version_promovida} activo en Producción (@champion)."
+                elif version_anterior and job_ver == str(version_anterior):
+                    job["estado_gobernanza"] = "archived"
+                elif job.get("estado_gobernanza") == "production" and job_ver != str(version_promovida):
+                    job["estado_gobernanza"] = "archived"
+
+
 def get_job_status(job_id: str) -> dict[str, Any]:
     """Retorna el estado de un job. HTTPException 404 si no existe."""
     with _job_lock:
@@ -88,7 +128,9 @@ def get_job_status(job_id: str) -> dict[str, Any]:
                 status_code=404,
                 detail={"error": "job_no_encontrado", "job_id": job_id},
             )
-        return dict(_job_registry[job_id])
+        job_copy = dict(_job_registry[job_id])
+    _sincronizar_gobernanza_con_mlflow(job_copy)
+    return job_copy
 
 
 def get_latest_job() -> dict[str, Any] | None:
@@ -97,13 +139,18 @@ def get_latest_job() -> dict[str, Any] | None:
         if not _job_registry:
             return None
         ultimo_id = list(_job_registry.keys())[-1]
-        return dict(_job_registry[ultimo_id])
+        job_copy = dict(_job_registry[ultimo_id])
+    _sincronizar_gobernanza_con_mlflow(job_copy)
+    return job_copy
 
 
 def list_all_jobs() -> list[dict[str, Any]]:
-    """Retorna la lista de todos los jobs registrados."""
+    """Retorna la lista de todos los jobs registrados sincronizados con gobernanza."""
     with _job_lock:
-        return [dict(j) for j in _job_registry.values()]
+        jobs_copies = [dict(j) for j in _job_registry.values()]
+    for j in jobs_copies:
+        _sincronizar_gobernanza_con_mlflow(j)
+    return jobs_copies
 
 
 def _update_job(job_id: str, **kwargs: Any) -> None:
@@ -451,7 +498,6 @@ def _run_training_pipeline(
         modelo.fit(
             X_train, y_train,
             sample_weight=sample_weights,
-            eval_set=[(X_test, y_test)],
             verbose=False,
         )
 
@@ -459,14 +505,20 @@ def _run_training_pipeline(
         _update_job(job_id, progreso="[6/8] Evaluando métricas sobre test set 2024-2025...")
         print(f"[EntrenamientoService][{job_id}] Paso 6: Calculando métricas...")
 
-        pred_log_test = modelo.predict(X_test)
+        # 6a. Predecir sobre TRAIN para aprender los factores de calibración de escala y distrito (Sin Data Leakage)
+        pred_log_train = modelo.predict(X_train)
         if usar_target_m2:
-            pred_total_raw = np.exp(pred_log_test) * sup_test
+            pred_total_raw_train = np.exp(pred_log_train) * sup_train
         else:
-            pred_total_raw = np.expm1(pred_log_test)
+            pred_total_raw_train = np.expm1(pred_log_train)
 
-        ratios_test = pred_total_raw / (y_real_test + 1e-8)
-        median_ratio_global = float(np.median(ratios_test))
+        # Ventana temporal reciente de TRAIN (año 2023) para calibración de escala de mercado
+        mask_calibracion = (df_train["Anio"] == 2023).values
+        if mask_calibracion.sum() < 100:
+            mask_calibracion = np.ones(len(df_train), dtype=bool)
+
+        ratios_train_cal = pred_total_raw_train[mask_calibracion] / (y_real_train[mask_calibracion] + 1e-8)
+        median_ratio_global = float(np.median(ratios_train_cal))
 
         if factor_calibracion is not None:
             factor_usado_global = float(factor_calibracion)
@@ -475,21 +527,33 @@ def _run_training_pipeline(
         else:
             factor_usado_global = 1.0
 
-        # Calibración estratificada por distrito (IAAO Standard on Ratio Studies §5.4)
-        df_eval = pd.DataFrame({"distrito": df_test_raw["distrito"], "ratio": ratios_test})
+        # Calibración estratificada por distrito aprendida de TRAIN (IAAO Standard on Ratio Studies §5.4)
+        df_eval_train = pd.DataFrame({
+            "distrito": df_train.loc[mask_calibracion, "distrito"],
+            "ratio": ratios_train_cal
+        })
         factores_distrito: dict[str, float] = {}
-        for dist, group in df_eval.groupby("distrito"):
+        for dist, group in df_eval_train.groupby("distrito"):
             factores_distrito[str(dist)] = round(float(np.median(group["ratio"])), 4)
 
-        # Aplicar factores estratificados por distrito
-        factores_vector = df_test_raw["distrito"].map(factores_distrito).fillna(factor_usado_global).values
+        # 6b. Predecir sobre TEST y aplicar los factores fijos aprendidos de TRAIN (Evaluación honesta out-of-sample)
+        pred_log_test = modelo.predict(X_test)
+        if usar_target_m2:
+            pred_total_raw = np.exp(pred_log_test) * sup_test
+        else:
+            pred_total_raw = np.expm1(pred_log_test)
+
+        ratios_test_crudo = pred_total_raw / (y_real_test + 1e-8)
+        median_ratio_crudo = float(np.median(ratios_test_crudo))
+
+        factores_vector = df_test["distrito"].map(factores_distrito).fillna(factor_usado_global).values
         y_pred_calibrado = pred_total_raw / factores_vector
 
         metricas_iaao = _calcular_metricas_iaao(y_real_test, y_pred_calibrado)
         metricas_dict = _calcular_metricas(y_real_test, y_pred_calibrado)
         metricas_dict["factor_calibracion_iaao"] = factor_usado_global
         metricas_dict["factores_calibracion_distrito"] = factores_distrito
-        metricas_dict["median_ratio_crudo"] = round(median_ratio_global, 4)
+        metricas_dict["median_ratio_crudo"] = round(median_ratio_crudo, 4)
         metricas_dict["median_ratio_calibrado"] = metricas_iaao["median_ratio"]
         metricas_dict["cod_pct"] = metricas_iaao["cod_pct"]
         metricas_dict["cov_pct"] = metricas_iaao["cov_pct"]
@@ -534,7 +598,7 @@ def _run_training_pipeline(
 
         # 7d. Exportar config del modelo
         now_utc = datetime.now(timezone.utc)
-        version = nombre_modelo.split("_")[-1] if "_" in nombre_modelo else ("v2" if tipo_operacion == "venta" else "v1")
+        version = nombre_modelo.split("_")[-1] if "_" in nombre_modelo else "v1"
 
         config_modelo_actual = {
             "modelo_version":  version,
@@ -697,6 +761,15 @@ def _run_training_pipeline(
             estado_gob = "candidate"
             print(f"[EntrenamientoService][{job_id}] Paso 8: Gobernanza activa. Modelo en espera de aprobación humana (no reemplaza producción en memoria).")
 
+        # ── Clean-up INCONDICIONAL: Eliminar siempre el binario .pkl local del contenedor ──
+        # El modelo ya fue subido a Azure Blob Storage vía MLflow y (si aplica) reside en la memoria RAM
+        try:
+            if os.path.exists(pkl_path):
+                os.remove(pkl_path)
+                print(f"[EntrenamientoService][{job_id}] [Clean-up] Binario local {pkl_path} eliminado del contenedor. El modelo reside en RAM y en Azure Blob Storage.")
+        except Exception as e_del:
+            print(f"[EntrenamientoService][{job_id}] Advertencia al limpiar binario: {e_del}")
+
         duracion = round(time.time() - inicio, 2)
 
         artefactos = ArtifactosGenerados(
@@ -761,6 +834,17 @@ def iniciar_entrenamiento(
     """
     Registra y lanza un job de reentrenamiento (venta o alquiler) en background.
     """
+    # Detección inteligente de Bootstrap / Primer entrenamiento:
+    # Si actualmente no existe un modelo activo en Producción en memoria,
+    # se promueve OBLIGATORIAMENTE a Producción (@champion).
+    modelo_actual = state.modelo if tipo_operacion == "venta" else state.modelo_alquiler
+    if modelo_actual is None and not guardar_como_activo:
+        print(
+            f"[EntrenamientoService] [Bootstrap Detectado] No existe modelo de {tipo_operacion} en Producción. "
+            "Forzando 'guardar_como_activo=True' para coronar este primer entrenamiento como Producción (@champion)."
+        )
+        guardar_como_activo = True
+
     if not _training_semaphore.acquire(blocking=False):
         raise HTTPException(
             status_code=409,
@@ -807,7 +891,7 @@ def iniciar_entrenamiento(
 
 
 def iniciar_entrenamiento_venta(
-    nombre_modelo: str = "xgboost_venta_v2",
+    nombre_modelo: str = "xgboost_venta_v1",
     hiperparametros: dict[str, Any] | None = None,
     shap_top_n: int = 10,
     state: "ModelState" | None = None,
