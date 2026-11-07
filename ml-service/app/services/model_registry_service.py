@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING, Literal
 
 import mlflow
 import mlflow.xgboost
+from mlflow.entities.model_registry import ModelVersion
 import shap
 from fastapi import HTTPException, status
 
@@ -28,6 +29,7 @@ from app.schemas.modelos import (
     BenchmarkResponse,
     ComparativaCandidato,
     DeltaMetricas,
+    DescartarModeloResponse,
     HistorialModelosResponse,
     MetricasModelo,
     PromoverModeloResponse,
@@ -96,7 +98,7 @@ def _build_version_info(
     stage_str = str(stage).strip() if stage is not None else ""
     if "champion" in aliases_list or stage_str.lower() in ("production", "prod") or tags_dict.get("estado_gobernanza") == "production":
         stage_final = "Production"
-    elif stage_str.lower() in ("archived", "archivado") or tags_dict.get("estado_gobernanza") == "archived":
+    elif stage_str.lower() in ("archived", "archivado") or tags_dict.get("estado_gobernanza") in ("archived", "discarded"):
         stage_final = "Archived"
     else:
         stage_final = "Candidate"
@@ -165,7 +167,7 @@ def obtener_benchmark(
     candidatos_evaluados: list[ComparativaCandidato] = []
 
     if mlflow_manager.check_connection():
-        candidates: list[Any] = []
+        candidates: list[ModelVersion] = []
         if version_candidato:
             specific_ver = mlflow_manager.get_model_version(model_name, version_candidato)
             if specific_ver:
@@ -540,4 +542,125 @@ def ejecutar_rollback(
         version=target_version,
         motivo=motivo_final,
         state=state,
+    )
+
+
+def descartar_modelo_candidato(
+    tipo_operacion: Literal["venta", "alquiler"],
+    version: str | int | None,
+    motivo: str,
+) -> DescartarModeloResponse:
+    """
+    Descarta y archiva un modelo candidato en MLflow Model Registry:
+    1. Verifica que la versión objetivo exista y no sea la versión activa en Producción.
+    2. Transiciona su stage a 'Archived' en MLflow y estampa tags de auditoría.
+    3. Sincroniza el estado en el registro en caliente de jobs si aplica.
+    """
+    model_name = _get_model_name(tipo_operacion)
+
+    if not mlflow_manager.check_connection():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                "error": "mlflow_no_disponible",
+                "message": "El servidor MLflow no está accesible para procesar el descarte.",
+            },
+        )
+
+    # Sanitizar versión
+    target_version: str | None = None
+    if version is not None:
+        v_raw = str(version).strip()
+        m = re.search(r"\d+", v_raw)
+        if m:
+            target_version = m.group(0)
+
+    # Si no se pasó versión específica, buscar el candidato activo más reciente
+    if not target_version:
+        candidates = mlflow_manager.get_latest_candidate_versions(model_name, limit=1)
+        if not candidates:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "error": "sin_candidatos",
+                    "message": f"No se encontró ninguna versión candidata activa para descartar en '{model_name}'.",
+                },
+            )
+        target_version = str(candidates[0].version)
+
+    # Verificar existencia de la versión en MLflow
+    v_obj = mlflow_manager.get_model_version(model_name, target_version)
+    if not v_obj:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "error": "version_no_encontrada",
+                "message": f"La versión {target_version} de '{model_name}' no existe en el Model Registry.",
+            },
+        )
+
+    # Proteger contra el descarte accidental del modelo en Producción
+    is_prod = (
+        v_obj.current_stage == "Production"
+        or "champion" in getattr(v_obj, "aliases", [])
+        or getattr(v_obj, "tags", {}).get("estado_gobernanza") == "production"
+    )
+    if is_prod:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error": "modelo_en_produccion",
+                "message": (
+                    f"La versión {target_version} de '{model_name}' está actualmente en PRODUCCIÓN. "
+                    "No se puede descartar directamente. Promueva otra versión o ejecute un rollback primero."
+                ),
+            },
+        )
+
+    # 1. Transicionar y archivar en MLflow
+    try:
+        mlflow_manager.discard_candidate_version(
+            model_name=model_name,
+            version=target_version,
+            motivo=motivo,
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error": "error_descarte_mlflow",
+                "message": f"No se pudo archivar la versión {target_version} en MLflow: {e}",
+            },
+        )
+
+    # 2. Sincronizar en el registro de jobs
+    try:
+        from app.services.entrenamiento_service import descartar_estado_gobernanza_job
+        descartar_estado_gobernanza_job(
+            tipo_operacion=tipo_operacion,
+            version_descartada=target_version,
+            motivo=motivo,
+        )
+    except Exception as e_sync:
+        print(f"[ModelRegistryService] Advertencia al sincronizar descarte en jobs: {e_sync}")
+
+    # 3. Obtener métricas históricas de la versión descartada para trazabilidad
+    info_descartada = _build_version_info(
+        model_name=model_name,
+        version=target_version,
+        stage="Archived",
+        run_id=v_obj.run_id,
+        tags=getattr(v_obj, "tags", {}),
+    )
+
+    print(f"[ModelRegistryService] [OK] Modelo {model_name} v{target_version} descartado y archivado.")
+
+    return DescartarModeloResponse(
+        exito=True,
+        mensaje=f"Modelo candidato {model_name} v{target_version} descartado y archivado exitosamente.",
+        tipo_operacion=tipo_operacion,
+        version_descartada=target_version,
+        nuevo_stage="Archived",
+        motivo=motivo,
+        metricas=info_descartada.metricas if info_descartada else None,
     )

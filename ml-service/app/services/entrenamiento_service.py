@@ -120,6 +120,22 @@ def actualizar_estado_gobernanza_job(
                     job["estado_gobernanza"] = "archived"
 
 
+def descartar_estado_gobernanza_job(
+    tipo_operacion: str,
+    version_descartada: str,
+    motivo: str = "",
+) -> None:
+    """Actualiza en caliente el estado de gobernanza a 'discarded' en el registro de jobs."""
+    with _job_lock:
+        for job_id, job in _job_registry.items():
+            if job.get("tipo_operacion") == tipo_operacion:
+                job_ver = str(job.get("mlflow_model_version") or "")
+                if job_ver == str(version_descartada):
+                    job["estado_gobernanza"] = "discarded"
+                    motivo_txt = f": {motivo}" if motivo else ""
+                    job["progreso"] = f"[Descartado] Candidato v{version_descartada} archivado y descartado{motivo_txt}"
+
+
 def get_job_status(job_id: str) -> dict[str, Any]:
     """Retorna el estado de un job. HTTPException 404 si no existe."""
     with _job_lock:

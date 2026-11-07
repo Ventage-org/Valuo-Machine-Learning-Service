@@ -1,12 +1,14 @@
 """
 app/schemas/modelos.py
 ──────────────────────
-Contratos Pydantic para los endpoints de gobernanza, benchmark y promoción de modelos.
+Contratos Pydantic para los endpoints de gobernanza, benchmark, promoción y descarte de modelos.
 
 Endpoints:
   GET  /api/v1/admin/modelos/benchmark/{tipo_operacion}
   GET  /api/v1/admin/modelos/historial/{tipo_operacion}
   POST /api/v1/admin/modelos/promover
+  POST /api/v1/admin/modelos/rollback
+  POST /api/v1/admin/modelos/descartar
 """
 
 from __future__ import annotations
@@ -121,3 +123,30 @@ class PromoverModeloResponse(BaseModel):
     metricas_anteriores: MetricasModelo | None = Field(default=None, description="Métricas de la versión previamente activa")
     deltas: DeltaMetricas | None = Field(default=None, description="Diferencias relativas (ΔMAPE, ΔR², mejora_mape)")
     promovido_en: datetime = Field(default_factory=datetime.utcnow)
+
+
+class DescartarModeloRequest(BaseModel):
+    """Solicitud de descarte/rechazo formal de un modelo candidato."""
+    tipo_operacion: Literal["venta", "alquiler"] = Field(
+        description="Tipo de modelo ('venta' o 'alquiler')",
+    )
+    version: str | int | None = Field(
+        default=None,
+        description="Número de versión candidata a descartar (opcional). Si se omite o es null, descarta el candidato más reciente.",
+    )
+    motivo: str = Field(
+        default="Descarte manual del administrador tras verificación de benchmark",
+        description="Justificación registrada en los tags de auditoría de MLflow",
+    )
+
+
+class DescartarModeloResponse(BaseModel):
+    """Respuesta tras descartar y archivar un modelo candidato."""
+    exito: bool = True
+    mensaje: str
+    tipo_operacion: str
+    version_descartada: str
+    nuevo_stage: str = "Archived"
+    motivo: str
+    metricas: MetricasModelo | None = Field(default=None, description="Métricas del modelo descartado")
+    descartado_en: datetime = Field(default_factory=datetime.utcnow)

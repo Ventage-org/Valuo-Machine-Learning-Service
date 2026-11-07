@@ -8,6 +8,7 @@ promoción de modelos entre etapas (Candidate -> Production).
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 import os
 from typing import Any
 import mlflow
@@ -118,7 +119,7 @@ class MLflowManager:
                 v for v in all_versions
                 if v.current_stage not in ("Production", "Archived")
                 and "champion" not in getattr(v, "aliases", [])
-                and getattr(v, "tags", {}).get("estado_gobernanza") != "production"
+                and getattr(v, "tags", {}).get("estado_gobernanza") not in ("production", "archived", "discarded")
             ]
             return candidates[:limit]
         except Exception as e:
@@ -281,6 +282,80 @@ class MLflowManager:
 
         print(f"[MLflowManager] [OK] {model_name} v{version_str} promovido exitosamente a Production (@champion).")
         return promoted
+
+    def discard_candidate_version(
+        self,
+        model_name: str,
+        version: int | str,
+        motivo: str = "",
+    ) -> ModelVersion:
+        """
+        Descarta y archiva una versión candidata en MLflow Model Registry.
+        Asigna stage='Archived' y estampa tags de gobernanza con la justificación y timestamp.
+        """
+        version_str = str(version).strip()
+        import re
+        m = re.search(r"\d+", version_str)
+        if m:
+            version_str = m.group(0)
+
+        print(f"[MLflowManager] Descartando {model_name} v{version_str}...")
+
+        # 1. Transicionar stage a Archived en MLflow
+        archived = self.client.transition_model_version_stage(
+            name=model_name,
+            version=version_str,
+            stage="Archived",
+            archive_existing_versions=False,
+        )
+
+        # 2. Registrar tags de auditoría y descarte
+        now_iso = datetime.now(timezone.utc).isoformat()
+        try:
+            self.client.set_model_version_tag(
+                name=model_name,
+                version=version_str,
+                key="estado_gobernanza",
+                value="discarded",
+            )
+            self.client.set_model_version_tag(
+                name=model_name,
+                version=version_str,
+                key="stage",
+                value="Archived",
+            )
+            if motivo:
+                self.client.set_model_version_tag(
+                    name=model_name,
+                    version=version_str,
+                    key="motivo_descarte",
+                    value=motivo,
+                )
+            self.client.set_model_version_tag(
+                name=model_name,
+                version=version_str,
+                key="descartado_en",
+                value=now_iso,
+            )
+
+            # Estampar también en el run_id asociado para trazabilidad
+            target_run_id = archived.run_id if archived else None
+            if not target_run_id:
+                try:
+                    ver_obj = self.client.get_model_version(model_name, version_str)
+                    target_run_id = ver_obj.run_id if ver_obj else None
+                except Exception:
+                    pass
+            if target_run_id:
+                self.client.set_tag(target_run_id, "estado_gobernanza", "discarded")
+                if motivo:
+                    self.client.set_tag(target_run_id, "motivo_descarte", motivo)
+                self.client.set_tag(target_run_id, "descartado_en", now_iso)
+        except Exception as e_tags:
+            print(f"[MLflowManager] Advertencia al fijar tags de descarte: {e_tags}")
+
+        print(f"[MLflowManager] [OK] {model_name} v{version_str} descartado y archivado.")
+        return archived
 
 
 # Instancia singleton del cliente de MLflow

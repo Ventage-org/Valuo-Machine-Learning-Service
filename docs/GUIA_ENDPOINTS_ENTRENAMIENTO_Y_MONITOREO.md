@@ -77,6 +77,7 @@ Para garantizar una arquitectura desacoplada y una correcta asignación de permi
 | **Monitoreo (Administrador)** | `/api/v1/admin/modelos/historial/{tipo_op}` | `GET` | `X-Admin-Token` | Auditoría de todas las versiones registradas en MLflow Model Registry. |
 | **Monitoreo (Administrador)** | `/api/v1/admin/modelos/promover` | `POST` | `X-Admin-Token` | Promoción formal: el administrador aprueba un candidato y se ejecuta Hot-Reload en RAM sin downtime. |
 | **Monitoreo (Administrador)** | `/api/v1/admin/modelos/rollback` | `POST` | `X-Admin-Token` | Rollback preventivo a una versión archivada con Hot-Reload inmediato en RAM. |
+| **Monitoreo (Administrador)** | `/api/v1/admin/modelos/descartar` | `POST` | `X-Admin-Token` | Descarte formal: el administrador rechaza un candidato deficiente, archiva en MLflow y limpia la cola de benchmark. |
 | **Monitoreo (Administrador)** | `/api/v1/admin/monitoreo/recursos` | `GET` | `X-Admin-Token` | Telemetría en vivo del uso de CPU y memoria RAM del contenedor. |
 | **Monitoreo (Administrador)** | `/api/v1/admin/monitoreo/drift/{tipo_op}` | `GET` | `X-Admin-Token` | Auditoría de Data Drift mediante el Population Stability Index (PSI). |
 | **Monitoreo (Administrador)** | `/api/v1/admin/monitoreo/fluctuacion-temporal/{tipo_op}` | `GET` | `X-Admin-Token` | Detección de degradación del modelo a lo largo del tiempo (MAPE/MAE histórico vs reciente). |
@@ -579,6 +580,46 @@ Prefijo: `/api/v1/admin/modelos`
     "mejora_r2": true
   },
   "promovido_en": "2026-10-13T01:16:11Z"
+}
+```
+
+---
+
+### 4.5. Descartar y Archivar Modelo Candidato (Rechazo Humano)
+- **Método / Ruta:** `POST /api/v1/admin/modelos/descartar`
+- **Descripción:** Acción formal de gobernanza MLOps para rechazar y archivar un modelo candidato que no superó los estándares de calidad o benchmark:
+  1. Si `version` se omite, es `null` o `"string"`, **resuelve automáticamente el candidato activo más reciente**. Si se provee una versión (`"8"`), descarta esa versión específica.
+  2. **Protección de Producción:** Si por error se intenta descartar el modelo activo en `Production`, el endpoint rechaza la solicitud con `HTTP 400 Bad Request` indicando que primero debe promoverse otro modelo o ejecutarse un rollback.
+  3. Transiciona la versión en MLflow Model Registry a `stage="Archived"`.
+  4. Estampa los tags de gobernanza: `estado_gobernanza="discarded"`, `motivo_descarte` y timestamp ISO `descartado_en` (tanto en la versión del modelo como en el run de MLflow Tracking).
+  5. **Limpia la cola de Benchmark:** El modelo candidato se excluye automáticamente de las comparativas de `GET /api/v1/admin/modelos/benchmark/{tipo_operacion}`, evitando falsas alertas.
+  6. Sincroniza el registro de jobs en memoria a `estado_gobernanza: "discarded"`.
+- **Request Body:**
+```json
+{
+  "tipo_operacion": "venta",
+  "version": "8",
+  "motivo": "MAPE 18.2% supera el umbral máximo de 15.0% y presenta dispersión IAAO COD > 15."
+}
+```
+- **Respuesta Exitosa (HTTP 200 OK):**
+```json
+{
+  "exito": true,
+  "mensaje": "Modelo candidato xgboost_venta v8 descartado y archivado exitosamente.",
+  "tipo_operacion": "venta",
+  "version_descartada": "8",
+  "nuevo_stage": "Archived",
+  "motivo": "MAPE 18.2% supera el umbral máximo de 15.0% y presenta dispersión IAAO COD > 15.",
+  "metricas": {
+    "mape_pct": 18.214,
+    "r2": 0.6912,
+    "mae": 61240.5,
+    "rmse": 91204.3,
+    "n_train": 44173,
+    "n_test": 23737
+  },
+  "descartado_en": "2026-11-07T12:35:00Z"
 }
 ```
 
@@ -1109,7 +1150,7 @@ public record JobEstadoResponse(
     @JsonProperty("error") String error
 ) {}
 
-// 2. Gobernanza: Promover y Rollback
+// 2. Gobernanza: Promover, Rollback y Descartar
 public record PromocionModeloRequest(
     @JsonProperty("tipo_operacion") String tipoOperacion, // "venta" | "alquiler"
     @JsonProperty("version") String version,             // Opcional (null = auto último candidato)
@@ -1120,6 +1161,23 @@ public record RollbackModeloRequest(
     @JsonProperty("tipo_operacion") String tipoOperacion, // "venta" | "alquiler"
     @JsonProperty("version") String version,             // Opcional (null = auto última versión archivada)
     @JsonProperty("motivo") String motivo                // Opcional
+) {}
+
+public record DescartarModeloRequest(
+    @JsonProperty("tipo_operacion") String tipoOperacion, // "venta" | "alquiler"
+    @JsonProperty("version") String version,             // Opcional (null = auto último candidato)
+    @JsonProperty("motivo") String motivo                // Justificación del descarte
+) {}
+
+public record DescartarModeloResponse(
+    @JsonProperty("exito") Boolean exito,
+    @JsonProperty("mensaje") String mensaje,
+    @JsonProperty("tipo_operacion") String tipoOperacion,
+    @JsonProperty("version_descartada") String versionDescartada,
+    @JsonProperty("nuevo_stage") String nuevoStage,
+    @JsonProperty("motivo") String motivo,
+    @JsonProperty("metricas") MetricasSummaryDTO metricas,
+    @JsonProperty("descartado_en") OffsetDateTime descartadoEn
 ) {}
 
 public record PromocionModeloResponse(
