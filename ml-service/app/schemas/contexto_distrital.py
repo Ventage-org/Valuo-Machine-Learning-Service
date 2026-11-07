@@ -20,11 +20,13 @@ class CoordenadasConsultadas(BaseModel):
 
 
 class EstratoSocioeconomico(BaseModel):
-    titulo: str = "Nivel Socioeconómico"
-    estrato: str = Field(..., description="Estrato predominante (ej: 'Nivel A / B')")
-    decil: str = Field(..., description="Decil socioeconómico poblacional (ej: 'Deciles 9-10 (Estrato Alto)')")
-    porcentaje_a_b: float = Field(..., description="Suma real de pct_NSE_A + pct_NSE_B (%)")
-    distribucion_detallada: dict[str, float] = Field(..., description="Desglose porcentual NSE A, B, C, D, E")
+    titulo: str = "Estrato Socioeconómico"
+    clasificacion: str = Field(..., description="Estrato predominante según clasificación ENAHO-INEI (ej: 'Estrato Alto')")
+    decil_referencial: str = Field(..., description="Decil socioeconómico poblacional referencial (ej: 'Deciles 9-10')")
+    concentracion_estrato_alto_pct: float = Field(..., description="Concentración de población en estratos altos (%)")
+    distribucion_estratos: dict[str, float] = Field(..., description="Desglose porcentual por estrato ENAHO (alto, medio_alto, medio, medio_bajo, bajo)")
+    es_imputado: bool = Field(default=False, description="True si los datos distritales de ENAHO provienen de estimación/imputación espacial.")
+    alerta_contexto: Optional[str] = Field(default=None, description="Mensaje explicativo si el estrato es imputado por muestra reducida.")
     fuente: str = "INEI / ENAHO 2025"
 
 

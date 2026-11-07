@@ -39,7 +39,7 @@ El sistema separa las responsabilidades entre el **Backend Principal** (NestJS /
 
 ### 1.1. Matriz de Clasificación por Rol y Microservicio Consumidor
 
-Para garantizar una arquitectura desacoplada y una correcta asignación de permisos en el API Gateway, la totalidad de los 24 endpoints del servicio se dividen estrictamente en dos dominios de consumo:
+Para garantizar una arquitectura desacoplada y una correcta asignación de permisos en el API Gateway, la totalidad de los 25 endpoints del servicio se dividen estrictamente en dos dominios de consumo:
 
 ```
 +----------------------------------------------------------------------------------------------------+
@@ -60,10 +60,10 @@ Para garantizar una arquitectura desacoplada y una correcta asignación de permi
 
 | Microservicio / Rol Consumidor | Endpoint / Ruta REST | Método | Auth Requerida | Propósito y Función en la Arquitectura |
 | :--- | :--- | :---: | :---: | :--- |
-| **Predicción (Usuario Final)** | `/api/v1/prediccion/venta` | `POST` | Pública / User | Tasación de compraventa con datos del inmueble ingresados por el usuario. Retorna precio, rango ±MAPE, 33 variables SHAP y 3 comparables RNTP. |
-| **Predicción (Usuario Final)** | `/api/v1/prediccion/alquiler` | `POST` | Pública / User | Estimación de renta mensual de alquiler con datos del inmueble. Retorna alquiler PEN, SHAP y 3 comparables RNTP. |
+| **Predicción (Usuario Final)** | `/api/v1/prediccion/venta` | `POST` | Pública / User | Tasación de compraventa con datos del inmueble ingresados por el usuario. Retorna precio en soles constantes y nominales, rango ±MAPE (14.86%), 29 variables SHAP (con estrato consolidado), alerta censal ENAHO y 3 comparables RNTP. |
+| **Predicción (Usuario Final)** | `/api/v1/prediccion/alquiler` | `POST` | Pública / User | Estimación de renta mensual de alquiler con datos del inmueble. Retorna alquiler PEN constantes y nominales, rango ±MAPE (13.68%), 29 variables SHAP (con estrato consolidado), alerta censal ENAHO y 3 comparables RNTP. |
 | **Predicción (Usuario Final)** | `/api/v1/distritos` | `GET` | Pública | Catálogo de los 22 distritos válidos de Lima Metropolitana para poblar el dropdown del formulario web. |
-| **Predicción (Usuario Final)** | `/api/v1/distritos/{distrito}/contexto` | `GET` | Pública | Micro-entorno enriquecido unificado (NSE INEI, seguridad PNP, distancias y tiempos a pie a parques, transporte y salud). Admite `lat` y `lon` opcionales. |
+| **Predicción (Usuario Final)** | `/api/v1/distritos/{distrito}/contexto` | `GET` | Pública | Micro-entorno enriquecido unificado (Estrato socioeconómico oficial INEI/ENAHO con alerta de estimación imputada en distritos de muestra reducida, seguridad PNP, distancias y tiempos a pie a parques, transporte, salud y comercio). Admite `lat` y `lon` opcionales. |
 | **Predicción (Usuario Final)** | `/api/v1/modelos/sensibilidad-factores` | `GET` | Pública | Desglose de los 4 macro-factores del mercado inmobiliario para la Landing Page pública y gráficos de sensibilidad. |
 | **Predicción (Usuario Final)** | `/api/v1/modelos/sensibilidad-factores/{tipo_op}` | `GET` | Pública | Macro-factores específicos para venta o alquiler. |
 | **Infraestructura / Gateway** | `/health` | `GET` | Pública | Liveness / Readiness probe para verificar estado de RAM y modelos cargados. |
@@ -121,7 +121,7 @@ Para lanzar el reentrenamiento, **ningún campo es obligatorio**. El microservic
 | `max_depth` | `int` | **Opcional** | `6` | `6` | Profundidad máxima de los árboles (evita sobreajuste). |
 | `learning_rate` | `float` | **Opcional** | `0.040` | `0.035` | Tasa de aprendizaje o contracción por árbol. |
 | `n_estimators` | `int` | **Opcional** | `650` | `600` | Número total de estimadores (árboles). |
-| `min_child_weight` | `int` | **Opcional** | `9` | `4` | Peso mínimo requerido en un nodo hoja. |
+| `min_child_weight` | `int` | **Opcional** | `8` | `4` | Peso mínimo requerido en un nodo hoja (Palanca 4: 8 venta / 4 alquiler). |
 | `usar_target_m2` | `bool` | **Opcional** | `true` | `true` | Si es `true`, entrena sobre $\ln(\text{precio}/m^2)$ (reduce sesgos en áreas dispares). |
 | `factor_calibracion`| `float` | **Opcional** | `null` (Automático) | `null` (Automático) | Multiplicador de escala. Si es `null`, calcula calibración estratificada IAAO. |
 | `guardar_como_activo`| `bool` | **Opcional** | `false` | `false` | **Gobernanza Human-in-the-Loop:** Si es `false`, se registra como `Candidate` en MLflow para ser comparado antes de promoverlo. Si es `true`, pasa a producción de inmediato. |
@@ -150,12 +150,13 @@ Para lanzar el reentrenamiento, **ningún campo es obligatorio**. El microservic
   X-Admin-Token: <ADMIN_TOKEN_CONFIGURADO>
   ```
 - **Propósito y Gobernanza:**  
-  Diseñado para el **primer despliegue** o reinicio en frío (*cold-start*) del servicio. A diferencia de los endpoints de reentrenamiento periódico (que generan un modelo en estado `Candidate` para revisión humana), este endpoint:
-  1. Entrena el modelo completo con la base histórica de PostgreSQL.
-  2. Registra los artefactos y métricas en **MLflow Tracking & Model Registry**.
+  Diseñado para el **primer despliegue** o reinicio en frío (*cold-start*) del servicio. En el repositorio de código, los archivos `model_config.json` y `model_alquiler_config.json` se mantienen deliberadamente limpios (`"modelo_archivo": "ninguno"`, `"modelo_version": "ninguno (esperando entrenamiento inicial)"`), sin pre-incluir binarios `.pkl`. Al subir el servicio por primera vez sin modelos, este endpoint:
+  1. Entrena el modelo completo desde la base histórica de PostgreSQL (`dataset_inmuebles_venta` o `alquiler`).
+  2. Registra los artefactos y métricas oficiales en **MLflow Tracking & Model Registry**.
   3. Promueve **automáticamente** la versión a stage **`Production`** y le asigna el alias **`@champion`**.
-  4. Realiza **Hot-Reload en memoria RAM** en el servicio de inferencia de manera inmediata (*zero-downtime*).
-  5. Sube los artefactos a Azure Blob Storage y **elimina incondicionalmente el binario `.pkl` local** del contenedor para mantenerlo liviano.
+  4. Realiza **Hot-Reload en memoria RAM** (cargando el modelo y el TreeExplainer de SHAP) de manera inmediata (*zero-downtime*).
+  5. Actualiza dinámicamente en disco los archivos `model_config.json` o `model_alquiler_config.json` con la versión, métricas y factor de calibración, permitiendo que ante futuros reinicios del contenedor (`lifespan`), el modelo y sus metadatos se carguen automáticamente en RAM.
+  6. Sube los artefactos a Azure Blob Storage y elimina el binario `.pkl` local del contenedor para mantenerlo liviano (salvo que `PRESERVAR_MODELOS_LOCALES=true` o MLflow esté desconectado, en cuyo caso preserva los `.pkl` locales en disco).
 
 - **Request Body (Opcional — puedes enviar `{}` o personalizar hiperparámetros):**
 ```json
@@ -292,29 +293,29 @@ Para lanzar el reentrenamiento, **ningún campo es obligatorio**. El microservic
   "duracion_segundos": 34.32,
   "progreso": "[8/8] Entrenamiento de venta completado y registrado como candidato.",
   "metricas": {
-    "mape_pct": 14.1620,
-    "r2": 0.7472,
-    "mae": 51230.15,
-    "rmse": 77650.40,
-    "cod_pct": 14.12,
-    "cov_pct": 18.35,
-    "prd": 1.0084,
-    "prb": -0.0125,
-    "median_ratio_calibrado": 1.0000,
-    "n_train": 44173,
-    "n_test": 23737,
+    "mape_pct": 14.8601,
+    "r2": 0.7477,
+    "mae": 51861.76,
+    "rmse": 78053.38,
+    "cod_pct": 14.20,
+    "cov_pct": 19.73,
+    "prd": 1.0363,
+    "prb": -0.0806,
+    "median_ratio_calibrado": 1.0305,
+    "n_train": 88346,
+    "n_test": 47474,
     "supera_benchmark": true,
     "iaao": {
-      "median_ratio": 1.0000,
-      "mean_ratio": 1.0142,
-      "weighted_mean_ratio": 1.0057,
-      "cod_pct": 14.12,
-      "cov_pct": 18.35,
-      "prd": 1.0084,
-      "prb": -0.0125,
+      "median_ratio": 1.0305,
+      "mean_ratio": 1.0456,
+      "weighted_mean_ratio": 1.0090,
+      "cod_pct": 14.20,
+      "cov_pct": 19.73,
+      "prd": 1.0363,
+      "prb": -0.0806,
       "cumple_iaao_cod": true,
       "cumple_iaao_nivel": true,
-      "cumple_iaao_prd": true
+      "cumple_iaao_prd": false
     }
   },
   "artefactos": {
@@ -587,33 +588,47 @@ Prefijo: `/api/v1/admin/modelos`
 
 ### 5.1. Health Check Operacional
 - **Método / Ruta:** `GET /health`
-- **Descripción:** Diseñado para *health check probes* de Kubernetes, Nginx o comprobación periódica del backend.
-- **Respuesta (HTTP 200 OK):**
+- **Descripción:** Diseñado para *health check probes* de Kubernetes, Nginx o comprobación periódica del backend. Refleja el ciclo de vida del servicio:
+  - **Cold-Start (Antes del entrenamiento inicial):** Retorna `status: "degraded"` indicando que los modelos aún no han sido generados ni cargados en memoria.
+  - **Operativo (Post-entrenamiento inicial o en producción):** Retorna `status: "ok"` cuando ambos modelos (venta y alquiler) están cargados en memoria RAM.
+
+#### Respuesta en Estado Operativo (HTTP 200 OK):
 ```json
 {
   "status": "ok",
-  "modelo_venta": "v8_mlflow",
-  "modelo_alquiler": "v4_mlflow",
+  "modelo_venta": "v2",
+  "modelo_alquiler": "v1",
   "ipc_periodo": "2026-Q1"
 }
 ```
-*(Si alguno de los modelos no está cargado en RAM, `status` pasa a `"degraded"`)*.
+
+#### Respuesta en Estado Cold-Start / Esperando Entrenamiento Inicial (HTTP 200 OK):
+```json
+{
+  "status": "degraded",
+  "modelo_venta": null,
+  "modelo_alquiler": null,
+  "ipc_periodo": null
+}
+```
 
 ---
 
 ### 5.2. Información y Metadatos del Modelo en Servicio
 - **Método / Ruta:** `GET /api/v1/modelo/info?tipo_operacion=venta`
 - **Query Params:** `tipo_operacion` (`venta` o `alquiler`, default `venta`)
-- **Descripción:** Retorna el estado completo del modelo que atiende las predicciones en este momento:
+- **Descripción:** Retorna el estado completo del modelo que atiende las predicciones en este momento. Si el servicio acaba de desplegarse en frío sin entrenar, responde de forma segura indicando `"ninguno (esperando entrenamiento inicial)"` con métricas en 0.0.
+
+#### Respuesta en Estado Operativo (HTTP 200 OK):
 ```json
 {
-  "version": "v8_mlflow",
+  "version": "v2",
   "archivo": "xgboost_venta_v2.pkl",
   "metricas": {
-    "mape_pct": 14.1620,
-    "r2": 0.7472,
-    "mae_soles": 51230.15,
-    "rmse_soles": 77650.40,
+    "mape_pct": 14.8601,
+    "r2": 0.7477,
+    "mae_soles": 51861.76,
+    "rmse_soles": 78053.38,
     "train_periodo": "2016-2023",
     "test_periodo": "2024-2025"
   },
@@ -631,23 +646,72 @@ Prefijo: `/api/v1/admin/modelos`
     "Barranco",
     "Bellavista",
     "Breña",
-    "Callao",
     "Carabayllo",
+    "Cercado de Lima",
     "Chorrillos",
     "Comas",
-    "Jesus Maria",
+    "Jesús María",
     "La Molina",
+    "La Perla",
     "La Victoria",
-    "Lima",
     "Lince",
     "Los Olivos",
-    "Magdalena del Mar",
+    "Magdalena",
     "Miraflores",
     "Pueblo Libre",
     "San Borja",
     "San Isidro",
     "San Miguel",
-    "Santiago de Surco",
+    "Surco",
+    "Surquillo"
+  ]
+}
+```
+
+#### Respuesta en Estado Cold-Start (HTTP 200 OK):
+```json
+{
+  "version": "ninguno (esperando entrenamiento inicial)",
+  "archivo": "ninguno",
+  "metricas": {
+    "mape_pct": 0.0,
+    "r2": 0.0,
+    "mae_soles": 0.0,
+    "rmse_soles": 0.0,
+    "train_periodo": "N/A",
+    "test_periodo": "N/A"
+  },
+  "ipc_actual": {
+    "valor": 169.18,
+    "periodo": "2026-Q1",
+    "fuente": "INEI/BCRP",
+    "nota": "Servicio a la espera de entrenamiento inicial."
+  },
+  "n_features": 33,
+  "n_distritos": 22,
+  "data_provider": "postgresql",
+  "distritos_disponibles": [
+    "Ate Vitarte",
+    "Barranco",
+    "Bellavista",
+    "Breña",
+    "Carabayllo",
+    "Cercado de Lima",
+    "Chorrillos",
+    "Comas",
+    "Jesús María",
+    "La Molina",
+    "La Perla",
+    "La Victoria",
+    "Lince",
+    "Los Olivos",
+    "Magdalena",
+    "Miraflores",
+    "Pueblo Libre",
+    "San Borja",
+    "San Isidro",
+    "San Miguel",
+    "Surco",
     "Surquillo"
   ]
 }
@@ -967,14 +1031,14 @@ Para construir la interfaz y la lógica de validación en el Backend, este es el
 
 | Categoría | Métrica en JSON | Rango / Umbral Objetivo | Interpretación Técnica en Tasación |
 | :--- | :--- | :---: | :--- |
-| **Error Relativo** | `mape_pct` | $\le 15.0\%$ (Venta)<br>$\le 17.89\%$ (Alquiler) | Porcentaje promedio de desviación absoluta sobre el valor real. Venta actual: **14.16%**, Alquiler actual: **13.76%**. |
-| **Ajuste Global** | `r2` | $\ge 0.70$ (Venta)<br>$\ge 0.65$ (Alquiler) | Varianza de los precios de mercado explicada por las 33 features socioeconómicas y físicas. |
-| **Error Escalar** | `mae` / `rmse` | Menor es mejor | Error en Soles constantes (sin inflación). MAE penaliza linealmente; RMSE penaliza cuadráticamente grandes desvíos. |
-| **Nivel IAAO** | `median_ratio` | **`0.90 – 1.10`** (Ideal: 1.00) | Mediana del cociente $\frac{\text{Predicho}}{\text{Real}}$. Con calibración estratificada, se ubica exactamente en **1.0000**. |
-| **Dispersión IAAO** | `cod_pct` | **`5.0% – 15.0%`** | Coeficiente de Dispersión (COD). Mide la equidad horizontal (dispersión de errores respecto a la mediana). Actual: **14.12%** ✅. |
-| **Variación IAAO**| `cov_pct` | $\le 20.0\%$ | Coeficiente de variación paramétrico basado en desviación estándar de ratios. |
-| **Equidad Vertical**| `prd` | **`0.98 – 1.03`** (Ideal: 1.00) | Diferencial Relacionado con el Precio (*Price-Related Differential*). Si es $>1.03$ hay regresividad; si es $<0.98$ progresividad. Actual: **1.0084** ✅. |
-| **Sesgo de Precio** | `prb` | **`-0.05 a +0.05`** | Sesgo Relacionado con el Precio (*Price-Related Bias*). Regresión del ratio sobre el logaritmo del precio. Actual: **-0.0125** ✅. |
+| **Error Relativo** | `mape_pct` | $\le 15.0\%$ (Venta)<br>$\le 17.89\%$ (Alquiler) | Porcentaje promedio de desviación absoluta sobre el valor real. Venta actual: **14.86%**, Alquiler actual: **13.68%**. |
+| **Ajuste Global** | `r2` | $\ge 0.70$ (Venta)<br>$\ge 0.65$ (Alquiler) | Varianza de los precios de mercado explicada por las features físicas y de entorno. Venta actual: **0.7477**, Alquiler actual: **0.6761**. |
+| **Error Escalar** | `mae` / `rmse` | Menor es mejor | Error en Soles constantes (sin inflación). MAE penaliza linealmente; RMSE penaliza cuadráticamente grandes desvíos. Venta: MAE S/ 51,861.76 / RMSE S/ 78,053.38; Alquiler: MAE S/ 235.28 / RMSE S/ 361.10. |
+| **Nivel IAAO** | `median_ratio` | **`0.90 – 1.10`** (Ideal: 1.00) | Mediana del cociente $\frac{\text{Predicho}}{\text{Real}}$. Con calibración estratificada, se ubica en **1.0305** (Venta) y **0.9900** (Alquiler) ✅. |
+| **Dispersión IAAO** | `cod_pct` | **`5.0% – 15.0%`** | Coeficiente de Dispersión (COD). Mide la equidad horizontal (dispersión de errores respecto a la mediana). Venta: **14.20%** ✅, Alquiler: **13.79%** ✅. |
+| **Variación IAAO**| `cov_pct` | $\le 20.0\%$ | Coeficiente de variación paramétrico basado en desviación estándar de ratios. Venta: **19.73%** ✅, Alquiler: **19.74%** ✅. |
+| **Equidad Vertical**| `prd` | **`0.98 – 1.03`** (Ideal: 1.00) | Diferencial Relacionado con el Precio (*Price-Related Differential*). Venta: **1.0363**, Alquiler: **1.0387**. |
+| **Sesgo de Precio** | `prb` | **`-0.05 a +0.05`** | Sesgo Relacionado con el Precio (*Price-Related Bias*). Regresión del ratio sobre el logaritmo del precio. Venta: **-0.0806**, Alquiler: **-0.1233**. |
 
 ---
 
@@ -1203,7 +1267,7 @@ Tanto para `/api/v1/prediccion/venta` como para `/api/v1/prediccion/alquiler`:
     "superior_nominales": 558000.0,
     "inferior_constantes": 243780.0,
     "superior_constantes": 330220.0,
-    "mape_pct": 15.04
+    "mape_pct": 14.86
   },
   "explicabilidad": {
     "valor_base_constantes": 432295.69,
@@ -1214,7 +1278,7 @@ Tanto para `/api/v1/prediccion/venta` como para `/api/v1/prediccion/alquiler`:
         "shap_value": 0.312,
         "valor_feature": 75.0,
         "impacto": "positivo",
-        "peso_porcentaje": 32.4,
+        "peso_porcentaje": 28.2,
         "nivel_impacto": "Impacto Muy Alto"
       },
       {
@@ -1223,7 +1287,16 @@ Tanto para `/api/v1/prediccion/venta` como para `/api/v1/prediccion/alquiler`:
         "shap_value": -0.198,
         "valor_feature": 287982.23,
         "impacto": "negativo",
-        "peso_porcentaje": 20.6,
+        "peso_porcentaje": 22.4,
+        "nivel_impacto": "Impacto Muy Alto"
+      },
+      {
+        "feature": "estrato_socioeconomico",
+        "label": "Estrato Socioeconómico de la Zona (NSE)",
+        "shap_value": 0.065,
+        "valor_feature": 53.586,
+        "impacto": "positivo",
+        "peso_porcentaje": 16.8,
         "nivel_impacto": "Impacto Alto"
       },
       {
@@ -1232,23 +1305,24 @@ Tanto para `/api/v1/prediccion/venta` como para `/api/v1/prediccion/alquiler`:
         "shap_value": -0.105,
         "valor_feature": 8.0,
         "impacto": "negativo",
-        "peso_porcentaje": 10.9,
+        "peso_porcentaje": 9.5,
         "nivel_impacto": "Impacto Moderado"
       }
     ],
-    "n_features_mostradas": 33,
+    "n_features_mostradas": 29,
     "n_features_total": 33,
-    "nota": "Los shap_values están en escala logarítmica. 'peso_porcentaje' suma 100.0% entre todas las variables."
+    "nota": "Los shap_values están en escala logarítmica (transformación log1p del target). 'peso_porcentaje' suma exactamente 100.0% entre la totalidad de variables del modelo."
   },
   "modelo": {
     "version": "v2",
-    "mape_test": 15.04,
-    "r2_test": 0.7469,
+    "mape_test": 14.8601,
+    "r2_test": 0.7477,
     "ipc_factor": 169.18,
     "periodo_ipc": "2026-Q1",
     "train_periodo": "2016-2023",
     "test_periodo": "2024-2025"
   },
+  "alerta_contexto": null,
   "comparables_rntp": [
     {
       "posicion": 1,
@@ -1352,7 +1426,7 @@ Tanto para `/api/v1/prediccion/venta` como para `/api/v1/prediccion/alquiler`:
     "superior_nominales": 4141.14,
     "inferior_constantes": 1852.23,
     "superior_constantes": 2447.77,
-    "mape_pct": 13.85
+    "mape_pct": 13.68
   },
   "explicabilidad": {
     "valor_base_constantes": 2680.5,
@@ -1367,6 +1441,15 @@ Tanto para `/api/v1/prediccion/venta` como para `/api/v1/prediccion/alquiler`:
         "nivel_impacto": "Impacto Muy Alto"
       },
       {
+        "feature": "estrato_socioeconomico",
+        "label": "Estrato Socioeconómico de la Zona (NSE)",
+        "shap_value": 0.0837,
+        "valor_feature": 53.586,
+        "impacto": "positivo",
+        "peso_porcentaje": 17.3,
+        "nivel_impacto": "Impacto Alto"
+      },
+      {
         "feature": "Superficie",
         "label": "Superficie (90.0 m²)",
         "shap_value": 0.21,
@@ -1376,19 +1459,20 @@ Tanto para `/api/v1/prediccion/venta` como para `/api/v1/prediccion/alquiler`:
         "nivel_impacto": "Impacto Alto"
       }
     ],
-    "n_features_mostradas": 33,
+    "n_features_mostradas": 29,
     "n_features_total": 33,
-    "nota": "Los shap_values están en escala logarítmica. 'peso_porcentaje' suma 100.0% entre todas las variables."
+    "nota": "Los shap_values están en escala logarítmica (transformación log1p del target). 'peso_porcentaje' suma exactamente 100.0% entre la totalidad de variables del modelo."
   },
   "modelo": {
     "version": "v1",
-    "mape_test": 13.85,
-    "r2_test": 0.7612,
+    "mape_test": 13.6811,
+    "r2_test": 0.6761,
     "ipc_factor": 169.18,
     "periodo_ipc": "2026-Q1",
     "train_periodo": "2016-2023",
     "test_periodo": "2024-2025"
   },
+  "alerta_contexto": null,
   "comparables_rntp": [
     {
       "posicion": 1,
@@ -1428,7 +1512,55 @@ Tanto para `/api/v1/prediccion/venta` como para `/api/v1/prediccion/alquiler`:
 
 ---
 
-#### D. DTOs Java / Spring Boot:
+#### D. Regla de las Tres (3) Muestras Comparables de Mercado (RNTP Art. 3) y Resumen Estadístico
+
+Tanto `POST /api/v1/prediccion/venta` como `POST /api/v1/prediccion/alquiler` retornan automáticamente los bloques `comparables_rntp` y `resumen_rntp` para cumplimiento normativo del **Reglamento Nacional de Tasaciones del Perú (RNTP)**:
+
+```json
+{
+  "comparables_rntp": [
+    {
+      "posicion": 1,
+      "distrito": "San Miguel",
+      "es_mismo_distrito": true,
+      "zona_homogenea": "LIMA_MODERNA",
+      "superficie_m2": 75.0,
+      "habitaciones": 3,
+      "banios": 2.0,
+      "garajes": 1,
+      "piso": 5,
+      "antiguedad_anios": 8,
+      "precio_total_pen": 482873.01,
+      "precio_m2_pen": 6438.31,
+      "periodo_muestra": "2025-Q2",
+      "indice_similitud_pct": 100.0,
+      "diferencias": {
+        "dif_superficie_m2": 0.0,
+        "dif_habitaciones": 0,
+        "dif_banios": 0.0,
+        "dif_antiguedad_anios": 0,
+        "dif_piso": 0
+      }
+    }
+  ],
+  "resumen_rntp": {
+    "cantidad_muestras": 3,
+    "precio_promedio_pen": 486691.0,
+    "precio_m2_promedio_pen": 6433.14,
+    "desviacion_vs_prediccion_pct": 0.26,
+    "cumple_regla_tres_muestras": true,
+    "criterio_busqueda": "Mismo distrito",
+    "advertencia": null
+  }
+}
+```
+
+- **Latencia:** Sub-milisegundo (< 0.5 ms) gracias al pre-cálculo de índices Numpy en memoria RAM.
+- **Resiliencia / Fallback:** En caso de baja densidad muestral en un distrito, conmuta a la Zona Homogénea (NSE) y/o degrada elegantemente sin romper el endpoint.
+
+---
+
+#### E. DTOs Java / Spring Boot Completos para Inferencia:
 
 ```java
 // 1. Request de Predicción
@@ -1452,7 +1584,10 @@ public record PrediccionResponseDTO(
     @JsonProperty("prediccion") ValoresPrediccionDTO prediccion,
     @JsonProperty("intervalo_confianza") IntervaloConfianzaDTO intervaloConfianza,
     @JsonProperty("explicabilidad") ExplicabilidadDTO explicabilidad,
-    @JsonProperty("modelo") InfoModeloDTO modelo
+    @JsonProperty("modelo") InfoModeloDTO modelo,
+    @JsonProperty("alerta_contexto") String alertaContexto, // Null si distrito tiene muestra completa; Aviso si es imputado (ENAHO)
+    @JsonProperty("comparables_rntp") List<MuestraComparableDTO> comparablesRntp,
+    @JsonProperty("resumen_rntp") ResumenRNTPDTO resumenRntp
 ) {}
 
 public record ValoresPrediccionDTO(
@@ -1472,19 +1607,19 @@ public record IntervaloConfianzaDTO(
 
 public record ExplicabilidadDTO(
     @JsonProperty("valor_base_constantes") Double valorBaseConstantes,
-    @JsonProperty("contribuciones") List<ContribucionFeatureDTO> contribuciones, // 33 variables para persistencia en BD
-    @JsonProperty("n_features_mostradas") Integer nFeaturesMostradas,           // 33
-    @JsonProperty("n_features_total") Integer nFeaturesTotal,                   // 33
+    @JsonProperty("contribuciones") List<ContribucionFeatureDTO> contribuciones, // Variables ordenadas por impacto SHAP
+    @JsonProperty("n_features_mostradas") Integer nFeaturesMostradas,           // 29 variables mostradas (estrato consolidado)
+    @JsonProperty("n_features_total") Integer nFeaturesTotal,                   // 33 variables totales del modelo
     @JsonProperty("nota") String nota
 ) {}
 
 public record ContribucionFeatureDTO(
-    @JsonProperty("feature") String feature,               // ej: "distrito_encoded"
-    @JsonProperty("label") String label,                   // ej: "Distrito (Miraflores)"
+    @JsonProperty("feature") String feature,               // ej: "estrato_socioeconomico", "distrito_encoded"
+    @JsonProperty("label") String label,                   // ej: "Estrato Socioeconómico de la Zona (NSE)"
     @JsonProperty("shap_value") Double shapValue,          // Escala logarítmica
     @JsonProperty("valor_feature") Double valorFeature,    // Valor real evaluado
     @JsonProperty("impacto") String impacto,               // "positivo" | "negativo" | "neutro"
-    @JsonProperty("peso_porcentaje") Double pesoPorcentaje,// % sobre el 100% total (suma 100.0%)
+    @JsonProperty("peso_porcentaje") Double pesoPorcentaje,// % sobre el 100% total (suma exactamente 100.0%)
     @JsonProperty("nivel_impacto") String nivelImpacto     // "Impacto Muy Alto" | "Impacto Alto" | "Impacto Moderado" | "Impacto Leve"
 ) {}
 
@@ -1497,12 +1632,49 @@ public record InfoModeloDTO(
     @JsonProperty("train_periodo") String trainPeriodo,
     @JsonProperty("test_periodo") String testPeriodo
 ) {}
+
+// 3. Muestras Comparables Normativas RNTP
+public record MuestraComparableDTO(
+    @JsonProperty("posicion") Integer posicion,
+    @JsonProperty("distrito") String distrito,
+    @JsonProperty("es_mismo_distrito") Boolean esMismoDistrito,
+    @JsonProperty("zona_homogenea") String zonaHomogenea,
+    @JsonProperty("superficie_m2") Double superficieM2,
+    @JsonProperty("habitaciones") Integer habitaciones,
+    @JsonProperty("banios") Double banios,
+    @JsonProperty("garajes") Integer garajes,
+    @JsonProperty("piso") Integer piso,
+    @JsonProperty("antiguedad_anios") Integer antiguedadAnios,
+    @JsonProperty("precio_total_pen") Double precioTotalPen,
+    @JsonProperty("precio_m2_pen") Double precioM2Pen,
+    @JsonProperty("periodo_muestra") String periodoMuestra,
+    @JsonProperty("indice_similitud_pct") Double indiceSimilitudPct,
+    @JsonProperty("diferencias") DiferenciasInmuebleDTO diferencias
+) {}
+
+public record DiferenciasInmuebleDTO(
+    @JsonProperty("dif_superficie_m2") Double difSuperficieM2,
+    @JsonProperty("dif_habitaciones") Integer difHabitaciones,
+    @JsonProperty("dif_banios") Double difBanios,
+    @JsonProperty("dif_antiguedad_anios") Integer difAntiguedadAnios,
+    @JsonProperty("dif_piso") Integer difPiso
+) {}
+
+public record ResumenRNTPDTO(
+    @JsonProperty("cantidad_muestras") Integer cantidadMuestras,
+    @JsonProperty("precio_promedio_pen") Double precioPromedioPen,
+    @JsonProperty("precio_m2_promedio_pen") Double precioM2PromedioPen,
+    @JsonProperty("desviacion_vs_prediccion_pct") Double desviacionVsPrediccionPct,
+    @JsonProperty("cumple_regla_tres_muestras") Boolean cumpleReglaTresMuestras,
+    @JsonProperty("criterio_busqueda") String criterioBusqueda,
+    @JsonProperty("advertencia") String advertencia
+) {}
 ```
 
-#### Estrategia en Frontend y Backend:
-- **Backend:** Almacena `explicabilidad.contribuciones` (las 33 variables) en una columna `JSONB` de la tabla `valuaciones` o `predicciones`.
-- **Frontend — Vista Principal:** Renderiza `contribuciones.slice(0, 10)`, que explica aproximadamente el **83.5%** del peso de la decisión del modelo.
-- **Frontend — Botón "Mostrar todas las variables":** Despliega las 23 variables restantes (`contribuciones.slice(10)`), completando el **16.5%** restante hasta el 100.0%.
+#### F. Estrategia en Frontend y Backend:
+- **Backend:** Almacena `explicabilidad.contribuciones` (las variables del modelo) en una columna `JSONB` de la tabla `valuaciones` o `predicciones`.
+- **Frontend — Vista Principal:** Renderiza las variables con mayor peso o agrupa en pestañas ejecutivas.
+- **Frontend — Muestras Comparables:** Renderiza la tabla pericial de los 3 testigos homólogos con sus diferencias relativas, dando sustento legal a la tasación.
 
 ---
 
@@ -1538,62 +1710,11 @@ public record FactorSensibilidadDTO(
 ) {}
 ```
 
-
-
-
-
-### 1.4 Regla de las Tres (3) Muestras Comparables de Mercado (RNTP Art. 3)
-
-Tanto `POST /api/v1/prediccion/venta` como `POST /api/v1/prediccion/alquiler` retornan automáticamente los bloques `comparables_rntp` y `resumen_rntp` para cumplimiento normativo del **Reglamento Nacional de Tasaciones del Perú (RNTP)**:
-
-```json
-{
-  "comparables_rntp": [
-    {
-      "posicion": 1,
-      "distrito": "San Miguel",
-      "es_mismo_distrito": true,
-      "zona_homogenea": "LIMA_MODERNA",
-      "superficie_m2": 75.0,
-      "habitaciones": 3,
-      "banios": 2.0,
-      "garajes": 1,
-      "piso": 5,
-      "antiguedad_anios": 8,
-      "precio_total_pen": 482873.01,
-      "precio_m2_pen": 6438.31,
-      "periodo_muestra": "2025-Q2",
-      "indice_similitud_pct": 100.0,
-      "diferencias": {
-        "dif_superficie_m2": 0.0,
-        "dif_habitaciones": 0,
-        "dif_banios": 0.0,
-        "dif_antiguedad_anios": 0,
-        "dif_piso": 0
-      }
-    }
-  ],
-  "resumen_rntp": {
-    "cantidad_muestras": 3,
-    "precio_promedio_pen": 469759.14,
-    "precio_m2_promedio_pen": 6232.92,
-    "desviacion_vs_prediccion_pct": 3.24,
-    "cumple_regla_tres_muestras": true,
-    "criterio_busqueda": "Mismo distrito",
-    "advertencia": null
-  }
-}
-```
-
-- **Latencia:** Sub-milisegundo (< 0.5 ms) gracias al pre-cálculo de índices Numpy en memoria RAM.
-- **Resiliencia / Fallback:** En caso de baja densidad muestral en un distrito, conmuta a la Zona Homogénea (NSE) y/o degrada elegantemente sin romper el endpoint.
-
-
 ---
 
 ### 7.6. Micro-Entorno Enriquecido y Contexto Distrital (`GET /api/v1/distritos/{distrito}/contexto`)
 
-Diseñado como **fuente canónica única** tanto para el **mapa interactivo previo a la tasación** como para las **tarjetas de detalle post-tasación**. Calcula métricas objetivas basadas en INEI/ENAHO, tasas oficiales de la PNP y distancias geodésicas en metros (Haversine) hacia los hitos urbanos de OpenStreetMap.
+Diseñado como **fuente canónica única** tanto para el **mapa interactivo previo a la tasación** como para las **tarjetas de detalle post-tasación**. Calcula métricas objetivas basadas en INEI/ENAHO (estratos socioeconómicos), tasas oficiales de la PNP y distancias geodésicas en metros (Haversine) hacia los hitos urbanos de OpenStreetMap.
 
 - **Método / Ruta:** `GET /api/v1/distritos/{distrito}/contexto`
 - **Query Params (Opcionales):**
@@ -1602,9 +1723,11 @@ Diseñado como **fuente canónica única** tanto para el **mapa interactivo prev
 - **Seguridad:** Pública (No requiere token de administrador).
 - **Comportamiento Híbrido:**
   - Si se envían `lat` y `lon`: calcula la distancia exacta en metros al hito más cercano y el tiempo de caminata a pie.
-  - Si se omiten: calcula las distancias referenciales a partir del centroide distrital.
+  - Si se omiten: calcula las distancias referenciales a partir del centroide distrital (`es_centroide: true`).
+- **Gobernanza de Muestra Reducida ENAHO:**  
+  En distritos donde la encuesta ENAHO tuvo un tamaño muestral censal reducido (ej. Barranco, Lince, Magdalena), el servicio activa `es_imputado: true` y genera un aviso transparente en `alerta_contexto`.
 
-#### Ejemplo de Respuesta (HTTP 200 OK):
+#### Ejemplo de Respuesta 1 — Distrito con Censo Completo (Miraflores, HTTP 200 OK):
 ```json
 {
   "distrito": "Miraflores",
@@ -1614,17 +1737,19 @@ Diseñado como **fuente canónica única** tanto para el **mapa interactivo prev
     "es_centroide": false
   },
   "estrato_socioeconomico": {
-    "titulo": "Nivel Socioeconómico",
-    "estrato": "Nivel A / B",
-    "decil": "Deciles 9-10 (Estrato Alto)",
-    "porcentaje_a_b": 53.6,
-    "distribucion_detallada": {
-      "A": 31.6,
-      "B": 21.9,
-      "C": 8.1,
-      "D": 38.3,
-      "E": 0.0
+    "titulo": "Estrato Socioeconómico",
+    "clasificacion": "Estrato Medio-Alto",
+    "decil_referencial": "Deciles 6-8 (Estrato Medio-Alto)",
+    "concentracion_estrato_alto_pct": 53.6,
+    "distribucion_estratos": {
+      "alto": 31.6,
+      "medio_alto": 21.9,
+      "medio": 8.1,
+      "medio_bajo": 38.3,
+      "bajo": 0.0
     },
+    "es_imputado": false,
+    "alerta_contexto": null,
     "fuente": "INEI / ENAHO 2025"
   },
   "seguridad_ciudadana": {
@@ -1675,4 +1800,163 @@ Diseñado como **fuente canónica única** tanto para el **mapa interactivo prev
     "fuente": "OpenStreetMap"
   }
 }
+```
+
+#### Ejemplo de Respuesta 2 — Distrito con Imputación Censal (Barranco, HTTP 200 OK):
+```json
+{
+  "distrito": "Barranco",
+  "coordenadas_consultadas": {
+    "lat": -12.1489,
+    "lon": -77.0211,
+    "es_centroide": true
+  },
+  "estrato_socioeconomico": {
+    "titulo": "Estrato Socioeconómico",
+    "clasificacion": "Estrato Medio-Alto",
+    "decil_referencial": "Deciles 6-8 (Estrato Medio-Alto)",
+    "concentracion_estrato_alto_pct": 53.6,
+    "distribucion_estratos": {
+      "alto": 31.6,
+      "medio_alto": 21.9,
+      "medio": 8.1,
+      "medio_bajo": 38.3,
+      "bajo": 0.0
+    },
+    "es_imputado": true,
+    "alerta_contexto": "Aviso de contexto: La información de estrato socioeconómico para el distrito de Barranco proviene de una estimación imputada debido a un tamaño muestral censal reducido en ENAHO. La valoración se fundamenta prioritariamente en las características físicas y equipamiento del entorno.",
+    "fuente": "INEI / ENAHO 2025"
+  },
+  "seguridad_ciudadana": {
+    "titulo": "Seguridad Ciudadana",
+    "indice": 6.8,
+    "escala": "10.0",
+    "nivel": "Medio",
+    "tasa_robos_10k_hab": 845.10,
+    "tasa_denuncias_10k_hab": 9120.45,
+    "comisaria_cercana": "Comisaría PNP Barranco",
+    "distancia_comisaria_m": 310,
+    "descripcion": "Zona turística con afluencia peatonal moderada y vigilancia focalizada.",
+    "fuente": "Sistema Estadístico de la Policía Nacional del Perú (PNP)"
+  },
+  "movilidad_transporte": {
+    "titulo": "Transporte Público Masivo",
+    "calificacion": "Accesibilidad Vial Óptima",
+    "estacion_cercana": "Estación Bulevar",
+    "sistema": "Metropolitano",
+    "distancia_m": 220,
+    "badge_tiempo_a_pie": "3 min a pie",
+    "fuente": "OpenStreetMap / ATU"
+  },
+  "areas_verdes": {
+    "titulo": "Parques y Espacios Públicos",
+    "calificacion": "Áreas verdes a corta distancia (< 300 m)",
+    "parque_cercano": "Parque Municipal de Barranco",
+    "tipo_parque": "Parque Histórico",
+    "distancia_m": 80,
+    "badge_tiempo_a_pie": "1 min a pie",
+    "parques_en_radio_1km": 6,
+    "fuente": "OpenStreetMap Cartography"
+  },
+  "salud_educacion": {
+    "titulo": "Equipamiento de Salud y Educación",
+    "hospital_clinica_cercana": "Policlínico Barranco",
+    "distancia_salud_m": 550,
+    "colegio_cercano": "Colegio San Luis",
+    "distancia_colegio_m": 280,
+    "universidad_cercana": "Universidad de Ingeniería y Tecnología (UTEC)",
+    "distancia_universidad_km": 0.8,
+    "fuente": "OpenStreetMap / MINSA / MINEDU"
+  },
+  "comercio_retail": {
+    "titulo": "Comercio y Servicios",
+    "centro_comercial_cercano": "Centro Comercial Barranco Plaza",
+    "distancia_comercio_m": 350,
+    "fuente": "OpenStreetMap"
+  }
+}
+```
+
+#### DTOs Java / Spring Boot para Contexto Distrital:
+
+```java
+public record ContextoDistritalResponseDTO(
+    @JsonProperty("distrito") String distrito,
+    @JsonProperty("coordenadas_consultadas") CoordenadasConsultadasDTO coordenadasConsultadas,
+    @JsonProperty("estrato_socioeconomico") EstratoSocioeconomicoDTO estratoSocioeconomico,
+    @JsonProperty("seguridad_ciudadana") SeguridadCiudadanaDTO seguridadCiudadana,
+    @JsonProperty("movilidad_transporte") MovilidadTransporteDTO movilidadTransporte,
+    @JsonProperty("areas_verdes") AreasVerdesDTO areasVerdes,
+    @JsonProperty("salud_educacion") SaludEducacionDTO saludEducacion,
+    @JsonProperty("comercio_retail") ComercioRetailDTO comercioRetail
+) {}
+
+public record CoordenadasConsultadasDTO(
+    @JsonProperty("lat") Double lat,
+    @JsonProperty("lon") Double lon,
+    @JsonProperty("es_centroide") Boolean esCentroide
+) {}
+
+public record EstratoSocioeconomicoDTO(
+    @JsonProperty("titulo") String titulo,
+    @JsonProperty("clasificacion") String clasificacion,
+    @JsonProperty("decil_referencial") String decilReferencial,
+    @JsonProperty("concentracion_estrato_alto_pct") Double concentracionEstratoAltoPct,
+    @JsonProperty("distribucion_estratos") Map<String, Double> distribucionEstratos,
+    @JsonProperty("es_imputado") Boolean esImputado,
+    @JsonProperty("alerta_contexto") String alertaContexto,
+    @JsonProperty("fuente") String fuente
+) {}
+
+public record SeguridadCiudadanaDTO(
+    @JsonProperty("titulo") String titulo,
+    @JsonProperty("indice") Double indice,
+    @JsonProperty("escala") String escala,
+    @JsonProperty("nivel") String nivel,
+    @JsonProperty("tasa_robos_10k_hab") Double tasaRobos10kHab,
+    @JsonProperty("tasa_denuncias_10k_hab") Double tasaDenuncias10kHab,
+    @JsonProperty("comisaria_cercana") String comisariaCercana,
+    @JsonProperty("distancia_comisaria_m") Integer distanciaComisariaM,
+    @JsonProperty("descripcion") String descripcion,
+    @JsonProperty("fuente") String fuente
+) {}
+
+public record MovilidadTransporteDTO(
+    @JsonProperty("titulo") String titulo,
+    @JsonProperty("calificacion") String calificacion,
+    @JsonProperty("estacion_cercana") String estacionCercana,
+    @JsonProperty("sistema") String sistema,
+    @JsonProperty("distancia_m") Integer distanciaM,
+    @JsonProperty("badge_tiempo_a_pie") String badgeTiempoAPie,
+    @JsonProperty("fuente") String fuente
+) {}
+
+public record AreasVerdesDTO(
+    @JsonProperty("titulo") String titulo,
+    @JsonProperty("calificacion") String calificacion,
+    @JsonProperty("parque_cercano") String parqueCercano,
+    @JsonProperty("tipo_parque") String tipoParque,
+    @JsonProperty("distancia_m") Integer distanciaM,
+    @JsonProperty("badge_tiempo_a_pie") String badgeTiempoAPie,
+    @JsonProperty("parques_en_radio_1km") Integer parquesEnRadio1km,
+    @JsonProperty("fuente") String fuente
+) {}
+
+public record SaludEducacionDTO(
+    @JsonProperty("titulo") String titulo,
+    @JsonProperty("hospital_clinica_cercana") String hospitalClinicaCercana,
+    @JsonProperty("distancia_salud_m") Integer distanciaSaludM,
+    @JsonProperty("colegio_cercano") String colegioCercano,
+    @JsonProperty("distancia_colegio_m") Integer distanciaColegioM,
+    @JsonProperty("universidad_cercana") String universidadCercana,
+    @JsonProperty("distancia_universidad_km") Double distanciaUniversidadKm,
+    @JsonProperty("fuente") String fuente
+) {}
+
+public record ComercioRetailDTO(
+    @JsonProperty("titulo") String titulo,
+    @JsonProperty("centro_comercial_cercano") String centroComercialCercano,
+    @JsonProperty("distancia_comercio_m") Integer distanciaComercioM,
+    @JsonProperty("fuente") String fuente
+) {}
 ```

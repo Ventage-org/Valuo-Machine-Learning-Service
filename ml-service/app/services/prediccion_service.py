@@ -57,6 +57,7 @@ _FEATURE_LABELS: dict[str, str] = {
     "Antiguedad":                  "Antigüedad ({v} años)",
     "Anio":                        "Año {v}",
     "Trimestre":                   "Trimestre {v}",
+    "estrato_socioeconomico":      "Estrato Socioeconómico de la Zona (NSE)",
     "pct_NSE_A":                   "NSE A en zona ({v:.1%})",
     "pct_NSE_B":                   "NSE B en zona ({v:.1%})",
     "pct_NSE_C":                   "NSE C en zona ({v:.1%})",
@@ -226,25 +227,46 @@ def _predecir_generico(
             detail=f"Error calculando SHAP values de {tipo}: {exc}",
         ) from exc
 
-    # 6. SHAP contribuciones: Todas las features del modelo ordenadas por magnitud
+    # 6. SHAP contribuciones: Agrupación exclusiva del bloque NSE (pct_NSE_A..E)
+    # y conservación individual estricta de las 28 variables restantes.
     feature_names = feature_cols
     fila_vals = X.iloc[0].to_dict()
 
-    indexed = sorted(
-        enumerate(shap_arr),
+    NSE_FEATURES = {"pct_NSE_A", "pct_NSE_B", "pct_NSE_C", "pct_NSE_D", "pct_NSE_E"}
+
+    # Extraemos el SHAP neto acumulado del bloque de estrato socioeconómico
+    shap_nse_total = sum(
+        float(sv) for fname, sv in zip(feature_names, shap_arr) if fname in NSE_FEATURES
+    )
+
+    # Armamos la lista de tuplas: (nombre_feature, shap_value, valor_para_label)
+    # Conservando todas las demás 28 variables individuales intactas
+    items_to_process: list[tuple[str, float, float]] = []
+
+    for fname, sv in zip(feature_names, shap_arr):
+        if fname not in NSE_FEATURES:
+            fval = float(fila_vals.get(fname, 0.0))
+            items_to_process.append((fname, float(sv), fval))
+
+    # Agregamos la variable consolidada del estrato socioeconómico
+    # Como valor de referencia usamos la suma de estratos A + B
+    fval_nse_ab = float(fila_vals.get("pct_NSE_A", 0.0) + fila_vals.get("pct_NSE_B", 0.0))
+    items_to_process.append(("estrato_socioeconomico", shap_nse_total, fval_nse_ab))
+
+    # Ordenamos por magnitud absoluta de impacto SHAP descendente
+    items_sorted = sorted(
+        items_to_process,
         key=lambda t: abs(t[1]),
         reverse=True,
     )
 
-    total_abs_shap = sum(abs(float(sv)) for sv in shap_arr)
+    total_abs_shap = sum(abs(sv) for _, sv, _ in items_sorted)
     if total_abs_shap < 1e-9:
         total_abs_shap = 1.0
 
     contribuciones: list[ContribucionFeature] = []
-    for idx, sv in indexed:
-        fname = feature_names[idx]
-        fval  = float(fila_vals.get(fname, 0.0))
-        abs_sv = abs(float(sv))
+    for fname, sv, fval in items_sorted:
+        abs_sv = abs(sv)
         p_pct = round((abs_sv / total_abs_shap) * 100.0, 1)
 
         if p_pct >= 20.0:
@@ -260,7 +282,7 @@ def _predecir_generico(
             ContribucionFeature(
                 feature=fname,
                 label=_build_label(fname, fval, req.distrito),
-                shap_value=round(float(sv), 6),
+                shap_value=round(sv, 6),
                 valor_feature=round(fval, 4),
                 impacto=(
                     "positivo" if sv > 1e-6
@@ -352,6 +374,12 @@ def _predecir_generico(
         ),
         comparables_rntp=muestras_rntp,
         resumen_rntp=resumen_rntp,
+        alerta_contexto=(
+            f"Aviso de contexto: La información de estrato socioeconómico para el distrito de {req.distrito} "
+            "proviene de una estimación imputada debido a un tamaño muestral censal reducido en ENAHO. "
+            "La valoración del modelo se fundamenta prioritariamente en las características físicas del inmueble "
+            "y la dinámica de precios del distrito."
+        ) if bool(ctx.get("nse_imputado")) else None,
     )
 
 

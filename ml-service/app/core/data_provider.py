@@ -73,6 +73,10 @@ SELECT
     c.pct_nse_c                  AS "pct_NSE_C",
     c.pct_nse_d                  AS "pct_NSE_D",
     c.pct_nse_e                  AS "pct_NSE_E",
+    EXISTS (
+        SELECT 1 FROM auditoria_flags_imputacion f
+        WHERE f.distrito_id = d.id AND f.nse_imputado = TRUE
+    )                            AS nse_imputado,
     c.tasa_robo,
     c.tasa_hurto,
     c.tasa_denuncias,

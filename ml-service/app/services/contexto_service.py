@@ -172,17 +172,24 @@ def obtener_contexto_distrital_enriquecido(
             )
         lat, lon = _CENTROS[distrito]
 
-    # 3. Estrato Socioeconómico (INEI / APEIM)
-    pct_ab = round(pct_a + pct_b, 1)
-    if pct_ab >= 60.0:
-        estrato = "Nivel A / B"
-        decil = "Deciles 9-10 (Estrato Alto)"
-    elif pct_ab >= 30.0:
-        estrato = "Nivel B / C"
-        decil = "Deciles 6-8 (Estrato Medio-Alto)"
+    # 3. Estrato Socioeconómico (INEI / ENAHO)
+    es_imputado = bool(ctx_db.get("nse_imputado", False))
+    alerta_contexto = (
+        f"Aviso de contexto: La información de estrato socioeconómico para el distrito de {distrito} "
+        "proviene de una estimación imputada debido a un tamaño muestral censal reducido en ENAHO. "
+        "La valoración se fundamenta prioritariamente en las características físicas y equipamiento del entorno."
+    ) if es_imputado else None
+
+    pct_alto_concentracion = round(pct_a + pct_b, 1)
+    if pct_alto_concentracion >= 60.0:
+        clasificacion = "Estrato Alto"
+        decil_ref = "Deciles 9-10 (Estrato Alto)"
+    elif pct_alto_concentracion >= 30.0:
+        clasificacion = "Estrato Medio-Alto"
+        decil_ref = "Deciles 6-8 (Estrato Medio-Alto)"
     else:
-        estrato = "Nivel C / D"
-        decil = "Deciles 1-5 (Estrato Medio-Bajo)"
+        clasificacion = "Estrato Medio-Bajo"
+        decil_ref = "Deciles 1-5 (Estrato Medio-Bajo)"
 
     # 4. Seguridad Ciudadana (PNP)
     # Normalización Min-Max inversa
@@ -243,16 +250,18 @@ def obtener_contexto_distrital_enriquecido(
             es_centroide=es_centroide,
         ),
         estrato_socioeconomico=EstratoSocioeconomico(
-            estrato=estrato,
-            decil=decil,
-            porcentaje_a_b=pct_ab,
-            distribucion_detallada={
-                "A": round(pct_a, 1),
-                "B": round(pct_b, 1),
-                "C": round(pct_c, 1),
-                "D": round(pct_d, 1),
-                "E": round(pct_e, 1),
+            clasificacion=clasificacion,
+            decil_referencial=decil_ref,
+            concentracion_estrato_alto_pct=pct_alto_concentracion,
+            distribucion_estratos={
+                "alto": round(pct_a, 1),
+                "medio_alto": round(pct_b, 1),
+                "medio": round(pct_c, 1),
+                "medio_bajo": round(pct_d, 1),
+                "bajo": round(pct_e, 1),
             },
+            es_imputado=es_imputado,
+            alerta_contexto=alerta_contexto,
         ),
         seguridad_ciudadana=SeguridadCiudadana(
             indice=indice_seguridad,

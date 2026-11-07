@@ -308,8 +308,9 @@ class InfoModelo(BaseModel):
 
 class PrediccionVentaResponse(BaseModel):
     """
-    Respuesta completa del endpoint de predicción de venta.
-    Incluye precio, intervalo de confianza, explicabilidad SHAP y metadata del modelo.
+    Respuesta completa del endpoint de predicción de venta o alquiler.
+    Incluye precio, intervalo de confianza, explicabilidad SHAP, metadata del modelo,
+    alerta de contexto distrital y 3 muestras comparables normativas RNTP.
     """
     distrito: str
     superficie_m2: float
@@ -317,13 +318,17 @@ class PrediccionVentaResponse(BaseModel):
     intervalo_confianza: IntervaloConfianza
     explicabilidad: Explicabilidad
     modelo: InfoModelo
+    alerta_contexto: str | None = Field(
+        default=None,
+        description="Aviso metodológico cuando la información socioeconómica del distrito proviene de estimación imputada (muestra ENAHO reducida).",
+    )
     comparables_rntp: list[MuestraComparable] = Field(
         default_factory=list,
-        description="Muestras comparables de mercado explícitas (Regla de las 3 muestras del RNTP - Art. 3)."
+        description="Tres muestras de mercado comparables para sustento de la tasación (RNTP Art. 3).",
     )
     resumen_rntp: ResumenComparablesRNTP | None = Field(
         default=None,
-        description="Resumen de homologación y consistencia con las muestras del RNTP."
+        description="Resumen estadístico de las muestras comparables y desviación respecto al valor predicho.",
     )
 
     model_config = {"json_schema_extra": {
@@ -352,6 +357,8 @@ class PrediccionVentaResponse(BaseModel):
                         "shap_value": 0.312,
                         "valor_feature": 75.0,
                         "impacto": "positivo",
+                        "peso_porcentaje": 32.4,
+                        "nivel_impacto": "Impacto Muy Alto",
                     },
                     {
                         "feature": "distrito_encoded",
@@ -359,20 +366,57 @@ class PrediccionVentaResponse(BaseModel):
                         "shap_value": -0.198,
                         "valor_feature": 287982.23,
                         "impacto": "negativo",
+                        "peso_porcentaje": 20.6,
+                        "nivel_impacto": "Impacto Alto",
                     },
                 ],
-                "n_features_mostradas": 10,
+                "n_features_mostradas": 29,
                 "n_features_total": 33,
                 "nota": "Los shap_values están en escala logarítmica.",
             },
             "modelo": {
-                "version": "v1",
-                "mape_test": 15.04,
-                "r2_test": 0.7469,
+                "version": "v2",
+                "mape_test": 14.86,
+                "r2_test": 0.7477,
                 "ipc_factor": 169.18,
                 "periodo_ipc": "2026-Q1",
                 "train_periodo": "2016-2023",
                 "test_periodo": "2024-2025",
+            },
+            "alerta_contexto": None,
+            "comparables_rntp": [
+                {
+                    "posicion": 1,
+                    "distrito": "San Miguel",
+                    "es_mismo_distrito": True,
+                    "zona_homogenea": "LIMA_MODERNA",
+                    "superficie_m2": 75.0,
+                    "habitaciones": 3,
+                    "banios": 2.0,
+                    "garajes": 1,
+                    "piso": 5,
+                    "antiguedad_anios": 8,
+                    "precio_total_pen": 482873.01,
+                    "precio_m2_pen": 6438.31,
+                    "periodo_muestra": "2025-Q2",
+                    "indice_similitud_pct": 100.0,
+                    "diferencias": {
+                        "dif_superficie_m2": 0.0,
+                        "dif_habitaciones": 0,
+                        "dif_banios": 0.0,
+                        "dif_antiguedad_anios": 0,
+                        "dif_piso": 0,
+                    },
+                }
+            ],
+            "resumen_rntp": {
+                "cantidad_muestras": 3,
+                "precio_promedio_pen": 486691.0,
+                "precio_m2_promedio_pen": 6433.14,
+                "desviacion_vs_prediccion_pct": 0.26,
+                "cumple_regla_tres_muestras": True,
+                "criterio_busqueda": "Mismo distrito",
+                "advertencia": None,
             },
         }
     }}
