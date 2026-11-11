@@ -56,7 +56,7 @@ cmd = [
     "--default-artifact-root",
     artifact_root,
     "--host",
-    "0.0.0.0",
+    "127.0.0.1",
     "--port",
     str(port),
 ]
