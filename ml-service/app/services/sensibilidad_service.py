@@ -25,7 +25,7 @@ MACRO_FACTORES_CONFIG: list[dict] = [
     {
         "id": "ubicacion_entorno",
         "factor": "Ubicación y Entorno Urbano",
-        "descripcion": "Distrito, estrato socioeconómico (NSE) y cercanía a vías principales, transporte, parques y servicios.",
+        "descripcion": "Distrito, estrato socioeconómico y cercanía a vías principales, transporte, parques y servicios.",
         "variables": [
             "distrito_encoded",
             "pct_NSE_A",

@@ -48,45 +48,59 @@ if TYPE_CHECKING:
 # ─── Etiquetas legibles para las features ─────────────────────────────────────
 
 _FEATURE_LABELS: dict[str, str] = {
-    "Superficie":                  "Superficie ({v} m²)",
-    "Habitaciones":                "Habitaciones ({v})",
-    "Banios":                      "Baños ({v})",
-    "Garajes":                     "Cocheras ({v})",
-    "Piso":                        "Piso {v}",
-    "Vista_Exterior":              "Vista exterior",
-    "Antiguedad":                  "Antigüedad ({v} años)",
-    "Anio":                        "Año {v}",
-    "Trimestre":                   "Trimestre {v}",
-    "estrato_socioeconomico":      "Estrato Socioeconómico de la Zona (NSE)",
-    "pct_NSE_A":                   "NSE A en zona ({v:.1%})",
-    "pct_NSE_B":                   "NSE B en zona ({v:.1%})",
-    "pct_NSE_C":                   "NSE C en zona ({v:.1%})",
-    "pct_NSE_D":                   "NSE D en zona ({v:.1%})",
-    "pct_NSE_E":                   "NSE E en zona ({v:.1%})",
-    "tasa_robo":                   "Tasa robos zona ({v:.2f})",
-    "tasa_hurto":                  "Tasa hurtos zona ({v:.2f})",
-    "poblacion_proyectada":        "Población distrito ({v:,.0f} hab)",
-    "area_distrito_km2":           "Área distrito ({v:.1f} km²)",
+    "Superficie":                  "Superficie ({v:g} m²)",
+    "Habitaciones":                "Habitaciones ({v:g})",
+    "Banios":                      "Baños ({v:g})",
+    "Garajes":                     "Cocheras ({v:g})",
+    "Piso":                        "Piso {v:g}",
+    "Vista_Exterior":              "Vista exterior a la calle",
+    "Antiguedad":                  "Antigüedad ({v:g} años)",
+    "Anio":                        "Año de referencia ({v:g})",
+    "Trimestre":                   "Efecto estacional (Trimestre {v:g})",
+    "estrato_socioeconomico":      "Estrato socioeconómico de la zona",
+    "pct_NSE_A":                   "Estrato socioeconómico A en zona ({v:.1%})",
+    "pct_NSE_B":                   "Estrato socioeconómico B en zona ({v:.1%})",
+    "pct_NSE_C":                   "Estrato socioeconómico C en zona ({v:.1%})",
+    "pct_NSE_D":                   "Estrato socioeconómico D en zona ({v:.1%})",
+    "pct_NSE_E":                   "Estrato socioeconómico E en zona ({v:.1%})",
+    "tasa_robo":                   "Tasa de robos en la zona ({v:.2f})",
+    "tasa_hurto":                  "Tasa de hurtos en la zona ({v:.2f})",
+    "poblacion_proyectada":        "Población distrital ({v:,.0f} hab)",
+    "area_distrito_km2":           "Área distrital ({v:.1f} km²)",
     "densidad_hab_km2":            "Densidad poblacional ({v:.0f} hab/km²)",
-    "distancia_centro_km":         "Dist. al centro ({v:.1f} km)",
-    "dist_colegio_km":             "Dist. al colegio más cercano ({v:.1f} km)",
-    "dist_hospital_km":            "Dist. al hospital más cercano ({v:.1f} km)",
-    "dist_estacion_transporte_km": "Dist. a estación de transporte ({v:.1f} km)",
-    "dist_centro_comercial_km":    "Dist. a centro comercial ({v:.1f} km)",
-    "dist_parque_km":              "Dist. al parque más cercano ({v:.1f} km)",
-    "dist_universidad_km":         "Dist. a universidad ({v:.1f} km)",
-    "periodo_numerico":            "Periodo temporal ({v})",
-    "m2_por_habitacion":           "m² por habitación ({v:.1f})",
-    "ratio_banios_hab":            "Ratio baños/habitaciones ({v:.2f})",
-    "tiene_garaje":                "Tiene cochera",
-    "es_piso_alto":                "Piso alto (≥8)",
-    "superficie_cuadrado":         "Superficie² ({v:.2f})",
-    "distrito_encoded":            "Distrito ({distrito})",
+    "distancia_centro_km":         "Distancia al centro urbano ({v:.1f} km)",
+    "dist_colegio_km":             "Distancia al colegio más cercano ({v:.1f} km)",
+    "dist_hospital_km":            "Distancia al centro de salud ({v:.1f} km)",
+    "dist_estacion_transporte_km": "Distancia a estación de transporte ({v:.1f} km)",
+    "dist_centro_comercial_km":    "Distancia a centro comercial ({v:.1f} km)",
+    "dist_parque_km":              "Distancia a áreas verdes / parque ({v:.1f} km)",
+    "dist_universidad_km":         "Distancia a universidad ({v:.1f} km)",
+    "periodo_numerico":            "Ciclo del mercado inmobiliario",
+    "m2_por_habitacion":           "Amplitud por dormitorio ({v:.1f} m²)",
+    "ratio_banios_hab":            "Dotación de baños por dormitorio ({v:.2f})",
+    "tiene_garaje":                "Disponibilidad de cochera",
+    "es_piso_alto":                "Ubicación en piso alto (Piso ≥8)",
+    "superficie_cuadrado":         "Efecto de escala por tamaño del inmueble",
+    "distrito_encoded":            "Ubicación distrital ({distrito})",
 }
 
 
 def _build_label(feature: str, valor: float, distrito: str) -> str:
-    """Genera la etiqueta legible de una feature para el response SHAP."""
+    """Genera la etiqueta legible y comercial de una feature para el response SHAP."""
+    if feature == "periodo_numerico" and valor > 1000:
+        anio = int((valor - 1) // 4)
+        trim = int((valor - 1) % 4) + 1
+        return f"Ciclo del mercado inmobiliario ({anio}-T{trim})"
+
+    if feature == "Trimestre":
+        return f"Efecto estacional del trimestre (T{int(valor)})"
+
+    if feature == "superficie_cuadrado":
+        return "Efecto de escala por tamaño del inmueble"
+
+    if feature == "ratio_banios_hab":
+        return f"Dotación de baños por dormitorio ({valor:.2f})"
+
     template = _FEATURE_LABELS.get(feature, feature)
     try:
         if "{v" in template:
