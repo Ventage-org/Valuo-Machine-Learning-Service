@@ -23,6 +23,10 @@ class FactorSensibilidad(BaseModel):
         description="Categoría cualitativa: 'Impacto Muy Alto' (≥30%), 'Impacto Alto' (20-29.9%), 'Impacto Moderado' (10-19.9%), 'Impacto Leve' (<10%)."
     )
     variables_incluidas: list[str] = Field(
+        description="Lista de variables en lenguaje claro y comprensible asociadas a este macro-factor."
+    )
+    variables_tecnicas: list[str] = Field(
+        default_factory=list,
         description="Lista de variables técnicas internas del modelo asociadas a este macro-factor."
     )
 

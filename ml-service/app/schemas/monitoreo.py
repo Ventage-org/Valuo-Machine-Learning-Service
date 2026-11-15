@@ -57,22 +57,35 @@ class DriftAnalisisResponse(BaseModel):
 # ─── 3. Fluctuación Temporal del Ciclo de Mercado ─────────────────────────────
 
 class PuntoFluctuacionTemporal(BaseModel):
-    """Punto en la serie de tiempo para la gráfica de error continuo."""
+    """Punto en la serie de tiempo para la gráfica de error continuo y métricas normativas IAAO."""
     period: str = Field(description="Etiqueta temporal (ej: 2024-Q1, 2024-Q2)")
     mape_pct: float = Field(description="MAPE alcanzado en dicho periodo")
     mae_soles: float = Field(description="MAE en Soles constantes para dicho periodo")
     upper_threshold_mape: float = Field(description="Cota máxima admisible del estándar", default=15.0)
     sample_count: int = Field(description="Número de transacciones en la ventana temporal")
     exceeds_threshold: bool = Field(description="True si el error superó el límite del 15%")
+    # Métricas estándar IAAO (Standard on Ratio Studies 2013/2020) por trimestre:
+    cod_iaao: float | None = Field(default=None, description="Coeficiente de Dispersión (COD <= 15.0% según IAAO)")
+    prd_iaao: float | None = Field(default=None, description="Price-Related Differential (0.98 - 1.03)")
+    prb_iaao: float | None = Field(default=None, description="Price-Related Bias (-0.05 a +0.05)")
+    median_ratio: float | None = Field(default=None, description="Nivel de evaluación (0.90 - 1.10)")
+    cumple_iaao_cod: bool | None = Field(default=None, description="True si COD <= 15.0%")
+    cumple_iaao_prd: bool | None = Field(default=None, description="True si 0.98 <= PRD <= 1.03")
 
 
 class FluctuacionTemporalResponse(BaseModel):
-    """Serie de tiempo completa para graficar MAPE y MAE a lo largo de los periodos."""
+    """Serie de tiempo completa para graficar MAPE, MAE y métricas IAAO a lo largo de los periodos."""
     operation_type: Literal["venta", "alquiler"]
     threshold_mape: float = Field(description="Umbral regulatorio máximo (15.0% venta / 17.89% alquiler)")
     time_series: list[PuntoFluctuacionTemporal] = Field(description="Puntos de la serie temporal")
     average_mape: float = Field(description="MAPE promedio en toda la ventana evaluada")
     average_mae: float = Field(description="MAE promedio en toda la ventana evaluada")
+    # Resumen global IAAO de la ventana evaluada
+    global_cod_iaao: float | None = Field(default=None, description="COD global alcanzado en la ventana evaluada")
+    global_prd_iaao: float | None = Field(default=None, description="PRD global alcanzado en la ventana evaluada")
+    global_prb_iaao: float | None = Field(default=None, description="PRB global alcanzado en la ventana evaluada")
+    global_median_ratio: float | None = Field(default=None, description="Mediana de ratios global de la ventana")
+    cumple_norma_iaao: bool = Field(default=True, description="True si cumple estándares de dispersión y equidad IAAO")
     total_evaluated_samples: int = Field(description="Total de transacciones evaluadas en la serie")
     generated_at: datetime = Field(description="Timestamp UTC de generación")
 

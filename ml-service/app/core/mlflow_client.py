@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 import os
+import time
 from typing import Any
 import mlflow
 from mlflow.entities.model_registry import ModelVersion
@@ -37,22 +38,33 @@ class MLflowManager:
         """
         Verifica si el servidor MLflow está accesible.
         Retorna True si responde HTTP 200, False si no está disponible.
+        Incluye caché en memoria de 10 segundos.
         """
+        now = time.time()
+        if hasattr(self, "_last_check_ts") and hasattr(self, "_last_check_res"):
+            if (now - self._last_check_ts) < 10.0:
+                return self._last_check_res
+
+        self._last_check_ts = now
         try:
             url = self.tracking_uri.rstrip("/")
-            # Si es URL HTTP/HTTPS
             if url.startswith("http://") or url.startswith("https://"):
-                resp = requests.get(f"{url}/health", timeout=timeout_sec)
-                if resp.status_code == 200:
-                    return True
-                # Algunos servidores MLflow responden en la raíz
+                try:
+                    resp = requests.get(f"{url}/health", timeout=timeout_sec)
+                    if resp.status_code == 200:
+                        self._last_check_res = True
+                        return True
+                except Exception:
+                    pass
                 resp = requests.get(url, timeout=timeout_sec)
-                return resp.status_code == 200
-            # Si es conexión directa a base de datos
+                self._last_check_res = bool(resp.status_code == 200)
+                return self._last_check_res
             self.client.search_experiments(max_results=1)
+            self._last_check_res = True
             return True
         except Exception as e:
-            print(f"[MLflowManager] Servidor no accesible en {self.tracking_uri}: {e}")
+            print(f"[MLflowManager] Servidor no accesible en {self.tracking_uri}: {e}", flush=True)
+            self._last_check_res = False
             return False
 
     def get_or_create_experiment(self, experiment_name: str) -> str:

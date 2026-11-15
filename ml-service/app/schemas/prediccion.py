@@ -298,6 +298,10 @@ class InfoModelo(BaseModel):
     version: str
     mape_test: float
     r2_test: float
+    cod_iaao: float | None = Field(default=None, description="Coeficiente de Dispersión IAAO (%)")
+    cov_iaao: float | None = Field(default=None, description="Coeficiente de Variación IAAO (%)")
+    prd_iaao: float | None = Field(default=None, description="Price-Related Differential IAAO")
+    prb_iaao: float | None = Field(default=None, description="Price-Related Bias IAAO")
     ipc_factor: float
     periodo_ipc: str
     train_periodo: str

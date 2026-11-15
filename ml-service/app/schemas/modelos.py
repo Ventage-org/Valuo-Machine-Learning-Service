@@ -24,6 +24,10 @@ class MetricasModelo(BaseModel):
     r2: float | None = Field(default=None, description="Coeficiente de determinación R²")
     mae: float | None = Field(default=None, description="Error absoluto medio (Soles Constantes)")
     rmse: float | None = Field(default=None, description="Raíz del error cuadrático medio")
+    cod_iaao: float | None = Field(default=None, description="Coeficiente de Dispersión COD (%)")
+    cov_iaao: float | None = Field(default=None, description="Coeficiente de Variación COV (%)")
+    prd_iaao: float | None = Field(default=None, description="Price-Related Differential PRD")
+    prb_iaao: float | None = Field(default=None, description="Price-Related Bias PRB")
     n_train: int | None = Field(default=None, description="Filas de entrenamiento")
     n_test: int | None = Field(default=None, description="Filas de prueba")
 

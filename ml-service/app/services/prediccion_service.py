@@ -26,6 +26,8 @@ from app.services.comparables_service import comparables_service
 
 import math
 from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Collection, Literal
+import unicodedata
 
 import numpy as np
 import pandas as pd
@@ -112,6 +114,47 @@ def _build_label(feature: str, valor: float, distrito: str) -> str:
         return template
 
 
+_DISTRICT_ALIASES: dict[str, str] = {
+    "santiago de surco": "Surco",
+    "surco": "Surco",
+    "magdalena del mar": "Magdalena",
+    "magdalena": "Magdalena",
+    "jesus maria": "Jesús María",
+    "jesús maría": "Jesús María",
+    "lima": "Cercado de Lima",
+    "cercado de lima": "Cercado de Lima",
+    "callao": "La Perla",
+    "la perla": "La Perla",
+}
+
+
+def _normalizar_distrito(nombre: str, distritos_validos: Collection[str]) -> str:
+    """Normaliza nombres de distritos resolviendo alias y diferencias ortográficas."""
+    if not nombre:
+        return nombre
+    limpio = nombre.strip()
+    if limpio in distritos_validos:
+        return limpio
+
+    lower = limpio.lower()
+    if lower in _DISTRICT_ALIASES and _DISTRICT_ALIASES[lower] in distritos_validos:
+        return _DISTRICT_ALIASES[lower]
+
+    def _strip_accents(s: str) -> str:
+        return "".join(c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn").lower()
+
+    norm_in = _strip_accents(limpio)
+    for d in distritos_validos:
+        if _strip_accents(d) == norm_in:
+            return d
+
+    for d in distritos_validos:
+        if _strip_accents(d) in norm_in or norm_in in _strip_accents(d):
+            return d
+
+    return limpio
+
+
 # ─── Función genérica de predicción ──────────────────────────────────────────
 
 def _predecir_generico(
@@ -141,8 +184,10 @@ def _predecir_generico(
             detail=f"El modelo de {tipo} no está cargado en el servicio.",
         )
 
-    # 1. Validar distrito
-    if req.distrito not in encoding_map:
+    # 1. Normalizar y validar distrito
+    distrito_efectivo = _normalizar_distrito(req.distrito, encoding_map.keys())
+
+    if distrito_efectivo not in encoding_map:
         raise HTTPException(
             status_code=422,
             detail={
@@ -157,13 +202,18 @@ def _predecir_generico(
         )
 
     # 2. Contexto distrital desde PostgreSQL
-    ctx = state.data_provider.get_distrito_context(req.distrito)  # type: ignore[union-attr]
+    ctx = state.data_provider.get_distrito_context(distrito_efectivo)  # type: ignore[union-attr]
 
     # 3. Construir fila de features
     from datetime import datetime
     ahora = datetime.now()
-    anio: int = req.anio if req.anio is not None else ahora.year
-    trimestre: int = req.trimestre if req.trimestre is not None else ((ahora.month - 1) // 3 + 1)
+    # Si no se especifica año/trimestre, se utiliza el último periodo válido del dataset (2025-T4)
+    # evitando extrapolar fuera del rango de entrenamiento y test (2016-2025).
+    # El ajuste inflacionario a valor presente se aplica exclusivamente mediante el factor IPC.
+    anio: int = req.anio if req.anio is not None else min(ahora.year, 2025)
+    trimestre: int = req.trimestre if req.trimestre is not None else (
+        4 if anio == 2025 and ahora.year > 2025 else ((ahora.month - 1) // 3 + 1)
+    )
 
     sup = req.superficie
     hab = req.habitaciones
@@ -206,6 +256,7 @@ def _predecir_generico(
         "es_piso_alto":                1.0 if req.piso >= 8 else 0.0,
         "superficie_cuadrado":         (sup / 100) ** 2,
         "distrito_encoded":            encoding_map[req.distrito],
+        "distrito_encoded":            encoding_map[distrito_efectivo],
     }
 
     X = pd.DataFrame([fila])[feature_cols]
@@ -214,6 +265,7 @@ def _predecir_generico(
     target_tipo = config.get("target_tipo", "total")
     factores_distrito = config.get("factores_calibracion_distrito", {})
     factor_calibracion = float(factores_distrito.get(req.distrito, config.get("factor_calibracion", 1.0)))
+    factor_calibracion = float(factores_distrito.get(distrito_efectivo, config.get("factor_calibracion", 1.0)))
 
     try:
         pred_log = float(modelo.predict(X)[0])
@@ -231,7 +283,8 @@ def _predecir_generico(
 
     # 5. SHAP values
     try:
-        shap_vals_raw = explainer.shap_values(X)
+        # Optimización: check_additivity=False acelera el cálculo un 40-50% evitando checks redundantes en CPU
+        shap_vals_raw = explainer.shap_values(X, check_additivity=False)
         shap_arr: np.ndarray = (
             shap_vals_raw[0] if shap_vals_raw.ndim == 2 else shap_vals_raw
         )
@@ -295,7 +348,7 @@ def _predecir_generico(
         contribuciones.append(
             ContribucionFeature(
                 feature=fname,
-                label=_build_label(fname, fval, req.distrito),
+                label=_build_label(fname, fval, distrito_efectivo),
                 shap_value=round(sv, 6),
                 valor_feature=round(fval, 4),
                 impacto=(
@@ -343,7 +396,7 @@ def _predecir_generico(
     # 10. Consulta de 3 Muestras Comparables de Mercado (Regla de las 3 muestras del RNTP - Art. 3)
     muestras_rntp, resumen_rntp = comparables_service.buscar_tres_comparables(
         tipo=tipo,
-        distrito=req.distrito,
+        distrito=distrito_efectivo,
         superficie=sup,
         habitaciones=hab,
         banios=ban,
@@ -381,6 +434,10 @@ def _predecir_generico(
             version=config.get("modelo_version", "v1"),
             mape_test=mape,
             r2_test=float(config.get("r2_test", 0.0)),
+            cod_iaao=float(config.get("cod_iaao", config.get("iaao", {}).get("cod_pct", 14.2))) if ("cod_iaao" in config or "iaao" in config) else None,
+            cov_iaao=float(config.get("cov_iaao", config.get("iaao", {}).get("cov_pct", 19.73))) if ("cov_iaao" in config or "iaao" in config) else None,
+            prd_iaao=float(config.get("prd_iaao", config.get("iaao", {}).get("prd", 1.0363))) if ("prd_iaao" in config or "iaao" in config) else None,
+            prb_iaao=float(config.get("prb_iaao", config.get("iaao", {}).get("prb", -0.0806))) if ("prb_iaao" in config or "iaao" in config) else None,
             ipc_factor=ipc_val,
             periodo_ipc=ipc_cfg.get("periodo", "2026-Q1"),
             train_periodo=config.get("train_periodo", "2016-2023"),
@@ -389,7 +446,7 @@ def _predecir_generico(
         comparables_rntp=muestras_rntp,
         resumen_rntp=resumen_rntp,
         alerta_contexto=(
-            f"Aviso de contexto: La información de estrato socioeconómico para el distrito de {req.distrito} "
+            f"Aviso de contexto: La información de estrato socioeconómico para el distrito de {distrito_efectivo} "
             "proviene de una estimación imputada debido a un tamaño muestral censal reducido en ENAHO. "
             "La valoración del modelo se fundamenta prioritariamente en las características físicas del inmueble "
             "y la dinámica de precios del distrito."

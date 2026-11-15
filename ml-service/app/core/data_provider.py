@@ -124,6 +124,7 @@ class PostgreSQLContextProvider(IContextDataProvider):
             "dbname":   db_name  or os.getenv("DB_NAME", "inmobiliaria_ml_db"),
             "user":     user     or os.getenv("DB_USER", "postgres"),
             "password": password or os.getenv("DB_PASSWORD") or "5432",
+            "sslmode":  os.getenv("DB_SSLMODE", "prefer"),
         }
         self._contexto: dict[str, dict] = {}
         self._cargar()
