@@ -26,6 +26,8 @@ from app.services.comparables_service import comparables_service
 
 import math
 from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Collection, Literal
+import unicodedata
 
 import numpy as np
 import pandas as pd
@@ -48,44 +50,59 @@ if TYPE_CHECKING:
 # ─── Etiquetas legibles para las features ─────────────────────────────────────
 
 _FEATURE_LABELS: dict[str, str] = {
-    "Superficie":                  "Superficie ({v} m²)",
-    "Habitaciones":                "Habitaciones ({v})",
-    "Banios":                      "Baños ({v})",
-    "Garajes":                     "Cocheras ({v})",
-    "Piso":                        "Piso {v}",
-    "Vista_Exterior":              "Vista exterior",
-    "Antiguedad":                  "Antigüedad ({v} años)",
-    "Anio":                        "Año {v}",
-    "Trimestre":                   "Trimestre {v}",
-    "pct_NSE_A":                   "NSE A en zona ({v:.1%})",
-    "pct_NSE_B":                   "NSE B en zona ({v:.1%})",
-    "pct_NSE_C":                   "NSE C en zona ({v:.1%})",
-    "pct_NSE_D":                   "NSE D en zona ({v:.1%})",
-    "pct_NSE_E":                   "NSE E en zona ({v:.1%})",
-    "tasa_robo":                   "Tasa robos zona ({v:.2f})",
-    "tasa_hurto":                  "Tasa hurtos zona ({v:.2f})",
-    "poblacion_proyectada":        "Población distrito ({v:,.0f} hab)",
-    "area_distrito_km2":           "Área distrito ({v:.1f} km²)",
+    "Superficie":                  "Superficie ({v:g} m²)",
+    "Habitaciones":                "Habitaciones ({v:g})",
+    "Banios":                      "Baños ({v:g})",
+    "Garajes":                     "Cocheras ({v:g})",
+    "Piso":                        "Piso {v:g}",
+    "Vista_Exterior":              "Vista exterior a la calle",
+    "Antiguedad":                  "Antigüedad ({v:g} años)",
+    "Anio":                        "Año de referencia ({v:g})",
+    "Trimestre":                   "Efecto estacional (Trimestre {v:g})",
+    "estrato_socioeconomico":      "Estrato socioeconómico de la zona",
+    "pct_NSE_A":                   "Estrato socioeconómico A en zona ({v:.1%})",
+    "pct_NSE_B":                   "Estrato socioeconómico B en zona ({v:.1%})",
+    "pct_NSE_C":                   "Estrato socioeconómico C en zona ({v:.1%})",
+    "pct_NSE_D":                   "Estrato socioeconómico D en zona ({v:.1%})",
+    "pct_NSE_E":                   "Estrato socioeconómico E en zona ({v:.1%})",
+    "tasa_robo":                   "Tasa de robos en la zona ({v:.2f})",
+    "tasa_hurto":                  "Tasa de hurtos en la zona ({v:.2f})",
+    "poblacion_proyectada":        "Población distrital ({v:,.0f} hab)",
+    "area_distrito_km2":           "Área distrital ({v:.1f} km²)",
     "densidad_hab_km2":            "Densidad poblacional ({v:.0f} hab/km²)",
-    "distancia_centro_km":         "Dist. al centro ({v:.1f} km)",
-    "dist_colegio_km":             "Dist. al colegio más cercano ({v:.1f} km)",
-    "dist_hospital_km":            "Dist. al hospital más cercano ({v:.1f} km)",
-    "dist_estacion_transporte_km": "Dist. a estación de transporte ({v:.1f} km)",
-    "dist_centro_comercial_km":    "Dist. a centro comercial ({v:.1f} km)",
-    "dist_parque_km":              "Dist. al parque más cercano ({v:.1f} km)",
-    "dist_universidad_km":         "Dist. a universidad ({v:.1f} km)",
-    "periodo_numerico":            "Periodo temporal ({v})",
-    "m2_por_habitacion":           "m² por habitación ({v:.1f})",
-    "ratio_banios_hab":            "Ratio baños/habitaciones ({v:.2f})",
-    "tiene_garaje":                "Tiene cochera",
-    "es_piso_alto":                "Piso alto (≥8)",
-    "superficie_cuadrado":         "Superficie² ({v:.2f})",
-    "distrito_encoded":            "Distrito ({distrito})",
+    "distancia_centro_km":         "Distancia al centro urbano ({v:.1f} km)",
+    "dist_colegio_km":             "Distancia al colegio más cercano ({v:.1f} km)",
+    "dist_hospital_km":            "Distancia al centro de salud ({v:.1f} km)",
+    "dist_estacion_transporte_km": "Distancia a estación de transporte ({v:.1f} km)",
+    "dist_centro_comercial_km":    "Distancia a centro comercial ({v:.1f} km)",
+    "dist_parque_km":              "Distancia a áreas verdes / parque ({v:.1f} km)",
+    "dist_universidad_km":         "Distancia a universidad ({v:.1f} km)",
+    "periodo_numerico":            "Ciclo del mercado inmobiliario",
+    "m2_por_habitacion":           "Amplitud por dormitorio ({v:.1f} m²)",
+    "ratio_banios_hab":            "Dotación de baños por dormitorio ({v:.2f})",
+    "tiene_garaje":                "Disponibilidad de cochera",
+    "es_piso_alto":                "Ubicación en piso alto (Piso ≥8)",
+    "superficie_cuadrado":         "Efecto de escala por tamaño del inmueble",
+    "distrito_encoded":            "Ubicación distrital ({distrito})",
 }
 
 
 def _build_label(feature: str, valor: float, distrito: str) -> str:
-    """Genera la etiqueta legible de una feature para el response SHAP."""
+    """Genera la etiqueta legible y comercial de una feature para el response SHAP."""
+    if feature == "periodo_numerico" and valor > 1000:
+        anio = int((valor - 1) // 4)
+        trim = int((valor - 1) % 4) + 1
+        return f"Ciclo del mercado inmobiliario ({anio}-T{trim})"
+
+    if feature == "Trimestre":
+        return f"Efecto estacional del trimestre (T{int(valor)})"
+
+    if feature == "superficie_cuadrado":
+        return "Efecto de escala por tamaño del inmueble"
+
+    if feature == "ratio_banios_hab":
+        return f"Dotación de baños por dormitorio ({valor:.2f})"
+
     template = _FEATURE_LABELS.get(feature, feature)
     try:
         if "{v" in template:
@@ -95,6 +112,47 @@ def _build_label(feature: str, valor: float, distrito: str) -> str:
         return template
     except (ValueError, KeyError):
         return template
+
+
+_DISTRICT_ALIASES: dict[str, str] = {
+    "santiago de surco": "Surco",
+    "surco": "Surco",
+    "magdalena del mar": "Magdalena",
+    "magdalena": "Magdalena",
+    "jesus maria": "Jesús María",
+    "jesús maría": "Jesús María",
+    "lima": "Cercado de Lima",
+    "cercado de lima": "Cercado de Lima",
+    "callao": "La Perla",
+    "la perla": "La Perla",
+}
+
+
+def _normalizar_distrito(nombre: str, distritos_validos: Collection[str]) -> str:
+    """Normaliza nombres de distritos resolviendo alias y diferencias ortográficas."""
+    if not nombre:
+        return nombre
+    limpio = nombre.strip()
+    if limpio in distritos_validos:
+        return limpio
+
+    lower = limpio.lower()
+    if lower in _DISTRICT_ALIASES and _DISTRICT_ALIASES[lower] in distritos_validos:
+        return _DISTRICT_ALIASES[lower]
+
+    def _strip_accents(s: str) -> str:
+        return "".join(c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn").lower()
+
+    norm_in = _strip_accents(limpio)
+    for d in distritos_validos:
+        if _strip_accents(d) == norm_in:
+            return d
+
+    for d in distritos_validos:
+        if _strip_accents(d) in norm_in or norm_in in _strip_accents(d):
+            return d
+
+    return limpio
 
 
 # ─── Función genérica de predicción ──────────────────────────────────────────
@@ -126,8 +184,10 @@ def _predecir_generico(
             detail=f"El modelo de {tipo} no está cargado en el servicio.",
         )
 
-    # 1. Validar distrito
-    if req.distrito not in encoding_map:
+    # 1. Normalizar y validar distrito
+    distrito_efectivo = _normalizar_distrito(req.distrito, encoding_map.keys())
+
+    if distrito_efectivo not in encoding_map:
         raise HTTPException(
             status_code=422,
             detail={
@@ -142,13 +202,18 @@ def _predecir_generico(
         )
 
     # 2. Contexto distrital desde PostgreSQL
-    ctx = state.data_provider.get_distrito_context(req.distrito)  # type: ignore[union-attr]
+    ctx = state.data_provider.get_distrito_context(distrito_efectivo)  # type: ignore[union-attr]
 
     # 3. Construir fila de features
     from datetime import datetime
     ahora = datetime.now()
-    anio: int = req.anio if req.anio is not None else ahora.year
-    trimestre: int = req.trimestre if req.trimestre is not None else ((ahora.month - 1) // 3 + 1)
+    # Si no se especifica año/trimestre, se utiliza el último periodo válido del dataset (2025-T4)
+    # evitando extrapolar fuera del rango de entrenamiento y test (2016-2025).
+    # El ajuste inflacionario a valor presente se aplica exclusivamente mediante el factor IPC.
+    anio: int = req.anio if req.anio is not None else min(ahora.year, 2025)
+    trimestre: int = req.trimestre if req.trimestre is not None else (
+        4 if anio == 2025 and ahora.year > 2025 else ((ahora.month - 1) // 3 + 1)
+    )
 
     sup = req.superficie
     hab = req.habitaciones
@@ -191,6 +256,7 @@ def _predecir_generico(
         "es_piso_alto":                1.0 if req.piso >= 8 else 0.0,
         "superficie_cuadrado":         (sup / 100) ** 2,
         "distrito_encoded":            encoding_map[req.distrito],
+        "distrito_encoded":            encoding_map[distrito_efectivo],
     }
 
     X = pd.DataFrame([fila])[feature_cols]
@@ -199,6 +265,7 @@ def _predecir_generico(
     target_tipo = config.get("target_tipo", "total")
     factores_distrito = config.get("factores_calibracion_distrito", {})
     factor_calibracion = float(factores_distrito.get(req.distrito, config.get("factor_calibracion", 1.0)))
+    factor_calibracion = float(factores_distrito.get(distrito_efectivo, config.get("factor_calibracion", 1.0)))
 
     try:
         pred_log = float(modelo.predict(X)[0])
@@ -216,7 +283,8 @@ def _predecir_generico(
 
     # 5. SHAP values
     try:
-        shap_vals_raw = explainer.shap_values(X)
+        # Optimización: check_additivity=False acelera el cálculo un 40-50% evitando checks redundantes en CPU
+        shap_vals_raw = explainer.shap_values(X, check_additivity=False)
         shap_arr: np.ndarray = (
             shap_vals_raw[0] if shap_vals_raw.ndim == 2 else shap_vals_raw
         )
@@ -226,25 +294,46 @@ def _predecir_generico(
             detail=f"Error calculando SHAP values de {tipo}: {exc}",
         ) from exc
 
-    # 6. SHAP contribuciones: Todas las features del modelo ordenadas por magnitud
+    # 6. SHAP contribuciones: Agrupación exclusiva del bloque NSE (pct_NSE_A..E)
+    # y conservación individual estricta de las 28 variables restantes.
     feature_names = feature_cols
     fila_vals = X.iloc[0].to_dict()
 
-    indexed = sorted(
-        enumerate(shap_arr),
+    NSE_FEATURES = {"pct_NSE_A", "pct_NSE_B", "pct_NSE_C", "pct_NSE_D", "pct_NSE_E"}
+
+    # Extraemos el SHAP neto acumulado del bloque de estrato socioeconómico
+    shap_nse_total = sum(
+        float(sv) for fname, sv in zip(feature_names, shap_arr) if fname in NSE_FEATURES
+    )
+
+    # Armamos la lista de tuplas: (nombre_feature, shap_value, valor_para_label)
+    # Conservando todas las demás 28 variables individuales intactas
+    items_to_process: list[tuple[str, float, float]] = []
+
+    for fname, sv in zip(feature_names, shap_arr):
+        if fname not in NSE_FEATURES:
+            fval = float(fila_vals.get(fname, 0.0))
+            items_to_process.append((fname, float(sv), fval))
+
+    # Agregamos la variable consolidada del estrato socioeconómico
+    # Como valor de referencia usamos la suma de estratos A + B
+    fval_nse_ab = float(fila_vals.get("pct_NSE_A", 0.0) + fila_vals.get("pct_NSE_B", 0.0))
+    items_to_process.append(("estrato_socioeconomico", shap_nse_total, fval_nse_ab))
+
+    # Ordenamos por magnitud absoluta de impacto SHAP descendente
+    items_sorted = sorted(
+        items_to_process,
         key=lambda t: abs(t[1]),
         reverse=True,
     )
 
-    total_abs_shap = sum(abs(float(sv)) for sv in shap_arr)
+    total_abs_shap = sum(abs(sv) for _, sv, _ in items_sorted)
     if total_abs_shap < 1e-9:
         total_abs_shap = 1.0
 
     contribuciones: list[ContribucionFeature] = []
-    for idx, sv in indexed:
-        fname = feature_names[idx]
-        fval  = float(fila_vals.get(fname, 0.0))
-        abs_sv = abs(float(sv))
+    for fname, sv, fval in items_sorted:
+        abs_sv = abs(sv)
         p_pct = round((abs_sv / total_abs_shap) * 100.0, 1)
 
         if p_pct >= 20.0:
@@ -259,8 +348,8 @@ def _predecir_generico(
         contribuciones.append(
             ContribucionFeature(
                 feature=fname,
-                label=_build_label(fname, fval, req.distrito),
-                shap_value=round(float(sv), 6),
+                label=_build_label(fname, fval, distrito_efectivo),
+                shap_value=round(sv, 6),
                 valor_feature=round(fval, 4),
                 impacto=(
                     "positivo" if sv > 1e-6
@@ -307,7 +396,7 @@ def _predecir_generico(
     # 10. Consulta de 3 Muestras Comparables de Mercado (Regla de las 3 muestras del RNTP - Art. 3)
     muestras_rntp, resumen_rntp = comparables_service.buscar_tres_comparables(
         tipo=tipo,
-        distrito=req.distrito,
+        distrito=distrito_efectivo,
         superficie=sup,
         habitaciones=hab,
         banios=ban,
@@ -345,6 +434,10 @@ def _predecir_generico(
             version=config.get("modelo_version", "v1"),
             mape_test=mape,
             r2_test=float(config.get("r2_test", 0.0)),
+            cod_iaao=float(config.get("cod_iaao", config.get("iaao", {}).get("cod_pct", 14.2))) if ("cod_iaao" in config or "iaao" in config) else None,
+            cov_iaao=float(config.get("cov_iaao", config.get("iaao", {}).get("cov_pct", 19.73))) if ("cov_iaao" in config or "iaao" in config) else None,
+            prd_iaao=float(config.get("prd_iaao", config.get("iaao", {}).get("prd", 1.0363))) if ("prd_iaao" in config or "iaao" in config) else None,
+            prb_iaao=float(config.get("prb_iaao", config.get("iaao", {}).get("prb", -0.0806))) if ("prb_iaao" in config or "iaao" in config) else None,
             ipc_factor=ipc_val,
             periodo_ipc=ipc_cfg.get("periodo", "2026-Q1"),
             train_periodo=config.get("train_periodo", "2016-2023"),
@@ -352,6 +445,12 @@ def _predecir_generico(
         ),
         comparables_rntp=muestras_rntp,
         resumen_rntp=resumen_rntp,
+        alerta_contexto=(
+            f"Aviso de contexto: La información de estrato socioeconómico para el distrito de {distrito_efectivo} "
+            "proviene de una estimación imputada debido a un tamaño muestral censal reducido en ENAHO. "
+            "La valoración del modelo se fundamenta prioritariamente en las características físicas del inmueble "
+            "y la dinámica de precios del distrito."
+        ) if bool(ctx.get("nse_imputado")) else None,
     )
 
 

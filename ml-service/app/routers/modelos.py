@@ -5,6 +5,8 @@ Router administrativo de gobernanza de modelos:
   - Benchmark comparativo (Producción vs Candidatos)
   - Historial de versiones en MLflow Model Registry
   - Promoción formal a Producción con Hot-Reload seguro en memoria RAM
+  - Reversión / Rollback a versiones previas
+  - Descarte / Rechazo formal de versiones candidatas
 """
 
 from __future__ import annotations
@@ -17,11 +19,14 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from app.core.model_loader import model_state
 from app.schemas.modelos import (
     BenchmarkResponse,
+    DescartarModeloRequest,
+    DescartarModeloResponse,
     HistorialModelosResponse,
     PromoverModeloRequest,
     PromoverModeloResponse,
 )
 from app.services.model_registry_service import (
+    descartar_modelo_candidato,
     ejecutar_rollback,
     obtener_benchmark,
     obtener_historial_versiones,
@@ -134,4 +139,26 @@ def rollback_modelo(
         version=request.version,
         motivo=request.motivo,
         state=model_state,
+    )
+
+
+@router.post(
+    "/descartar",
+    response_model=DescartarModeloResponse,
+    summary="Descartar y archivar modelo candidato",
+    description=(
+        "Acción de gobernanza de descarte: el administrador o data scientist rechaza una versión candidata.\n\n"
+        "1. MLflow transiciona la versión a 'Archived' y fija tags de auditoría con el motivo del descarte.\n"
+        "2. El candidato se retira de la cola de benchmarking activo.\n"
+        "3. El modelo en Producción y la memoria RAM se mantienen intactos."
+    ),
+)
+def descartar_modelo(
+    request: DescartarModeloRequest,
+    _: None = Depends(_verificar_admin_token),
+) -> DescartarModeloResponse:
+    return descartar_modelo_candidato(
+        tipo_operacion=request.tipo_operacion,
+        version=request.version,
+        motivo=request.motivo,
     )

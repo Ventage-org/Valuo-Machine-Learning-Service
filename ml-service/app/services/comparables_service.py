@@ -110,10 +110,16 @@ class ComparablesService:
         self._cache_global_venta: dict[str, Any] | None = None
         self._cache_global_alquiler: dict[str, Any] | None = None
         self._disponible: bool = False
+        self._intento_carga: bool = False
 
     @property
     def disponible(self) -> bool:
         return self._disponible
+
+    def forzar_recarga(self) -> None:
+        """Reinicia el flag de intento para forzar una nueva conexión a BD."""
+        self._intento_carga = False
+        self.cargar_datos()
 
     def cargar_datos(
         self,
@@ -125,15 +131,19 @@ class ComparablesService:
         anio_min: int = 2021,
     ) -> None:
         """
-        Carga las muestras históricas desde PostgreSQL y construye los índices
-        Numpy por distrito y zona en memoria RAM.
+        Carga las muestras históricas directamente desde PostgreSQL y construye los
+        índices Numpy en memoria RAM.
         """
+        self._intento_carga = True
+
         conn_params = {
             "host":     host     or os.getenv("DB_HOST", "localhost"),
             "port":     port     or int(os.getenv("DB_PORT", "5432")),
             "dbname":   db_name  or os.getenv("DB_NAME", "inmobiliaria_ml_db"),
             "user":     user     or os.getenv("DB_USER", "postgres"),
             "password": password or os.getenv("DB_PASSWORD") or "5432",
+            "sslmode":  os.getenv("DB_SSLMODE", "prefer"),
+            "connect_timeout": 3,
         }
 
         try:
@@ -244,7 +254,7 @@ class ComparablesService:
         """
         Encuentra las 3 muestras de mercado más homogéneas en tiempo récord (< 0.5 ms).
         """
-        if not self._disponible or not self._cache_distrito_venta:
+        if not self._disponible and not self._intento_carga:
             self.cargar_datos()
 
         cache_distritos = self._cache_distrito_venta if tipo == "venta" else self._cache_distrito_alquiler

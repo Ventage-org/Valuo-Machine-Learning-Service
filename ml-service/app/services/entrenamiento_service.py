@@ -120,6 +120,22 @@ def actualizar_estado_gobernanza_job(
                     job["estado_gobernanza"] = "archived"
 
 
+def descartar_estado_gobernanza_job(
+    tipo_operacion: str,
+    version_descartada: str,
+    motivo: str = "",
+) -> None:
+    """Actualiza en caliente el estado de gobernanza a 'discarded' en el registro de jobs."""
+    with _job_lock:
+        for job_id, job in _job_registry.items():
+            if job.get("tipo_operacion") == tipo_operacion:
+                job_ver = str(job.get("mlflow_model_version") or "")
+                if job_ver == str(version_descartada):
+                    job["estado_gobernanza"] = "discarded"
+                    motivo_txt = f": {motivo}" if motivo else ""
+                    job["progreso"] = f"[Descartado] Candidato v{version_descartada} archivado y descartado{motivo_txt}"
+
+
 def get_job_status(job_id: str) -> dict[str, Any]:
     """Retorna el estado de un job. HTTPException 404 si no existe."""
     with _job_lock:
@@ -761,12 +777,14 @@ def _run_training_pipeline(
             estado_gob = "candidate"
             print(f"[EntrenamientoService][{job_id}] Paso 8: Gobernanza activa. Modelo en espera de aprobación humana (no reemplaza producción en memoria).")
 
-        # ── Clean-up INCONDICIONAL: Eliminar siempre el binario .pkl local del contenedor ──
-        # El modelo ya fue subido a Azure Blob Storage vía MLflow y (si aplica) reside en la memoria RAM
+        # ── Clean-up Condicional: Conservar el binario local en ejecuciones locales o si no hay MLflow ──
         try:
-            if os.path.exists(pkl_path):
-                os.remove(pkl_path)
-                print(f"[EntrenamientoService][{job_id}] [Clean-up] Binario local {pkl_path} eliminado del contenedor. El modelo reside en RAM y en Azure Blob Storage.")
+            if mlflow_run_id and os.getenv("PRESERVAR_MODELOS_LOCALES", "true").lower() != "true":
+                if os.path.exists(pkl_path):
+                    os.remove(pkl_path)
+                    print(f"[EntrenamientoService][{job_id}] [Clean-up] Binario local {pkl_path} eliminado del contenedor. El modelo reside en RAM y en Azure Blob Storage.")
+            else:
+                print(f"[EntrenamientoService][{job_id}] [Almacenamiento Local] Binario oficial conservado en disco: {pkl_path}")
         except Exception as e_del:
             print(f"[EntrenamientoService][{job_id}] Advertencia al limpiar binario: {e_del}")
 
