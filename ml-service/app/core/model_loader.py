@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
@@ -31,6 +32,9 @@ from app.core.data_provider import (
     IContextDataProvider,
     PostgreSQLContextProvider,
 )
+
+# Lock de exclusión mutua para operaciones de carga de modelos en memoria
+_load_lock = threading.Lock()
 
 
 # ─── Estado global de los modelos ─────────────────────────────────────────────
@@ -151,7 +155,11 @@ def _descargar_json_mlflow_http(tracking_uri: str, run_id: str, artifact_path: s
         return None
 
 
-def _cargar_artefactos_venta(state: ModelState, model_path_override: str | None = None) -> None:
+def _cargar_artefactos_venta(
+    state: ModelState,
+    model_path_override: str | None = None,
+    esperar_mlflow: bool = True,
+) -> None:
     """Carga el modelo de Venta, SHAP explainer y su configuración."""
     metadata_path = _resolver_ruta(os.getenv("METADATA_PATH", "data/features_metadata.json"))
     config_path   = _resolver_ruta(os.getenv("CONFIG_PATH",   "config/model_config.json"))
@@ -167,7 +175,13 @@ def _cargar_artefactos_venta(state: ModelState, model_path_override: str | None 
     model_name_mlflow = os.getenv("MLFLOW_MODEL_NAME_VENTA", "xgboost_venta")
     modelo_cargado = False
 
-    if not model_path_override and mlflow_manager.check_connection():
+    server_ok = (
+        mlflow_manager.wait_for_server(max_retries=8, delay_sec=2.5, timeout_per_try=3.0)
+        if esperar_mlflow
+        else mlflow_manager.check_connection(timeout_sec=2.0)
+    )
+
+    if not model_path_override and server_ok:
         prod_ver = mlflow_manager.get_production_version(model_name_mlflow)
 
         # 1. Prioridad: Descarga directa desacoplada vía proxy HTTP de MLflow
@@ -228,6 +242,21 @@ def _cargar_artefactos_venta(state: ModelState, model_path_override: str | None 
 
         if not modelo_cargado:
             print("[ModelLoader][Venta] Advertencia: No se pudo cargar ninguna versión activa desde MLflow. Usando fallback local...")
+        else:
+            # Guardar copia runtime en caché para resiliencia ante futuras suspensiones
+            try:
+                os.makedirs(models_dir, exist_ok=True)
+                joblib.dump(state.modelo, os.path.join(models_dir, "cached_mlflow_venta.joblib"))
+            except Exception:
+                pass
+
+    if not modelo_cargado:
+        cache_path = os.path.join(models_dir, "cached_mlflow_venta.joblib")
+        if not model_path_override and os.path.exists(cache_path):
+            print(f"[ModelLoader][Venta] Cargando modelo desde caché runtime local: {cache_path} ...")
+            state.modelo = joblib.load(cache_path)
+            modelo_cargado = True
+            print(f"[ModelLoader][Venta] [OK] Modelo restaurado desde caché ({os.path.getsize(cache_path) / 1e6:.1f} MB)")
 
     if not modelo_cargado:
         config_model_file = state.config.get("modelo_archivo", "xgboost_venta_v1.pkl")
@@ -286,7 +315,11 @@ def _cargar_artefactos_venta(state: ModelState, model_path_override: str | None 
         print(f"[ModelLoader][Venta] [OK] Metadata: {len(state.feature_cols)} features, {len(state.encoding_map)} distritos")
 
 
-def _cargar_artefactos_alquiler(state: ModelState, model_path_override: str | None = None) -> None:
+def _cargar_artefactos_alquiler(
+    state: ModelState,
+    model_path_override: str | None = None,
+    esperar_mlflow: bool = True,
+) -> None:
     """Carga el modelo de Alquiler, SHAP explainer y su configuración."""
     metadata_path = _resolver_ruta(os.getenv("METADATA_ALQUILER_PATH", "data/features_metadata_alquiler.json"))
     config_path   = _resolver_ruta(os.getenv("CONFIG_ALQUILER_PATH",   "config/model_alquiler_config.json"))
@@ -302,7 +335,13 @@ def _cargar_artefactos_alquiler(state: ModelState, model_path_override: str | No
     model_name_mlflow = os.getenv("MLFLOW_MODEL_NAME_ALQUILER", "xgboost_alquiler")
     modelo_cargado = False
 
-    if not model_path_override and mlflow_manager.check_connection():
+    server_ok = (
+        mlflow_manager.wait_for_server(max_retries=8, delay_sec=2.5, timeout_per_try=3.0)
+        if esperar_mlflow
+        else mlflow_manager.check_connection(timeout_sec=2.0)
+    )
+
+    if not model_path_override and server_ok:
         prod_ver = mlflow_manager.get_production_version(model_name_mlflow)
 
         # 1. Prioridad: Descarga directa desacoplada vía proxy HTTP de MLflow
@@ -362,6 +401,21 @@ def _cargar_artefactos_alquiler(state: ModelState, model_path_override: str | No
 
         if not modelo_cargado:
             print("[ModelLoader][Alquiler] Advertencia: No se pudo cargar ninguna versión activa desde MLflow. Usando fallback local...")
+        else:
+            # Guardar copia runtime en caché para resiliencia ante futuras suspensiones
+            try:
+                os.makedirs(models_dir, exist_ok=True)
+                joblib.dump(state.modelo_alquiler, os.path.join(models_dir, "cached_mlflow_alquiler.joblib"))
+            except Exception:
+                pass
+
+    if not modelo_cargado:
+        cache_path = os.path.join(models_dir, "cached_mlflow_alquiler.joblib")
+        if not model_path_override and os.path.exists(cache_path):
+            print(f"[ModelLoader][Alquiler] Cargando modelo desde caché runtime local: {cache_path} ...")
+            state.modelo_alquiler = joblib.load(cache_path)
+            modelo_cargado = True
+            print(f"[ModelLoader][Alquiler] [OK] Modelo restaurado desde caché ({os.path.getsize(cache_path) / 1e6:.1f} MB)")
 
     if not modelo_cargado:
         config_model_file = state.config_alquiler.get("modelo_archivo", "xgboost_alquiler_v1.pkl")
@@ -424,25 +478,58 @@ def cargar_modelo(
     state: ModelState,
     tipo: Literal["all", "venta", "alquiler"] = "all",
     model_path_override: str | None = None,
-) -> None:
+    esperar_mlflow: bool = True,
+    force: bool = False,
+) -> bool:
     """
-    Carga los modelos en el ModelState proporcionado.
-    Lanza RuntimeError si algún archivo crítico no existe.
+    Carga los modelos en el ModelState proporcionado de forma idempotente y thread-safe.
+    Retorna True si los modelos solicitados quedan disponibles en memoria.
     """
-    if tipo in ("all", "venta"):
-        _cargar_artefactos_venta(state, model_path_override=model_path_override if tipo == "venta" else None)
+    with _load_lock:
+        if tipo in ("all", "venta"):
+            if force or state.modelo is None or state.explainer is None:
+                _cargar_artefactos_venta(
+                    state,
+                    model_path_override=model_path_override if tipo == "venta" else None,
+                    esperar_mlflow=esperar_mlflow,
+                )
 
-    if tipo in ("all", "alquiler"):
-        _cargar_artefactos_alquiler(state, model_path_override=model_path_override if tipo == "alquiler" else None)
+        if tipo in ("all", "alquiler"):
+            if force or state.modelo_alquiler is None or state.explainer_alquiler is None:
+                _cargar_artefactos_alquiler(
+                    state,
+                    model_path_override=model_path_override if tipo == "alquiler" else None,
+                    esperar_mlflow=esperar_mlflow,
+                )
 
-    # Contexto distrital desde PostgreSQL (compartido para ambos modelos)
-    if state.data_provider is None:
-        print("[ModelLoader] Cargando contexto distrital desde PostgreSQL ...")
-        state.data_provider = PostgreSQLContextProvider()
-        n_distritos = len(state.data_provider.listar_distritos())
-        print(f"[ModelLoader] [OK] Contexto distrital: {n_distritos} distritos cargados")
+        # Contexto distrital desde PostgreSQL (compartido para ambos modelos)
+        if state.data_provider is None:
+            try:
+                print("[ModelLoader] Cargando contexto distrital desde PostgreSQL ...")
+                state.data_provider = PostgreSQLContextProvider()
+                n_distritos = len(state.data_provider.listar_distritos())
+                print(f"[ModelLoader] [OK] Contexto distrital: {n_distritos} distritos cargados")
+            except Exception as ex_db:
+                print(f"[ModelLoader] [WARN] No se pudo inicializar PostgreSQLContextProvider: {ex_db}")
 
-    print("[ModelLoader] ===== Servicio ML listo (Venta + Alquiler) =====")
+        venta_ok = state.modelo is not None and state.explainer is not None
+        alquiler_ok = state.modelo_alquiler is not None and state.explainer_alquiler is not None
+
+        if tipo == "venta":
+            return venta_ok
+        elif tipo == "alquiler":
+            return alquiler_ok
+        else:
+            if venta_ok and alquiler_ok:
+                print("[ModelLoader] ===== Servicio ML listo (Venta + Alquiler) =====")
+                return True
+            else:
+                print(
+                    f"[ModelLoader] ===== Servicio ML en Standby "
+                    f"(Venta={'OK' if venta_ok else 'PENDIENTE'}, "
+                    f"Alquiler={'OK' if alquiler_ok else 'PENDIENTE'}) ====="
+                )
+                return False
 
 
 def liberar_recursos(state: ModelState) -> None:
