@@ -13,7 +13,7 @@ from __future__ import annotations
 from typing import Literal
 from fastapi import APIRouter, Query
 
-from app.core.model_loader import model_state
+from app.core.model_loader import cargar_modelo, model_state
 from app.schemas.contexto_distrital import ContextoDistritalResponse
 from app.services.contexto_service import obtener_contexto_distrital_enriquecido
 from typing import Optional
@@ -37,6 +37,13 @@ router = APIRouter(tags=["Estado y Metadata"])
 def health_check() -> dict:
     modelo_venta_ok = model_state.modelo is not None
     modelo_alquiler_ok = model_state.modelo_alquiler is not None
+
+    # Si algún modelo no está en memoria, intentar carga rápida no bloqueante
+    if not (modelo_venta_ok and modelo_alquiler_ok):
+        cargar_modelo(model_state, tipo="all", esperar_mlflow=False)
+        modelo_venta_ok = model_state.modelo is not None
+        modelo_alquiler_ok = model_state.modelo_alquiler is not None
+
     return {
         "status": "ok" if (modelo_venta_ok and modelo_alquiler_ok) else "degraded",
         "modelo_venta": model_state.config.get("modelo_version", "desconocido") if modelo_venta_ok else None,
@@ -63,6 +70,11 @@ def modelo_info(
         description="Tipo de modelo a consultar ('venta' o 'alquiler')."
     ),
 ) -> ModeloInfoResponse:
+    # Asegurar que el modelo esté cargado en RAM (auto-recuperación si despertó de suspensión)
+    if (tipo_operacion == "alquiler" and model_state.modelo_alquiler is None) or \
+       (tipo_operacion == "venta" and model_state.modelo is None):
+        cargar_modelo(model_state, tipo=tipo_operacion, esperar_mlflow=True)
+
     if tipo_operacion == "alquiler":
         modelo_activo = model_state.modelo_alquiler
         cfg = model_state.config_alquiler

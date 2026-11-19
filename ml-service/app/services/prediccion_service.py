@@ -163,7 +163,12 @@ def _predecir_generico(
     tipo: Literal["venta", "alquiler"],
 ) -> PrediccionVentaResponse:
     """Ejecuta inferencia y cálculo SHAP para venta o alquiler."""
+    # 0. Lazy loading / On-Demand Self-Healing si el contenedor despertó de suspensión (scale-to-zero)
     if tipo == "venta":
+        if state.modelo is None or state.explainer is None:
+            print("[PrediccionService][Venta] Modelo en RAM no disponible. Ejecutando carga on-demand...")
+            from app.core.model_loader import cargar_modelo
+            cargar_modelo(state, tipo="venta", esperar_mlflow=True)
         modelo = state.modelo
         explainer = state.explainer
         encoding_map = state.encoding_map
@@ -171,6 +176,10 @@ def _predecir_generico(
         media_global = state.media_global
         config = state.config
     else:
+        if state.modelo_alquiler is None or state.explainer_alquiler is None:
+            print("[PrediccionService][Alquiler] Modelo en RAM no disponible. Ejecutando carga on-demand...")
+            from app.core.model_loader import cargar_modelo
+            cargar_modelo(state, tipo="alquiler", esperar_mlflow=True)
         modelo = state.modelo_alquiler
         explainer = state.explainer_alquiler
         encoding_map = state.encoding_map_alquiler
@@ -181,8 +190,23 @@ def _predecir_generico(
     if modelo is None or explainer is None:
         raise HTTPException(
             status_code=503,
-            detail=f"El modelo de {tipo} no está cargado en el servicio.",
+            detail=(
+                f"El modelo de {tipo} no está disponible en memoria. "
+                "El servidor MLflow se encuentra suspendido o inaccesible. "
+                "Por favor intente nuevamente en unos instantes mientras el servicio se restablece."
+            ),
         )
+
+    # 1. Asegurar conectividad con el proveedor de datos de contexto distrital
+    if state.data_provider is None:
+        try:
+            from app.core.data_provider import PostgreSQLContextProvider
+            state.data_provider = PostgreSQLContextProvider()
+        except Exception as ex_db:
+            raise HTTPException(
+                status_code=503,
+                detail=f"Error al conectar con la base de datos de contexto distrital: {ex_db}",
+            )
 
     # 1. Normalizar y validar distrito
     distrito_efectivo = _normalizar_distrito(req.distrito, encoding_map.keys())

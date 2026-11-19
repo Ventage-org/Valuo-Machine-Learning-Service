@@ -38,12 +38,13 @@ class MLflowManager:
         """
         Verifica si el servidor MLflow está accesible.
         Retorna True si responde HTTP 200, False si no está disponible.
-        Incluye caché en memoria de 10 segundos.
+        Solo cachea resultados positivos (True) para permitir reintentos inmediatos
+        si el servidor estaba levantándose o en cold start.
         """
         now = time.time()
-        if hasattr(self, "_last_check_ts") and hasattr(self, "_last_check_res"):
-            if (now - self._last_check_ts) < 10.0:
-                return self._last_check_res
+        if getattr(self, "_last_check_res", None) is True and hasattr(self, "_last_check_ts"):
+            if (now - self._last_check_ts) < 15.0:
+                return True
 
         self._last_check_ts = now
         try:
@@ -66,6 +67,57 @@ class MLflowManager:
             print(f"[MLflowManager] Servidor no accesible en {self.tracking_uri}: {e}", flush=True)
             self._last_check_res = False
             return False
+
+    def wait_for_server(
+        self,
+        max_retries: int = 8,
+        delay_sec: float = 2.5,
+        timeout_per_try: float = 3.0,
+    ) -> bool:
+        """
+        Espera activamente a que el servidor MLflow despierte y esté listo.
+        Diseñado para resolver la condición de carrera en Azure Container Apps
+        cuando tanto ml-service como mlflow-server despiertan de suspensión (minReplicas: 0).
+        """
+        url = self.tracking_uri.rstrip("/")
+        if not (url.startswith("http://") or url.startswith("https://")):
+            return self.check_connection()
+
+        # Si ya verificamos recientemente que está activo, retornar rápido
+        if self.check_connection(timeout_sec=timeout_per_try):
+            return True
+
+        print(f"[MLflowManager] Servidor no disponible de inmediato. Esperando arranque de MLflow en {self.tracking_uri}...", flush=True)
+
+        for attempt in range(1, max_retries + 1):
+            try:
+                try:
+                    resp = requests.get(f"{url}/health", timeout=timeout_per_try)
+                    if resp.status_code == 200:
+                        print(f"[MLflowManager] [OK] MLflow Server respondió exitosamente tras {attempt} intentos.", flush=True)
+                        self._last_check_res = True
+                        self._last_check_ts = time.time()
+                        return True
+                except Exception:
+                    pass
+
+                resp = requests.get(url, timeout=timeout_per_try)
+                if resp.status_code == 200:
+                    print(f"[MLflowManager] [OK] MLflow Server respondió en raíz tras {attempt} intentos.", flush=True)
+                    self._last_check_res = True
+                    self._last_check_ts = time.time()
+                    return True
+            except Exception:
+                pass
+
+            if attempt < max_retries:
+                print(f"[MLflowManager] Esperando que MLflow Server despierte de suspensión (intento {attempt}/{max_retries})...", flush=True)
+                time.sleep(delay_sec)
+
+        print(f"[MLflowManager] Advertencia: MLflow Server no respondió tras {max_retries} intentos ({max_retries * delay_sec:.0f}s).", flush=True)
+        self._last_check_res = False
+        self._last_check_ts = time.time()
+        return False
 
     def get_or_create_experiment(self, experiment_name: str) -> str:
         """

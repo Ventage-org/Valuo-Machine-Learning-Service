@@ -69,11 +69,16 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     print("  Iniciando carga de artefactos ...", flush=True)
     print("=" * 55, flush=True)
 
-    cargar_modelo(model_state)
+    listo = cargar_modelo(model_state, esperar_mlflow=True)
     comparables_service.cargar_datos()
 
     print("=" * 55, flush=True)
-    print("  Servicio listo. Accede a /docs para la API.", flush=True)
+    if listo:
+        print("  Servicio 100% operativo. Modelos en RAM listos.", flush=True)
+    else:
+        print("  Servicio activo en modo Standby / Recuperación.", flush=True)
+        print("  Los modelos se sincronizarán on-demand con MLflow.", flush=True)
+    print("  Accede a /docs para la API.", flush=True)
     print("=" * 55 + "\n", flush=True)
 
     yield  # ← El servidor está activo aquí
