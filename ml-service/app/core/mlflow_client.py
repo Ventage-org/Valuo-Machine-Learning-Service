@@ -8,7 +8,9 @@ promoción de modelos entre etapas (Candidate -> Production).
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 import os
+import time
 from typing import Any
 import mlflow
 from mlflow.entities.model_registry import ModelVersion
@@ -36,23 +38,86 @@ class MLflowManager:
         """
         Verifica si el servidor MLflow está accesible.
         Retorna True si responde HTTP 200, False si no está disponible.
+        Solo cachea resultados positivos (True) para permitir reintentos inmediatos
+        si el servidor estaba levantándose o en cold start.
         """
+        now = time.time()
+        if getattr(self, "_last_check_res", None) is True and hasattr(self, "_last_check_ts"):
+            if (now - self._last_check_ts) < 15.0:
+                return True
+
+        self._last_check_ts = now
         try:
             url = self.tracking_uri.rstrip("/")
-            # Si es URL HTTP/HTTPS
             if url.startswith("http://") or url.startswith("https://"):
-                resp = requests.get(f"{url}/health", timeout=timeout_sec)
-                if resp.status_code == 200:
-                    return True
-                # Algunos servidores MLflow responden en la raíz
+                try:
+                    resp = requests.get(f"{url}/health", timeout=timeout_sec)
+                    if resp.status_code == 200:
+                        self._last_check_res = True
+                        return True
+                except Exception:
+                    pass
                 resp = requests.get(url, timeout=timeout_sec)
-                return resp.status_code == 200
-            # Si es conexión directa a base de datos
+                self._last_check_res = bool(resp.status_code == 200)
+                return self._last_check_res
             self.client.search_experiments(max_results=1)
+            self._last_check_res = True
             return True
         except Exception as e:
-            print(f"[MLflowManager] Servidor no accesible en {self.tracking_uri}: {e}")
+            print(f"[MLflowManager] Servidor no accesible en {self.tracking_uri}: {e}", flush=True)
+            self._last_check_res = False
             return False
+
+    def wait_for_server(
+        self,
+        max_retries: int = 8,
+        delay_sec: float = 2.5,
+        timeout_per_try: float = 3.0,
+    ) -> bool:
+        """
+        Espera activamente a que el servidor MLflow despierte y esté listo.
+        Diseñado para resolver la condición de carrera en Azure Container Apps
+        cuando tanto ml-service como mlflow-server despiertan de suspensión (minReplicas: 0).
+        """
+        url = self.tracking_uri.rstrip("/")
+        if not (url.startswith("http://") or url.startswith("https://")):
+            return self.check_connection()
+
+        # Si ya verificamos recientemente que está activo, retornar rápido
+        if self.check_connection(timeout_sec=timeout_per_try):
+            return True
+
+        print(f"[MLflowManager] Servidor no disponible de inmediato. Esperando arranque de MLflow en {self.tracking_uri}...", flush=True)
+
+        for attempt in range(1, max_retries + 1):
+            try:
+                try:
+                    resp = requests.get(f"{url}/health", timeout=timeout_per_try)
+                    if resp.status_code == 200:
+                        print(f"[MLflowManager] [OK] MLflow Server respondió exitosamente tras {attempt} intentos.", flush=True)
+                        self._last_check_res = True
+                        self._last_check_ts = time.time()
+                        return True
+                except Exception:
+                    pass
+
+                resp = requests.get(url, timeout=timeout_per_try)
+                if resp.status_code == 200:
+                    print(f"[MLflowManager] [OK] MLflow Server respondió en raíz tras {attempt} intentos.", flush=True)
+                    self._last_check_res = True
+                    self._last_check_ts = time.time()
+                    return True
+            except Exception:
+                pass
+
+            if attempt < max_retries:
+                print(f"[MLflowManager] Esperando que MLflow Server despierte de suspensión (intento {attempt}/{max_retries})...", flush=True)
+                time.sleep(delay_sec)
+
+        print(f"[MLflowManager] Advertencia: MLflow Server no respondió tras {max_retries} intentos ({max_retries * delay_sec:.0f}s).", flush=True)
+        self._last_check_res = False
+        self._last_check_ts = time.time()
+        return False
 
     def get_or_create_experiment(self, experiment_name: str) -> str:
         """
@@ -72,11 +137,11 @@ class MLflowManager:
 
     def get_production_version(self, model_name: str) -> ModelVersion | None:
         """
-        Obtiene la versión del modelo que actualmente se encuentra en stage 'Production'
-        o que posee el alias 'champion'.
+        Obtiene la versión del modelo que actualmente se encuentra en producción
+        (prioridad: alias 'champion', luego stage 'Production' ordenado por versión DESC).
         """
         try:
-            # 1. Intentar por alias moderno (MLflow 2.8+)
+            # 1. Intentar por alias moderno @champion (MLflow 2.8+)
             try:
                 model_ver = self.client.get_model_version_by_alias(model_name, "champion")
                 if model_ver:
@@ -84,10 +149,18 @@ class MLflowManager:
             except Exception:
                 pass
 
-            # 2. Buscar por stage clásico 'Production'
+            # 2. Buscar por stage clásico 'Production' (la más reciente descendentemente)
             versions = self.client.get_latest_versions(model_name, stages=["Production"])
             if versions:
+                versions.sort(key=lambda v: int(v.version) if str(v.version).isdigit() else 0, reverse=True)
                 return versions[0]
+
+            # 3. Fallback: buscar en todas las versiones registradas
+            all_versions = self.client.search_model_versions(f"name = '{model_name}'")
+            for v in all_versions:
+                if "champion" in getattr(v, "aliases", []) or v.current_stage == "Production":
+                    return v
+
             return None
         except Exception as e:
             print(f"[MLflowManager] Error consultando versión de producción de '{model_name}': {e}")
@@ -95,21 +168,22 @@ class MLflowManager:
 
     def get_latest_candidate_versions(self, model_name: str, limit: int = 5) -> list[ModelVersion]:
         """
-        Retorna las versiones candidatas activas (excluyendo 'Production' y 'Archived')
+        Retorna las versiones candidatas activas (excluyendo 'Production', 'Archived' y alias 'champion')
         para evaluación y benchmarking.
         """
         try:
-            # Buscar versiones del modelo registradas ordenadas descendentemente
             filter_str = f"name = '{model_name}'"
             all_versions = self.client.search_model_versions(
                 filter_string=filter_str,
                 order_by=["version_number DESC"],
                 max_results=max(limit * 3, 20),
             )
-            # Filtrar estrictamente las candidatas activas (no Production ni Archived)
+            # Filtrar estrictamente las candidatas activas
             candidates = [
                 v for v in all_versions
                 if v.current_stage not in ("Production", "Archived")
+                and "champion" not in getattr(v, "aliases", [])
+                and getattr(v, "tags", {}).get("estado_gobernanza") not in ("production", "archived", "discarded")
             ]
             return candidates[:limit]
         except Exception as e:
@@ -142,7 +216,9 @@ class MLflowManager:
                 order_by=["version_number DESC"],
             )
             for v in all_versions:
-                if v.current_stage == "Archived":
+                if "champion" in getattr(v, "aliases", []):
+                    continue
+                if v.current_stage == "Archived" or getattr(v, "tags", {}).get("estado_gobernanza") == "archived":
                     return v
             return None
         except Exception as e:
@@ -173,7 +249,7 @@ class MLflowManager:
     ) -> ModelVersion:
         """
         Promueve una versión candidata a 'Production', asigna el alias 'champion',
-        archiva la versión previa y registra los tags de auditoría.
+        archiva de forma explícita las versiones previas en MLflow y registra los tags de auditoría.
         """
         version_str = str(version).strip()
         import re
@@ -183,31 +259,167 @@ class MLflowManager:
 
         print(f"[MLflowManager] Promoviendo {model_name} v{version_str} a Production...")
 
-        # 1. Asignar stage Production en Model Registry
+        # 1. Asignar stage Production a la versión seleccionada
         promoted = self.client.transition_model_version_stage(
             name=model_name,
             version=version_str,
             stage="Production",
-            archive_existing_versions=archive_existing,
+            archive_existing_versions=False,
         )
 
-        # 2. Asignar alias champion
+        # 2. Archivar explícitamente todas las demás versiones previas
+        if archive_existing:
+            try:
+                all_versions = self.client.search_model_versions(f"name = '{model_name}'")
+                for v in all_versions:
+                    if str(v.version) != str(version_str) and (
+                        v.current_stage == "Production" or "champion" in getattr(v, "aliases", [])
+                    ):
+                        print(f"[MLflowManager] Archivando versión previa {model_name} v{v.version}...")
+                        try:
+                            self.client.transition_model_version_stage(
+                                name=model_name,
+                                version=str(v.version),
+                                stage="Archived",
+                            )
+                        except Exception as e_tr:
+                            print(f"[MLflowManager] Advertencia transición a Archived v{v.version}: {e_tr}")
+
+                        try:
+                            self.client.set_model_version_tag(
+                                name=model_name,
+                                version=str(v.version),
+                                key="estado_gobernanza",
+                                value="archived",
+                            )
+                            self.client.set_model_version_tag(
+                                name=model_name,
+                                version=str(v.version),
+                                key="stage",
+                                value="Archived",
+                            )
+                            if v.run_id:
+                                self.client.set_tag(v.run_id, "estado_gobernanza", "archived")
+                        except Exception as e_tag_arch:
+                            print(f"[MLflowManager] Advertencia actualizando tags de versión archivada v{v.version}: {e_tag_arch}")
+            except Exception as e_arch:
+                print(f"[MLflowManager] Advertencia al buscar y archivar versiones previas: {e_arch}")
+
+        # 3. Asignar alias champion a la nueva versión
         try:
             self.client.set_registered_model_alias(model_name, "champion", version_str)
-        except Exception:
-            pass
+        except Exception as e_alias:
+            print(f"[MLflowManager] Advertencia al asignar alias champion: {e_alias}")
 
-        # 3. Registrar tag de auditoría con el motivo
-        if motivo:
+        # 4. Registrar tags de gobernanza y auditoría en la versión y en el run
+        try:
             self.client.set_model_version_tag(
                 name=model_name,
                 version=version_str,
-                key="promotion_reason",
-                value=motivo,
+                key="estado_gobernanza",
+                value="production",
+            )
+            self.client.set_model_version_tag(
+                name=model_name,
+                version=version_str,
+                key="stage",
+                value="Production",
+            )
+            if motivo:
+                self.client.set_model_version_tag(
+                    name=model_name,
+                    version=version_str,
+                    key="promotion_reason",
+                    value=motivo,
+                )
+            target_run_id = promoted.run_id if promoted else None
+            if not target_run_id:
+                try:
+                    ver_obj = self.client.get_model_version(model_name, version_str)
+                    target_run_id = ver_obj.run_id if ver_obj else None
+                except Exception:
+                    pass
+            if target_run_id:
+                self.client.set_tag(target_run_id, "estado_gobernanza", "production")
+        except Exception as e_tags:
+            print(f"[MLflowManager] Advertencia al fijar tags de promoción: {e_tags}")
+
+        print(f"[MLflowManager] [OK] {model_name} v{version_str} promovido exitosamente a Production (@champion).")
+        return promoted
+
+    def discard_candidate_version(
+        self,
+        model_name: str,
+        version: int | str,
+        motivo: str = "",
+    ) -> ModelVersion:
+        """
+        Descarta y archiva una versión candidata en MLflow Model Registry.
+        Asigna stage='Archived' y estampa tags de gobernanza con la justificación y timestamp.
+        """
+        version_str = str(version).strip()
+        import re
+        m = re.search(r"\d+", version_str)
+        if m:
+            version_str = m.group(0)
+
+        print(f"[MLflowManager] Descartando {model_name} v{version_str}...")
+
+        # 1. Transicionar stage a Archived en MLflow
+        archived = self.client.transition_model_version_stage(
+            name=model_name,
+            version=version_str,
+            stage="Archived",
+            archive_existing_versions=False,
+        )
+
+        # 2. Registrar tags de auditoría y descarte
+        now_iso = datetime.now(timezone.utc).isoformat()
+        try:
+            self.client.set_model_version_tag(
+                name=model_name,
+                version=version_str,
+                key="estado_gobernanza",
+                value="discarded",
+            )
+            self.client.set_model_version_tag(
+                name=model_name,
+                version=version_str,
+                key="stage",
+                value="Archived",
+            )
+            if motivo:
+                self.client.set_model_version_tag(
+                    name=model_name,
+                    version=version_str,
+                    key="motivo_descarte",
+                    value=motivo,
+                )
+            self.client.set_model_version_tag(
+                name=model_name,
+                version=version_str,
+                key="descartado_en",
+                value=now_iso,
             )
 
-        print(f"[MLflowManager] [OK] {model_name} v{version_str} promovido exitosamente a Production.")
-        return promoted
+            # Estampar también en el run_id asociado para trazabilidad
+            target_run_id = archived.run_id if archived else None
+            if not target_run_id:
+                try:
+                    ver_obj = self.client.get_model_version(model_name, version_str)
+                    target_run_id = ver_obj.run_id if ver_obj else None
+                except Exception:
+                    pass
+            if target_run_id:
+                self.client.set_tag(target_run_id, "estado_gobernanza", "discarded")
+                if motivo:
+                    self.client.set_tag(target_run_id, "motivo_descarte", motivo)
+                self.client.set_tag(target_run_id, "descartado_en", now_iso)
+        except Exception as e_tags:
+            print(f"[MLflowManager] Advertencia al fijar tags de descarte: {e_tags}")
+
+        print(f"[MLflowManager] [OK] {model_name} v{version_str} descartado y archivado.")
+        return archived
 
 
 # Instancia singleton del cliente de MLflow

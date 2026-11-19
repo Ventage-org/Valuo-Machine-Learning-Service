@@ -88,8 +88,32 @@ Documentación interactiva: http://localhost:8000/docs
 - **`POST /api/v1/prediccion/venta`**: Predice precio de venta de un inmueble (soles constantes y nominales, intervalo de confianza ±15.04%, explicabilidad SHAP).
 - **`POST /api/v1/prediccion/alquiler`**: Predice canon de arrendamiento mensual (soles constantes y nominales, intervalo de confianza ±13.85%, explicabilidad SHAP).
 - **`GET /api/v1/modelos/sensibilidad-factores`**: Análisis de sensibilidad de macro-factores del modelo para la pantalla principal (Home / Landing Page). Admite `?tipo_operacion=venta` o `alquiler`.
+- **`GET /api/v1/distritos/{distrito}/contexto`**: Contexto de micro-entorno distrital enriquecido (estrato socioeconómico INEI/ENAHO, seguridad PNP, distancias geodésicas Haversine a hitos de OpenStreetMap: parques, transporte masivo Metropolitano/Metro, colegios, universidades, salud y centros comerciales). Admite `?lat={lat}&lon={lon}` opcionales.
 - **`GET /api/v1/distritos`**: Lista los 22 distritos disponibles de Lima Metropolitana.
 - **`GET /health`**: Health check para balanceadores.
+
+
+### 1.3 Micro-Entorno Urbano y Contexto Distrital (`GET /api/v1/distritos/{distrito}/contexto`)
+
+Endpoint público y canónico que provee métricas objetivas de entorno urbano tanto para el **pin del mapa interactivo** (pre-tasación) como para las **tarjetas de detalle del informe** (post-tasación).
+
+- **Parámetros:**
+  - `distrito` (path, string): Uno de los 22 distritos soportados (ej. `Miraflores`, `Pueblo Libre`, `San Miguel`).
+  - `lat` (query, float, opcional): Latitud WGS84 del predio.
+  - `lon` (query, float, opcional): Longitud WGS84 del predio.
+- **Fuentes de datos oficiales integradas:**
+  1. **Estrato Socioeconómico:** INEI / Encuesta Nacional de Hogares (ENAHO 2025). Distribución porcentual decil/estrato (A, B, C, D, E) y ratio consolidado A+B.
+  2. **Seguridad Ciudadana:** Sistema Estadístico de la Policía Nacional del Perú (PNP). Tasa de robos y tasa de denuncias por 10k hab., normalizadas en índice de 1.0 a 10.0 (Min-Max invertido). Identifica comisaría más cercana y distancia real.
+  3. **Hitos Urbanos y Equipamiento (OpenStreetMap Nominatim):** Catálogo depurado de más de 1,000 puntos de interés con precisión geodésica WGS84 a 6-7 decimales (centimétrica), agrupados en:
+     - *Movilidad y Transporte:* Metropolitano (troncales y alimentadores), Línea 1 y 2 del Metro de Lima, corredores.
+     - *Áreas Verdes:* Parques metropolitanos, zonales y urbanos con conteo de parques en radio de 1 km.
+     - *Salud y Educación:* Hospitales, clínicas especializadas, colegios y campus universitarios.
+     - *Comercio:* Centros comerciales, malls y galerías retail.
+- **Métricas calculadas:**
+  - Distancia geodésica $d$ mediante fórmula de Haversine ($R = 6,371,000	ext{ m}$).
+  - Tiempo estimado de caminata a pie considerando velocidad peatonal urbana estándar ($v = 4.8	ext{ km/h} = 80	ext{ m/min}$).
+
+---
 
 ### 2. Administración y Reentrenamiento
 - **`POST /api/v1/admin/entrenamiento/venta`**: Lanza pipeline de reentrenamiento del modelo de venta consumiendo `dataset_inmuebles_venta` desde PostgreSQL.

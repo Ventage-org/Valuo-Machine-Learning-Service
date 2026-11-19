@@ -23,13 +23,17 @@ class FactorSensibilidad(BaseModel):
         description="Categoría cualitativa: 'Impacto Muy Alto' (≥30%), 'Impacto Alto' (20-29.9%), 'Impacto Moderado' (10-19.9%), 'Impacto Leve' (<10%)."
     )
     variables_incluidas: list[str] = Field(
+        description="Lista de variables en lenguaje claro y comprensible asociadas a este macro-factor."
+    )
+    variables_tecnicas: list[str] = Field(
+        default_factory=list,
         description="Lista de variables técnicas internas del modelo asociadas a este macro-factor."
     )
 
 
 class SensibilidadFactoresResponse(BaseModel):
     """Respuesta canónica de GET /api/v1/modelos/sensibilidad-factores."""
-    modelo: str = Field(description="Nombre del modelo activo en producción (ej: 'xgboost_venta_v2').")
+    modelo: str = Field(description="Nombre del modelo activo en producción (ej: 'xgboost_venta_v1').")
     tipo_operacion: Literal["venta", "alquiler"] = Field(description="Tipo de operación inmobiliaria analizada.")
     version: str = Field(description="Versión del modelo.")
     metodo: str = Field(

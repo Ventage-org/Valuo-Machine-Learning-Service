@@ -25,7 +25,7 @@ MACRO_FACTORES_CONFIG: list[dict] = [
     {
         "id": "ubicacion_entorno",
         "factor": "Ubicación y Entorno Urbano",
-        "descripcion": "Distrito, estrato socioeconómico (NSE) y cercanía a vías principales, transporte, parques y servicios.",
+        "descripcion": "Distrito, estrato socioeconómico y cercanía a vías principales, transporte, parques y servicios.",
         "variables": [
             "distrito_encoded",
             "pct_NSE_A",
@@ -39,8 +39,10 @@ MACRO_FACTORES_CONFIG: list[dict] = [
             "dist_colegio_km",
             "dist_centro_comercial_km",
             "tasa_robo",
+            "tasa_hurto",
             "tasa_homicidio",
             "densidad_pob_km2",
+            "densidad_hab_km2",
             "poblacion_proyectada",
         ],
     },
@@ -50,9 +52,11 @@ MACRO_FACTORES_CONFIG: list[dict] = [
         "descripcion": "Metraje total en m², distribución espacial y número de ambientes (habitaciones y baños).",
         "variables": [
             "Superficie",
+            "superficie_cuadrado",
             "Habitaciones",
             "Banios",
-            "ratio_banio_hab",
+            "ratio_banios_hab",
+            "m2_por_habitacion",
         ],
     },
     {
@@ -71,9 +75,57 @@ MACRO_FACTORES_CONFIG: list[dict] = [
         "variables": [
             "Antiguedad",
             "es_estreno",
+            "Piso",
+            "es_piso_alto",
+            "Vista_Exterior",
         ],
     },
 ]
+
+# Traducción a etiquetas legibles y comerciales para usuarios / agentes
+_VARIABLE_LABELS: dict[str, str] = {
+    # Ubicación y Entorno Urbano
+    "distrito_encoded":            "Ubicación distrital",
+    "pct_NSE_A":                   "Estrato socioeconómico A (Encuesta ENAHO)",
+    "pct_NSE_B":                   "Estrato socioeconómico B (Encuesta ENAHO)",
+    "pct_NSE_C":                   "Estrato socioeconómico C (Encuesta ENAHO)",
+    "pct_NSE_D":                   "Estrato socioeconómico D (Encuesta ENAHO)",
+    "pct_NSE_E":                   "Estrato socioeconómico E (Encuesta ENAHO)",
+    "distancia_centro_km":         "Distancia al centro urbano",
+    "dist_estacion_transporte_km": "Cercanía a estaciones de transporte público",
+    "dist_parque_km":              "Cercanía a parques y áreas verdes",
+    "dist_colegio_km":             "Cercanía a colegios",
+    "dist_centro_comercial_km":    "Cercanía a centros comerciales",
+    "dist_hospital_km":            "Cercanía a centros de salud",
+    "dist_universidad_km":         "Cercanía a universidades",
+    "tasa_robo":                   "Nivel de seguridad (tasa de robos)",
+    "tasa_hurto":                  "Nivel de seguridad (tasa de hurtos)",
+    "tasa_homicidio":              "Nivel de seguridad (tasa de homicidios)",
+    "densidad_pob_km2":            "Densidad poblacional distrital",
+    "densidad_hab_km2":            "Densidad poblacional distrital",
+    "poblacion_proyectada":        "Población distrital proyectada",
+    "area_distrito_km2":           "Área geográfica distrital",
+
+    # Área y Superficie Construida
+    "Superficie":                  "Superficie total construida (m²)",
+    "superficie_cuadrado":         "Efecto de escala por metraje",
+    "Habitaciones":                "Número de dormitorios",
+    "Banios":                      "Número de baños",
+    "ratio_banios_hab":            "Dotación de baños por dormitorio",
+    "ratio_banio_hab":             "Dotación de baños por dormitorio",
+    "m2_por_habitacion":           "Amplitud por dormitorio (m²)",
+
+    # Estacionamiento y Accesibilidad
+    "tiene_garaje":                "Disponibilidad de cochera",
+    "Garajes":                     "Número de cocheras",
+
+    # Antigüedad y Conservación
+    "Antiguedad":                  "Antigüedad de la edificación (años)",
+    "es_estreno":                  "Condición de estreno",
+    "Piso":                        "Nivel de piso",
+    "es_piso_alto":                "Ubicación en piso alto",
+    "Vista_Exterior":              "Vista exterior a la calle",
+}
 
 
 def obtener_sensibilidad_factores(
@@ -146,6 +198,10 @@ def obtener_sensibilidad_factores(
         else:
             nivel = "Impacto Leve"
 
+        variables_amigables = list(dict.fromkeys(
+            _VARIABLE_LABELS.get(v, v) for v in mf["variables"]
+        ))
+
         factores_resultado.append(
             FactorSensibilidad(
                 id=mf_id,
@@ -153,7 +209,8 @@ def obtener_sensibilidad_factores(
                 descripcion=mf["descripcion"],
                 peso_porcentaje=pct,
                 nivel_impacto=nivel,
-                variables_incluidas=mf["variables"],
+                variables_incluidas=variables_amigables,
+                variables_tecnicas=mf["variables"],
             )
         )
 

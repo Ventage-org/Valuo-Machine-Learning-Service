@@ -1,0 +1,7155 @@
+{
+  "Miraflores": {
+    "parques": [
+      {
+        "nombre": "Parque Alberto Andrade Carmona",
+        "lat": -12.1267365,
+        "lon": -77.0365127
+      },
+      {
+        "nombre": "Parque Reducto",
+        "lat": -12.1262952,
+        "lon": -77.0226427
+      },
+      {
+        "nombre": "Parque Eduardo Villena Rey",
+        "lat": -12.113251,
+        "lon": -77.0423657
+      },
+      {
+        "nombre": "Parque de los Héroes",
+        "lat": -12.1379775,
+        "lon": -77.0244826
+      },
+      {
+        "nombre": "Parque Pablo Arguedas",
+        "lat": -12.1272057,
+        "lon": -77.0195647
+      },
+      {
+        "nombre": "Parque Miguel Maldonado",
+        "lat": -12.1323493,
+        "lon": -77.0166075
+      },
+      {
+        "nombre": "Parque Augusto B. Leguía",
+        "lat": -12.127329,
+        "lon": -77.0169296
+      },
+      {
+        "nombre": "Parque Los Geranios",
+        "lat": -12.1280468,
+        "lon": -77.0154133
+      },
+      {
+        "nombre": "Parque Los Rosales",
+        "lat": -12.128955,
+        "lon": -77.0154026
+      },
+      {
+        "nombre": "Surquillo Viejo",
+        "lat": -12.1174017,
+        "lon": -77.0159445
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación Benavides",
+        "lat": -12.1251887,
+        "lon": -77.024196
+      },
+      {
+        "nombre": "Estación Ricardo Palma",
+        "lat": -12.1189574,
+        "lon": -77.0259296
+      },
+      {
+        "nombre": "Estación 28 de Julio",
+        "lat": -12.1293792,
+        "lon": -77.0228415
+      },
+      {
+        "nombre": "La Estacion Centro Veterinario",
+        "lat": -12.1195732,
+        "lon": -77.0235377
+      },
+      {
+        "nombre": "Estación Plaza de Flores",
+        "lat": -12.13594,
+        "lon": -77.0186746
+      },
+      {
+        "nombre": "Estación Reciclame",
+        "lat": -12.1303084,
+        "lon": -77.0176149
+      },
+      {
+        "nombre": "Estación Angamos",
+        "lat": -12.1132067,
+        "lon": -77.0259753
+      },
+      {
+        "nombre": "Estación 329",
+        "lat": -12.1171251,
+        "lon": -77.0318711
+      },
+      {
+        "nombre": "CityBikeLima",
+        "lat": -12.1317486,
+        "lon": -77.0298438
+      },
+      {
+        "nombre": "Estación Parque del Faro La Marina",
+        "lat": -12.1231022,
+        "lon": -77.0399715
+      },
+      {
+        "nombre": "Estación Malecón Cisneros - Calle Trípoli",
+        "lat": -12.1247695,
+        "lon": -77.0373416
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Hospital José Casimiro Ulloa",
+        "lat": -12.1280242,
+        "lon": -77.0177447
+      },
+      {
+        "nombre": "Hospital III Suarez Angamos",
+        "lat": -12.1133598,
+        "lon": -77.0281371
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "San Silvestre School",
+        "lat": -12.1155639,
+        "lon": -77.0403524
+      },
+      {
+        "nombre": "Colegio Pestalozzi",
+        "lat": -12.1235053,
+        "lon": -77.0151423
+      },
+      {
+        "nombre": "Institución Educativa Nuestra Señora Del Carmen",
+        "lat": -12.1275747,
+        "lon": -77.0219144
+      },
+      {
+        "nombre": "Escuela Adventista",
+        "lat": -12.1119404,
+        "lon": -77.0364605
+      },
+      {
+        "nombre": "Institución Educativa Independencia",
+        "lat": -12.1148787,
+        "lon": -77.0266271
+      },
+      {
+        "nombre": "Institución Educativa 7701 Nuestra Señora Del Carmen",
+        "lat": -12.1348782,
+        "lon": -77.0206941
+      },
+      {
+        "nombre": "Institución Educativa Pamer Barranco",
+        "lat": -12.1400005,
+        "lon": -77.0219467
+      },
+      {
+        "nombre": "Institución Educativa San Ignacio De Loyola",
+        "lat": -12.1172834,
+        "lon": -77.0289861
+      },
+      {
+        "nombre": "Institución Educativa Santa Maria Reyna",
+        "lat": -12.1384118,
+        "lon": -77.0159599
+      },
+      {
+        "nombre": "Ciclovía El Sol",
+        "lat": -12.1390517,
+        "lon": -77.0234381
+      },
+      {
+        "nombre": "Institución Educativa Nivel A",
+        "lat": -12.1399371,
+        "lon": -77.0183678
+      },
+      {
+        "nombre": "Peruano De Marketing",
+        "lat": -12.1284373,
+        "lon": -77.0227336
+      },
+      {
+        "nombre": "Institución Educativa 6049 Ricardo Palma",
+        "lat": -12.1124675,
+        "lon": -77.0159794
+      },
+      {
+        "nombre": "Institución Educativa Alfredo Salazar Southwell",
+        "lat": -12.1143685,
+        "lon": -77.0277215
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Larcomar",
+        "lat": -12.1322184,
+        "lon": -77.0302263
+      },
+      {
+        "nombre": "Centro Comercial Fortuna",
+        "lat": -12.1106749,
+        "lon": -77.0256044
+      },
+      {
+        "nombre": "Centro Comercial Esperanza",
+        "lat": -12.1205523,
+        "lon": -77.0278645
+      },
+      {
+        "nombre": "Centro Comercial Cantuarias",
+        "lat": -12.1215036,
+        "lon": -77.0285275
+      },
+      {
+        "nombre": "Centro Comercial Balta",
+        "lat": -12.1229297,
+        "lon": -77.0322474
+      },
+      {
+        "nombre": "Centro Comercial Acuario",
+        "lat": -12.1227567,
+        "lon": -77.0290268
+      },
+      {
+        "nombre": "Ransa Comercial",
+        "lat": -12.1196535,
+        "lon": -77.0372316
+      },
+      {
+        "nombre": "Expocentro",
+        "lat": -12.1239292,
+        "lon": -77.0299484
+      },
+      {
+        "nombre": "Strip Mall 28 de Julio",
+        "lat": -12.1294161,
+        "lon": -77.0222586
+      },
+      {
+        "nombre": "El Paseo",
+        "lat": -12.1218295,
+        "lon": -77.0275953
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP Miraflores",
+        "lat": -12.1148015,
+        "lon": -77.027878
+      },
+      {
+        "nombre": "Comisaría PNP Surquillo",
+        "lat": -12.1186374,
+        "lon": -77.0222992
+      }
+    ]
+  },
+  "San Isidro": {
+    "parques": [
+      {
+        "nombre": "Parque Combate de Abtao",
+        "lat": -12.0937546,
+        "lon": -77.0285144
+      },
+      {
+        "nombre": "Parque María Reiche",
+        "lat": -12.1147278,
+        "lon": -77.0493238
+      },
+      {
+        "nombre": "Parque Santa Rosa",
+        "lat": -12.1013996,
+        "lon": -77.0332171
+      },
+      {
+        "nombre": "Parque Juana Alarco de Dammert",
+        "lat": -12.1108491,
+        "lon": -77.0354664
+      },
+      {
+        "nombre": "Alfonso Ugarte",
+        "lat": -12.0953012,
+        "lon": -77.0488303
+      },
+      {
+        "nombre": "República de Panamá",
+        "lat": -12.1074107,
+        "lon": -77.0517137
+      },
+      {
+        "nombre": "La Fuente",
+        "lat": -12.1033744,
+        "lon": -77.0533291
+      },
+      {
+        "nombre": "Mariscal Gamarra",
+        "lat": -12.1048022,
+        "lon": -77.0535274
+      },
+      {
+        "nombre": "Renan Elias",
+        "lat": -12.1041848,
+        "lon": -77.0497718
+      },
+      {
+        "nombre": "Plaza Leoncio Prado",
+        "lat": -12.0981236,
+        "lon": -77.0480897
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación Canaval y Moreyra",
+        "lat": -12.0966099,
+        "lon": -77.0249873
+      },
+      {
+        "nombre": "Estación Javier Prado",
+        "lat": -12.0893542,
+        "lon": -77.0235184
+      },
+      {
+        "nombre": "Estacion Aramburú",
+        "lat": -12.1026563,
+        "lon": -77.0273261
+      },
+      {
+        "nombre": "Estación Angamos",
+        "lat": -12.1132067,
+        "lon": -77.0259753
+      },
+      {
+        "nombre": "Estación Domingo Orué",
+        "lat": -12.1084776,
+        "lon": -77.0264514
+      },
+      {
+        "nombre": "Estación de Autobuses República de Colombia",
+        "lat": -12.0985614,
+        "lon": -77.0326425
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Hospital Central FAP",
+        "lat": -12.1038117,
+        "lon": -77.0299279
+      },
+      {
+        "nombre": "Hospital III Suarez Angamos",
+        "lat": -12.1133598,
+        "lon": -77.0281371
+      },
+      {
+        "nombre": "Instituto de Salud Oral FAP",
+        "lat": -12.1032022,
+        "lon": -77.020556
+      },
+      {
+        "nombre": "Policlínico Suárez",
+        "lat": -12.1096731,
+        "lon": -77.0271871
+      },
+      {
+        "nombre": "Centro de Atención Primaria Alfredo Piazza Roberts",
+        "lat": -12.0863619,
+        "lon": -77.0276373
+      },
+      {
+        "nombre": "Policlínico Peruano Japonés",
+        "lat": -12.0877134,
+        "lon": -77.0546996
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio de los Sagrados Corazones Belén",
+        "lat": -12.1044448,
+        "lon": -77.0470239
+      },
+      {
+        "nombre": "Colegio Santander",
+        "lat": -12.1072446,
+        "lon": -77.0306915
+      },
+      {
+        "nombre": "Institución Educativa Sagrado Corazon Sophianum",
+        "lat": -12.0865515,
+        "lon": -77.0490033
+      },
+      {
+        "nombre": "Institución Educativa Nuestra Señora Del Pilar",
+        "lat": -12.0879373,
+        "lon": -77.0202921
+      },
+      {
+        "nombre": "Institución Educativa Santa Rosa De Lima",
+        "lat": -12.0868682,
+        "lon": -77.0390818
+      },
+      {
+        "nombre": "Institución Educativa San Jose De Cluny",
+        "lat": -12.1034122,
+        "lon": -77.0266862
+      },
+      {
+        "nombre": "Institución Educativa Republica De Chile",
+        "lat": -12.0850662,
+        "lon": -77.0316317
+      },
+      {
+        "nombre": "Institución Educativa 1051 El Olivar",
+        "lat": -12.102236,
+        "lon": -77.0332128
+      },
+      {
+        "nombre": "Institución Educativa Nuestra Señora De La Luz",
+        "lat": -12.0989244,
+        "lon": -77.0299312
+      },
+      {
+        "nombre": "Institución Educativa 6003 Rebeca Carrion Cachot",
+        "lat": -12.1146421,
+        "lon": -77.0439786
+      },
+      {
+        "nombre": "Institución Educativa Alberto Benjamin Simpson",
+        "lat": -12.0873506,
+        "lon": -77.0336925
+      },
+      {
+        "nombre": "Nina Design",
+        "lat": -12.0981657,
+        "lon": -77.020895
+      },
+      {
+        "nombre": "BS Grupo",
+        "lat": -12.1051263,
+        "lon": -77.0315725
+      },
+      {
+        "nombre": "Institución Educativa La Casita De Juegos",
+        "lat": -12.0931575,
+        "lon": -77.0338208
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Centro Comercial Camino Real",
+        "lat": -12.0974121,
+        "lon": -77.036902
+      },
+      {
+        "nombre": "Centro Comercial Fortuna",
+        "lat": -12.1106749,
+        "lon": -77.0256044
+      },
+      {
+        "nombre": "Real Plaza Salaverry",
+        "lat": -12.0898845,
+        "lon": -77.0527159
+      },
+      {
+        "nombre": "Risso",
+        "lat": -12.0863063,
+        "lon": -77.0348226
+      },
+      {
+        "nombre": "Plaza Santa Catalina",
+        "lat": -12.0892615,
+        "lon": -77.0202365
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP San Isidro",
+        "lat": -12.09509,
+        "lon": -77.0322384
+      },
+      {
+        "nombre": "Comisaría PNP Miraflores",
+        "lat": -12.1148015,
+        "lon": -77.027878
+      }
+    ]
+  },
+  "San Borja": {
+    "parques": [
+      {
+        "nombre": "Parque Javier Prado 2",
+        "lat": -12.0836567,
+        "lon": -76.9884726
+      },
+      {
+        "nombre": "Parque Andrés Aramburú Salinas",
+        "lat": -12.1084226,
+        "lon": -76.9877096
+      },
+      {
+        "nombre": "Parque Santa María Josefina",
+        "lat": -12.1162115,
+        "lon": -77.0119955
+      },
+      {
+        "nombre": "Parque Euler",
+        "lat": -12.1029249,
+        "lon": -77.0086857
+      },
+      {
+        "nombre": "Parque Alfonso Ugarte",
+        "lat": -12.0807405,
+        "lon": -76.9908996
+      },
+      {
+        "nombre": "Parque Las Lomas",
+        "lat": -12.1050194,
+        "lon": -76.9893635
+      },
+      {
+        "nombre": "Parque Jacanda",
+        "lat": -12.0872191,
+        "lon": -76.9884809
+      },
+      {
+        "nombre": "Parque Olímpico",
+        "lat": -12.1038661,
+        "lon": -76.9893527
+      },
+      {
+        "nombre": "Alameda Héroes de la guerra del Pacífico",
+        "lat": -12.0963589,
+        "lon": -76.988112
+      },
+      {
+        "nombre": "Salamanca",
+        "lat": -12.0810174,
+        "lon": -76.9851986
+      },
+      {
+        "nombre": "Surquillo Viejo",
+        "lat": -12.1099026,
+        "lon": -77.0131698
+      },
+      {
+        "nombre": "Ovalo Velasco Astete",
+        "lat": -12.0913761,
+        "lon": -76.9859699
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación La Cultura",
+        "lat": -12.0868045,
+        "lon": -77.0037572
+      },
+      {
+        "nombre": "Estación San Borja Sur",
+        "lat": -12.1010728,
+        "lon": -77.0019722
+      },
+      {
+        "nombre": "Estación Angamos",
+        "lat": -12.1104227,
+        "lon": -77.0003563
+      },
+      {
+        "nombre": "Estacion La Cultura",
+        "lat": -12.0867325,
+        "lon": -77.0037841
+      },
+      {
+        "nombre": "Estación \"La Cultura\"",
+        "lat": -12.0865598,
+        "lon": -77.0037399
+      },
+      {
+        "nombre": "Estación \"Angamos\"",
+        "lat": -12.1102847,
+        "lon": -77.000444
+      },
+      {
+        "nombre": "Estacion San Borja Sur",
+        "lat": -12.1008842,
+        "lon": -77.0013843
+      },
+      {
+        "nombre": "Estación \"San Borja Sur\"",
+        "lat": -12.1004192,
+        "lon": -77.001846
+      },
+      {
+        "nombre": "Estación Ebony",
+        "lat": -12.0990425,
+        "lon": -77.0105517
+      },
+      {
+        "nombre": "Estación San Borja Norte",
+        "lat": -12.0957989,
+        "lon": -76.9891194
+      },
+      {
+        "nombre": "Estación Primavera",
+        "lat": -12.1115086,
+        "lon": -76.9999565
+      },
+      {
+        "nombre": "Estación San Borja",
+        "lat": -12.1002603,
+        "lon": -76.9948246
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Instituto Nacional de Enfermedades Neoplásicas",
+        "lat": -12.112548,
+        "lon": -76.9985362
+      },
+      {
+        "nombre": "Instituto Nacional de Salud del Niño",
+        "lat": -12.0856388,
+        "lon": -76.9921837
+      },
+      {
+        "nombre": "Centro de Salud Villa Victoria",
+        "lat": -12.108796,
+        "lon": -77.012017
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio Molinari",
+        "lat": -12.1010079,
+        "lon": -76.9986292
+      },
+      {
+        "nombre": "Colegio John Neper",
+        "lat": -12.0962657,
+        "lon": -77.0126161
+      },
+      {
+        "nombre": "Colegio Nuestra Señora de la Merced",
+        "lat": -12.1094105,
+        "lon": -77.0093631
+      },
+      {
+        "nombre": "Institución Educativa San Francisco de Borja",
+        "lat": -12.0907974,
+        "lon": -76.9977922
+      },
+      {
+        "nombre": "Confusio",
+        "lat": -12.1146842,
+        "lon": -77.0008159
+      },
+      {
+        "nombre": "Institución Educativa Nuestra Señora de Lourdes",
+        "lat": -12.1129142,
+        "lon": -77.0090486
+      },
+      {
+        "nombre": "Institución Educativa 7029 Virgen Milagrosa",
+        "lat": -12.1101651,
+        "lon": -77.0090819
+      },
+      {
+        "nombre": "Institución Educativa Entidad Educativa S.s. Bondy",
+        "lat": -12.0891509,
+        "lon": -76.9918211
+      },
+      {
+        "nombre": "Institución Educativa Ángeles de la Paz",
+        "lat": -12.1091502,
+        "lon": -77.009622
+      },
+      {
+        "nombre": "Institución Educativa Santo Grial",
+        "lat": -12.1144961,
+        "lon": -77.0062852
+      },
+      {
+        "nombre": "Institución Educativa La Divina Providencia",
+        "lat": -12.1123288,
+        "lon": -77.006192
+      },
+      {
+        "nombre": "Institución Educativa Divino Niño Jesus",
+        "lat": -12.1137869,
+        "lon": -77.0068785
+      },
+      {
+        "nombre": "Institución Educativa Santa Cecilia De La Calera",
+        "lat": -12.1149052,
+        "lon": -77.004307
+      },
+      {
+        "nombre": "Institución Educativa Green Gables",
+        "lat": -12.088688,
+        "lon": -77.0023007
+      },
+      {
+        "nombre": "Institución Educativa Liceo Naval Almirante Guise",
+        "lat": -12.0966876,
+        "lon": -76.9996925
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Centro Comercial Caminos del Inca",
+        "lat": -12.1132967,
+        "lon": -76.9915105
+      },
+      {
+        "nombre": "Centro Comercial Plaza Hogar Design Center",
+        "lat": -12.1114345,
+        "lon": -77.0145942
+      },
+      {
+        "nombre": "Centro Comercial Chacarilla",
+        "lat": -12.1117224,
+        "lon": -76.9912736
+      },
+      {
+        "nombre": "Centro Comercial Marsano Center",
+        "lat": -12.1165814,
+        "lon": -77.0089195
+      },
+      {
+        "nombre": "Real Plaza Primavera",
+        "lat": -12.1101168,
+        "lon": -77.0016537
+      },
+      {
+        "nombre": "Mallplaza Angamos",
+        "lat": -12.1115064,
+        "lon": -77.0118223
+      },
+      {
+        "nombre": "La Rambla",
+        "lat": -12.0893663,
+        "lon": -77.0048063
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP San Borja",
+        "lat": -12.1055507,
+        "lon": -76.9989349
+      },
+      {
+        "nombre": "Comisaría PNP San Antonio de Miraflores",
+        "lat": -12.1148199,
+        "lon": -77.0108557
+      }
+    ]
+  },
+  "Surco": {
+    "parques": [
+      {
+        "nombre": "Parque Miguel Alegre",
+        "lat": -12.1365056,
+        "lon": -76.9777349
+      },
+      {
+        "nombre": "Parque Los Alhelies",
+        "lat": -12.1331704,
+        "lon": -76.9874623
+      },
+      {
+        "nombre": "Parque El Maestro",
+        "lat": -12.1451174,
+        "lon": -76.9892711
+      },
+      {
+        "nombre": "Parque Carlos Paz Caferata",
+        "lat": -12.1424596,
+        "lon": -76.9830839
+      },
+      {
+        "nombre": "Parque El Olímpico",
+        "lat": -12.1446375,
+        "lon": -76.9748804
+      },
+      {
+        "nombre": "Parque María Parado de Bellido",
+        "lat": -12.1537551,
+        "lon": -76.976699
+      },
+      {
+        "nombre": "Parque Alvariño",
+        "lat": -12.1300228,
+        "lon": -76.9966393
+      },
+      {
+        "nombre": "Parque España",
+        "lat": -12.139166,
+        "lon": -76.992586
+      },
+      {
+        "nombre": "Parque México",
+        "lat": -12.1368072,
+        "lon": -76.9933635
+      },
+      {
+        "nombre": "Parque Paraguay",
+        "lat": -12.1360285,
+        "lon": -76.9916807
+      },
+      {
+        "nombre": "Parque Totaral I",
+        "lat": -12.1473124,
+        "lon": -76.9969241
+      },
+      {
+        "nombre": "Parque Panamá",
+        "lat": -12.136792,
+        "lon": -76.9944362
+      },
+      {
+        "nombre": "Parque Amistad",
+        "lat": -12.1525811,
+        "lon": -76.9790541
+      },
+      {
+        "nombre": "Parque La Pileta",
+        "lat": -12.1481112,
+        "lon": -76.9699666
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación Jorge Chávez",
+        "lat": -12.1425549,
+        "lon": -76.9910694
+      },
+      {
+        "nombre": "Estacion La Cultura",
+        "lat": -12.0867325,
+        "lon": -77.0037841
+      },
+      {
+        "nombre": "Estación \"La Cultura\"",
+        "lat": -12.0865598,
+        "lon": -77.0037399
+      },
+      {
+        "nombre": "Estación \"Angamos\"",
+        "lat": -12.1102847,
+        "lon": -77.000444
+      },
+      {
+        "nombre": "Estación \"Ayacucho\"",
+        "lat": -12.1347916,
+        "lon": -76.9969635
+      },
+      {
+        "nombre": "Estación \"Jorge Chávez\"",
+        "lat": -12.1425394,
+        "lon": -76.9909709
+      },
+      {
+        "nombre": "Estación \"Cabitos\"",
+        "lat": -12.1272009,
+        "lon": -77.0004955
+      },
+      {
+        "nombre": "Estación \"San Borja Sur\"",
+        "lat": -12.1004192,
+        "lon": -77.001846
+      },
+      {
+        "nombre": "Estación San Borja Sur",
+        "lat": -12.1003705,
+        "lon": -77.0018215
+      },
+      {
+        "nombre": "Estación Cabitos",
+        "lat": -12.1272727,
+        "lon": -77.0004202
+      },
+      {
+        "nombre": "Estación San Borja",
+        "lat": -12.1002603,
+        "lon": -76.9948246
+      },
+      {
+        "nombre": "Estación Primavera",
+        "lat": -12.1115086,
+        "lon": -76.9999565
+      },
+      {
+        "nombre": "Estación Culinaria",
+        "lat": -12.1020035,
+        "lon": -76.9718429
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Instituto Nacional de Enfermedades Neoplásicas",
+        "lat": -12.112548,
+        "lon": -76.9985362
+      },
+      {
+        "nombre": "Instituto Nacional de Salud del Niño",
+        "lat": -12.0856388,
+        "lon": -76.9921837
+      },
+      {
+        "nombre": "Hospital Municipal de Surco",
+        "lat": -12.1441144,
+        "lon": -77.0058713
+      },
+      {
+        "nombre": "Hospital Municipal Surco Salud",
+        "lat": -12.1480591,
+        "lon": -76.983964
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio Hiram Bingham",
+        "lat": -12.1392295,
+        "lon": -77.0058303
+      },
+      {
+        "nombre": "Colegio Parroquial Niño Jesús",
+        "lat": -12.1509906,
+        "lon": -76.9704882
+      },
+      {
+        "nombre": "Colegio Molinari",
+        "lat": -12.1010079,
+        "lon": -76.9986292
+      },
+      {
+        "nombre": "Colegio Brasilia",
+        "lat": -12.1014425,
+        "lon": -77.0028585
+      },
+      {
+        "nombre": "I.E. N° 6044 Jorge Chávez",
+        "lat": -12.1424146,
+        "lon": -77.0047383
+      },
+      {
+        "nombre": "Little St. Georges",
+        "lat": -12.1157855,
+        "lon": -77.002185
+      },
+      {
+        "nombre": "I.E. 7069 \"Cesár Vallejo\"",
+        "lat": -12.150829,
+        "lon": -76.9737736
+      },
+      {
+        "nombre": "Lima Japanese School",
+        "lat": -12.1067572,
+        "lon": -76.9635119
+      },
+      {
+        "nombre": "Institución Educativa Maria De Los Angeles",
+        "lat": -12.0985297,
+        "lon": -76.9740208
+      },
+      {
+        "nombre": "Harrington",
+        "lat": -12.1146842,
+        "lon": -77.0008159
+      },
+      {
+        "nombre": "Institución Educativa Manuel Gonzales Prada 7083",
+        "lat": -12.0852351,
+        "lon": -77.0017277
+      },
+      {
+        "nombre": "I.E. N° 7068 Abraham Roldán Poma",
+        "lat": -12.1456401,
+        "lon": -77.0062725
+      },
+      {
+        "nombre": "I.E. N° 7067 \"Toribio Seminario\"",
+        "lat": -12.1503348,
+        "lon": -76.9776408
+      },
+      {
+        "nombre": "Institución Educativa María Auxiliadora",
+        "lat": -12.1061949,
+        "lon": -77.0038451
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Jockey Plaza Shopping Center",
+        "lat": -12.086058,
+        "lon": -76.9763812
+      },
+      {
+        "nombre": "Centro Comercial Caminos del Inca",
+        "lat": -12.1132967,
+        "lon": -76.9915105
+      },
+      {
+        "nombre": "Centro Comercial Higuereta",
+        "lat": -12.1277181,
+        "lon": -77.0012825
+      },
+      {
+        "nombre": "Centro Comercial El Polo",
+        "lat": -12.1013806,
+        "lon": -76.9709242
+      },
+      {
+        "nombre": "Centro Comercial Chacarilla",
+        "lat": -12.1117224,
+        "lon": -76.9912736
+      },
+      {
+        "nombre": "Centro Comercial \"Valle Hermoso\"",
+        "lat": -12.1267957,
+        "lon": -76.9754444
+      },
+      {
+        "nombre": "Centro Comercial Polvos Rosados",
+        "lat": -12.1270976,
+        "lon": -76.9999551
+      },
+      {
+        "nombre": "Centro Comercial Venturo",
+        "lat": -12.1207597,
+        "lon": -76.9964132
+      },
+      {
+        "nombre": "Centro Comercial El Trigal",
+        "lat": -12.1276394,
+        "lon": -76.9879884
+      },
+      {
+        "nombre": "Centro Comercial Polvos de Higuereta",
+        "lat": -12.1261484,
+        "lon": -77.000476
+      },
+      {
+        "nombre": "Centro Comercial Marsano Center",
+        "lat": -12.1165814,
+        "lon": -77.0089195
+      },
+      {
+        "nombre": "Centro Comercial Santa Rosa",
+        "lat": -12.1265135,
+        "lon": -77.0006168
+      },
+      {
+        "nombre": "Centro Comercial Preciados",
+        "lat": -12.1284431,
+        "lon": -76.9997089
+      },
+      {
+        "nombre": "Centro Comercial PLATAforma",
+        "lat": -12.1516689,
+        "lon": -76.9786584
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP Chacarilla del Estanque",
+        "lat": -12.1082677,
+        "lon": -76.9832942
+      },
+      {
+        "nombre": "Comisaría PNP Monterrico",
+        "lat": -12.0947859,
+        "lon": -76.973511
+      },
+      {
+        "nombre": "Comisaría PNP Pamplona I",
+        "lat": -12.1482785,
+        "lon": -76.9661991
+      },
+      {
+        "nombre": "Comisaría PNP Santiago de Surco",
+        "lat": -12.1453911,
+        "lon": -77.0030978
+      },
+      {
+        "nombre": "Comisaría PNP San Borja",
+        "lat": -12.1055507,
+        "lon": -76.9989349
+      }
+    ]
+  },
+  "San Miguel": {
+    "parques": [
+      {
+        "nombre": "Parque Sagrada Familia",
+        "lat": -12.0837692,
+        "lon": -77.0861716
+      },
+      {
+        "nombre": "Parque Precursores",
+        "lat": -12.0701462,
+        "lon": -77.0925045
+      },
+      {
+        "nombre": "Parque Santa Isabel",
+        "lat": -12.0797837,
+        "lon": -77.0705531
+      },
+      {
+        "nombre": "Parque de la torres de san miguelito",
+        "lat": -12.0842477,
+        "lon": -77.0781126
+      },
+      {
+        "nombre": "Boulevard Bertoloto",
+        "lat": -12.09362,
+        "lon": -77.07965
+      },
+      {
+        "nombre": "Pq. Jose Abelardo Quiñones",
+        "lat": -12.0725064,
+        "lon": -77.0953137
+      },
+      {
+        "nombre": "Jesús Vasquez",
+        "lat": -12.0832437,
+        "lon": -77.0899554
+      },
+      {
+        "nombre": "Pq. Bartolome Herrera",
+        "lat": -12.0802918,
+        "lon": -77.0791462
+      },
+      {
+        "nombre": "Espinar",
+        "lat": -12.0865385,
+        "lon": -77.0895561
+      },
+      {
+        "nombre": "Plaza Pallka",
+        "lat": -12.0881479,
+        "lon": -77.0799886
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación Plaza San Miguel",
+        "lat": -12.0780104,
+        "lon": -77.0831007
+      },
+      {
+        "nombre": "Estación Colegio Bartolomé",
+        "lat": -12.0807734,
+        "lon": -77.0732274
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Hospital Geriátrico San José",
+        "lat": -12.0868607,
+        "lon": -77.0806029
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio Santísima Cruz",
+        "lat": -12.0719964,
+        "lon": -77.0883968
+      },
+      {
+        "nombre": "Institución Educativa Cristo Rey",
+        "lat": -12.0724532,
+        "lon": -77.0755475
+      },
+      {
+        "nombre": "Institución Educativa Mater Admirabilis",
+        "lat": -12.0890574,
+        "lon": -77.0826602
+      },
+      {
+        "nombre": "Institución Educativa Rosenthal De La Puente",
+        "lat": -12.0927938,
+        "lon": -77.0740472
+      },
+      {
+        "nombre": "Institución Educativa Buenas Nuevas",
+        "lat": -12.087583,
+        "lon": -77.0755844
+      },
+      {
+        "nombre": "Institución Educativa Innova Schools",
+        "lat": -12.0850715,
+        "lon": -77.0904833
+      },
+      {
+        "nombre": "Institución Educativa 0094 Santa Maria De Maranga",
+        "lat": -12.0760524,
+        "lon": -77.093786
+      },
+      {
+        "nombre": "Institución Educativa Jorge Polar",
+        "lat": -12.071869,
+        "lon": -77.0725939
+      },
+      {
+        "nombre": "Institución Educativa 0013 Bernardo O'higgins",
+        "lat": -12.0795105,
+        "lon": -77.0725093
+      },
+      {
+        "nombre": "Pitagoras",
+        "lat": -12.0708343,
+        "lon": -77.0988509
+      },
+      {
+        "nombre": "Academia Pamer",
+        "lat": -12.0783228,
+        "lon": -77.0897157
+      },
+      {
+        "nombre": "Institución Educativa Jose Antonio Encinas",
+        "lat": -12.0943056,
+        "lon": -77.0727782
+      },
+      {
+        "nombre": "Institución Educativa Alas Peruano Argentino",
+        "lat": -12.0922961,
+        "lon": -77.0720282
+      },
+      {
+        "nombre": "SISE Gallesi",
+        "lat": -12.09038,
+        "lon": -77.0835952
+      },
+      {
+        "nombre": "Institución Educativa Maria Goretti",
+        "lat": -12.0790066,
+        "lon": -77.0867
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Plaza San Miguel",
+        "lat": -12.0769403,
+        "lon": -77.0827179
+      },
+      {
+        "nombre": "Centro Comercial Shopping Center San Miguel",
+        "lat": -12.0751626,
+        "lon": -77.0818851
+      },
+      {
+        "nombre": "Centro Comerical Tacna",
+        "lat": -12.0915596,
+        "lon": -77.0719186
+      },
+      {
+        "nombre": "Open Plaza",
+        "lat": -12.0795829,
+        "lon": -77.0886904
+      },
+      {
+        "nombre": "D'Paso Shopping Center",
+        "lat": -12.0744725,
+        "lon": -77.0796283
+      },
+      {
+        "nombre": "Marina Plaza",
+        "lat": -12.0779918,
+        "lon": -77.0789096
+      },
+      {
+        "nombre": "Boulevard Plaza San Miguel",
+        "lat": -12.0758767,
+        "lon": -77.0826646
+      },
+      {
+        "nombre": "Bella Mar",
+        "lat": -12.0916324,
+        "lon": -77.0713769
+      },
+      {
+        "nombre": "Sandra",
+        "lat": -12.0915397,
+        "lon": -77.0712463
+      },
+      {
+        "nombre": "Galería Santa Patricia",
+        "lat": -12.0893545,
+        "lon": -77.073731
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP San Miguel",
+        "lat": -12.0894905,
+        "lon": -77.0878705
+      },
+      {
+        "nombre": "Comisaría PNP Magdalena",
+        "lat": -12.0878794,
+        "lon": -77.0731981
+      }
+    ]
+  },
+  "Barranco": {
+    "parques": [
+      {
+        "nombre": "Parque Municipal de Barranco",
+        "lat": -12.1494807,
+        "lon": -77.0211974
+      },
+      {
+        "nombre": "Parque Federico Villareal",
+        "lat": -12.1484204,
+        "lon": -77.0224476
+      },
+      {
+        "nombre": "Parque Tejada",
+        "lat": -12.1501456,
+        "lon": -77.0150743
+      },
+      {
+        "nombre": "Parque Niño Héroe",
+        "lat": -12.1394304,
+        "lon": -77.0193666
+      },
+      {
+        "nombre": "Surco Viejo",
+        "lat": -12.1509697,
+        "lon": -77.0103856
+      },
+      {
+        "nombre": "Alameda Saenz Peña",
+        "lat": -12.143336,
+        "lon": -77.0239148
+      },
+      {
+        "nombre": "Plaza Butters",
+        "lat": -12.1434442,
+        "lon": -77.0158124
+      },
+      {
+        "nombre": "Malecón de los Ingleses",
+        "lat": -12.147009,
+        "lon": -77.0237905
+      },
+      {
+        "nombre": "Santiago de Surco",
+        "lat": -12.1529459,
+        "lon": -77.0148123
+      },
+      {
+        "nombre": "Plazuela Gardel",
+        "lat": -12.1478817,
+        "lon": -77.0219869
+      },
+      {
+        "nombre": "Plaza Octavio Espinoza",
+        "lat": -12.1467002,
+        "lon": -77.0198275
+      },
+      {
+        "nombre": "Plazuela Chabuca Granda",
+        "lat": -12.1489063,
+        "lon": -77.0227733
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación Bulevar",
+        "lat": -12.1484921,
+        "lon": -77.0201384
+      },
+      {
+        "nombre": "Estación Balta",
+        "lat": -12.1401574,
+        "lon": -77.0177904
+      },
+      {
+        "nombre": "La estación de Barranco",
+        "lat": -12.1498694,
+        "lon": -77.0218441
+      },
+      {
+        "nombre": "Estación Estadio Unión",
+        "lat": -12.1529607,
+        "lon": -77.0196944
+      }
+    ],
+    "salud": [],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio Inmaculado",
+        "lat": -12.1473756,
+        "lon": -77.0191702
+      },
+      {
+        "nombre": "Institución Educativa 6051 Mercedes Indacochea",
+        "lat": -12.1542595,
+        "lon": -77.0202997
+      },
+      {
+        "nombre": "Institución Educativa 02 Laura Alva Saldaña",
+        "lat": -12.15428,
+        "lon": -77.0168732
+      },
+      {
+        "nombre": "Institución Educativa 7050 Nicanor Rivera Caceres",
+        "lat": -12.1435695,
+        "lon": -77.0199804
+      },
+      {
+        "nombre": "Institución Educativa 7047 Tacna",
+        "lat": -12.1446054,
+        "lon": -77.0178885
+      },
+      {
+        "nombre": "Institución Educativa San Jose De Cluny",
+        "lat": -12.1443552,
+        "lon": -77.0208615
+      },
+      {
+        "nombre": "Institución Educativa 7049 Jose Abelardo Quiñones",
+        "lat": -12.1442709,
+        "lon": -77.0143039
+      },
+      {
+        "nombre": "Institución Educativa Los Reyes Rojos",
+        "lat": -12.1449184,
+        "lon": -77.0215324
+      },
+      {
+        "nombre": "Instituto Educativo Reino de España",
+        "lat": -12.1456776,
+        "lon": -77.0233365
+      },
+      {
+        "nombre": "Institución Educativa Pamer Barranco",
+        "lat": -12.1400005,
+        "lon": -77.0219467
+      },
+      {
+        "nombre": "Institución Educativa Virgen De Fatima De Barranco",
+        "lat": -12.1428242,
+        "lon": -77.015198
+      },
+      {
+        "nombre": "Institución Educativa Santa Maria Reyna",
+        "lat": -12.1384118,
+        "lon": -77.0159599
+      },
+      {
+        "nombre": "Ciclovía El Sol",
+        "lat": -12.1391002,
+        "lon": -77.0230512
+      },
+      {
+        "nombre": "Institución Educativa Nivel A",
+        "lat": -12.1399371,
+        "lon": -77.0183678
+      },
+      {
+        "nombre": "Institución Educativa John Dewey",
+        "lat": -12.1482908,
+        "lon": -77.0184315
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Boulevard BordeMar",
+        "lat": -12.1423419,
+        "lon": -77.0268359
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP Barranco",
+        "lat": -12.1463819,
+        "lon": -77.0225259
+      }
+    ]
+  },
+  "Jesús María": {
+    "parques": [
+      {
+        "nombre": "Parque Pedro D'onofrio",
+        "lat": -12.0653457,
+        "lon": -77.0572251
+      },
+      {
+        "nombre": "Parque Pedro La Rosa",
+        "lat": -12.0873789,
+        "lon": -77.0597022
+      },
+      {
+        "nombre": "Parque San José",
+        "lat": -12.0743025,
+        "lon": -77.0481393
+      },
+      {
+        "nombre": "Parque de Los Bomberos",
+        "lat": -12.0856633,
+        "lon": -77.0459276
+      },
+      {
+        "nombre": "Parque Colombia",
+        "lat": -12.0684935,
+        "lon": -77.0588293
+      },
+      {
+        "nombre": "Parque Almagro",
+        "lat": -12.0836725,
+        "lon": -77.0597777
+      },
+      {
+        "nombre": "Parque Ayacucho",
+        "lat": -12.0732842,
+        "lon": -77.0571539
+      },
+      {
+        "nombre": "Parque Maldonado",
+        "lat": -12.0692744,
+        "lon": -77.0544373
+      },
+      {
+        "nombre": "Campo de Marte",
+        "lat": -12.0681181,
+        "lon": -77.0418936
+      },
+      {
+        "nombre": "Parque Habich",
+        "lat": -12.0729922,
+        "lon": -77.0391754
+      },
+      {
+        "nombre": "Parque Próceres de la Independencia",
+        "lat": -12.0818972,
+        "lon": -77.0428388
+      },
+      {
+        "nombre": "Parque Mariscal Cáceres",
+        "lat": -12.0751541,
+        "lon": -77.0434686
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación Central Veterinaria",
+        "lat": -12.0804169,
+        "lon": -77.0489127
+      },
+      {
+        "nombre": "Estación de Monitoreo Climático",
+        "lat": -12.0705403,
+        "lon": -77.0432239
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Hospital Nacional Edgardo Rebagliati Martins",
+        "lat": -12.0781476,
+        "lon": -77.0399884
+      },
+      {
+        "nombre": "Hospital Nacional PNP Luis N. Saenz",
+        "lat": -12.0848068,
+        "lon": -77.0591134
+      },
+      {
+        "nombre": "Instituto Nacional de Salud del Niño",
+        "lat": -12.0651531,
+        "lon": -77.0465607
+      },
+      {
+        "nombre": "Clínica Stella Maris",
+        "lat": -12.070901,
+        "lon": -77.0597637
+      },
+      {
+        "nombre": "Complejo Hospitalario Arenales",
+        "lat": -12.0785806,
+        "lon": -77.0371482
+      },
+      {
+        "nombre": "Clinica Centenario Peruano Japonesa",
+        "lat": -12.0730267,
+        "lon": -77.0594544
+      },
+      {
+        "nombre": "SISOL Salud Lince",
+        "lat": -12.0840314,
+        "lon": -77.0395119
+      },
+      {
+        "nombre": "Torre Trecca",
+        "lat": -12.0788208,
+        "lon": -77.0369795
+      },
+      {
+        "nombre": "Policlínico Peruano Japonés",
+        "lat": -12.0877134,
+        "lon": -77.0546996
+      },
+      {
+        "nombre": "UBAB Jesús María",
+        "lat": -12.071483,
+        "lon": -77.0498354
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio",
+        "lat": -12.0823297,
+        "lon": -77.0598631
+      },
+      {
+        "nombre": "Colegio Mis Años Inolvidables",
+        "lat": -12.06501,
+        "lon": -77.05017
+      },
+      {
+        "nombre": "Colegio Santa Rita de Casia",
+        "lat": -12.07408,
+        "lon": -77.05264
+      },
+      {
+        "nombre": "Colegio Francisco de Zela",
+        "lat": -12.06504,
+        "lon": -77.05365
+      },
+      {
+        "nombre": "Institución Educativa Sagrado Corazon Sophianum",
+        "lat": -12.0865515,
+        "lon": -77.0490033
+      },
+      {
+        "nombre": "Institución Educativa Dante Alighieri",
+        "lat": -12.0751638,
+        "lon": -77.0352226
+      },
+      {
+        "nombre": "Institución Educativa Los Alamos",
+        "lat": -12.083649,
+        "lon": -77.0540529
+      },
+      {
+        "nombre": "Institución Educativa 1098 Cap Fap Jose Abelardo Quiñones",
+        "lat": -12.0772857,
+        "lon": -77.0527826
+      },
+      {
+        "nombre": "Institución Educativa Santisimo Señor De Luren",
+        "lat": -12.0660311,
+        "lon": -77.0527011
+      },
+      {
+        "nombre": "Institución Educativa Albert Einstein",
+        "lat": -12.0811567,
+        "lon": -77.0370927
+      },
+      {
+        "nombre": "Southern Technological Institute",
+        "lat": -12.0741685,
+        "lon": -77.0373429
+      },
+      {
+        "nombre": "Institución Educativa Pamer",
+        "lat": -12.06972,
+        "lon": -77.03865
+      },
+      {
+        "nombre": "General Oscar Arteta Terzi",
+        "lat": -12.0707751,
+        "lon": -77.0388522
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Real Plaza Salaverry",
+        "lat": -12.0898845,
+        "lon": -77.0527159
+      },
+      {
+        "nombre": "Centro Comercial Plaza Jesús María",
+        "lat": -12.0738299,
+        "lon": -77.0504564
+      },
+      {
+        "nombre": "Centro Comercial Breña",
+        "lat": -12.0674147,
+        "lon": -77.0495015
+      },
+      {
+        "nombre": "Centro Comercial Mega Rekord",
+        "lat": -12.0674383,
+        "lon": -77.0507454
+      },
+      {
+        "nombre": "Centro Comercial Guizaldo Plaza",
+        "lat": -12.0670018,
+        "lon": -77.0500098
+      },
+      {
+        "nombre": "La Rambla",
+        "lat": -12.0662233,
+        "lon": -77.0476522
+      },
+      {
+        "nombre": "Arenales Plaza",
+        "lat": -12.082002,
+        "lon": -77.0356336
+      },
+      {
+        "nombre": "El Rey",
+        "lat": -12.0756031,
+        "lon": -77.0501382
+      },
+      {
+        "nombre": "Accu",
+        "lat": -12.0758743,
+        "lon": -77.0497291
+      },
+      {
+        "nombre": "Horacio",
+        "lat": -12.0757566,
+        "lon": -77.0496657
+      },
+      {
+        "nombre": "La Cooperativa",
+        "lat": -12.0758184,
+        "lon": -77.0485105
+      },
+      {
+        "nombre": "El Emporio",
+        "lat": -12.0759995,
+        "lon": -77.0499813
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP Jesús María",
+        "lat": -12.0709062,
+        "lon": -77.0475797
+      },
+      {
+        "nombre": "Comisaría PNP Breña",
+        "lat": -12.0670319,
+        "lon": -77.0531072
+      },
+      {
+        "nombre": "Comisaría PNP Petit Thouars",
+        "lat": -12.0688801,
+        "lon": -77.0352972
+      }
+    ]
+  },
+  "Pueblo Libre": {
+    "parques": [
+      {
+        "nombre": "Parque Candamo",
+        "lat": -12.0740945,
+        "lon": -77.0634772
+      },
+      {
+        "nombre": "Parque Alberti",
+        "lat": -12.0858519,
+        "lon": -77.0576985
+      },
+      {
+        "nombre": "Parque Amoretti",
+        "lat": -12.0808279,
+        "lon": -77.0621376
+      },
+      {
+        "nombre": "Parque San Bernardo",
+        "lat": -12.0714248,
+        "lon": -77.0664969
+      },
+      {
+        "nombre": "Parque Sirivichi",
+        "lat": -12.0668957,
+        "lon": -77.066458
+      },
+      {
+        "nombre": "Parque Santa Isabel",
+        "lat": -12.0797837,
+        "lon": -77.0705531
+      },
+      {
+        "nombre": "Parque Orlando Leite Ribeyro",
+        "lat": -12.0798566,
+        "lon": -77.0678451
+      },
+      {
+        "nombre": "Parque Arrieta",
+        "lat": -12.0752989,
+        "lon": -77.0552982
+      },
+      {
+        "nombre": "Parque Echenique",
+        "lat": -12.0749421,
+        "lon": -77.0616459
+      },
+      {
+        "nombre": "13 de Diciembre",
+        "lat": -12.0865278,
+        "lon": -77.0566556
+      },
+      {
+        "nombre": "Pq. Pershing",
+        "lat": -12.0801167,
+        "lon": -77.0778852
+      },
+      {
+        "nombre": "Plaza Bolivar",
+        "lat": -12.0777445,
+        "lon": -77.0622459
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación Colegio Bartolomé",
+        "lat": -12.0807734,
+        "lon": -77.0732274
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Clínica Stella Maris",
+        "lat": -12.070901,
+        "lon": -77.0597637
+      },
+      {
+        "nombre": "Hospital Central Militar Coronel Luis Arias Schreiber",
+        "lat": -12.0855549,
+        "lon": -77.0613919
+      },
+      {
+        "nombre": "Hospital Nacional PNP Luis N. Saenz",
+        "lat": -12.0848068,
+        "lon": -77.0591134
+      },
+      {
+        "nombre": "Hospital Santa Rosa",
+        "lat": -12.0720794,
+        "lon": -77.0610369
+      },
+      {
+        "nombre": "Clinica Centenario Peruano Japonesa",
+        "lat": -12.0730267,
+        "lon": -77.0594544
+      },
+      {
+        "nombre": "Policlínico Peruano Japonés",
+        "lat": -12.0877134,
+        "lon": -77.0546996
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio",
+        "lat": -12.0823297,
+        "lon": -77.0598631
+      },
+      {
+        "nombre": "Colegio Perpetuo Socorro",
+        "lat": -12.0802085,
+        "lon": -77.0584658
+      },
+      {
+        "nombre": "Institución Educativa 0014 Andrés Bello",
+        "lat": -12.0800313,
+        "lon": -77.0740706
+      },
+      {
+        "nombre": "Institución Educativa La Unión",
+        "lat": -12.0746336,
+        "lon": -77.0780993
+      },
+      {
+        "nombre": "Institución Educativa Miguel Grau",
+        "lat": -12.089316,
+        "lon": -77.0688083
+      },
+      {
+        "nombre": "Institución Educativa De la Cruz",
+        "lat": -12.0763184,
+        "lon": -77.063019
+      },
+      {
+        "nombre": "Institución Educativa San Judas Tadeo Corazonistas",
+        "lat": -12.0818557,
+        "lon": -77.0796227
+      },
+      {
+        "nombre": "Institución Educativa Jorge Polar",
+        "lat": -12.071869,
+        "lon": -77.0725939
+      },
+      {
+        "nombre": "Institución Educativa 072 San Martin De Porres",
+        "lat": -12.087202,
+        "lon": -77.0690844
+      },
+      {
+        "nombre": "Institución Educativa 1214 Señor De Los Milagros",
+        "lat": -12.0882269,
+        "lon": -77.0690283
+      },
+      {
+        "nombre": "Institución Educativa Jose Santos Chocano",
+        "lat": -12.0803685,
+        "lon": -77.0628
+      },
+      {
+        "nombre": "Institución Educativa Los Rosales",
+        "lat": -12.0818367,
+        "lon": -77.0734822
+      },
+      {
+        "nombre": "Institución Educativa 1073 Hermann Buse De La Guerra",
+        "lat": -12.0783354,
+        "lon": -77.0613013
+      },
+      {
+        "nombre": "Institución Educativa San Pablo",
+        "lat": -12.0665908,
+        "lon": -77.0672027
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Centro Comercial Plaza Jesús María",
+        "lat": -12.0738299,
+        "lon": -77.0504564
+      },
+      {
+        "nombre": "Centro Comercial Andalucía Via-A",
+        "lat": -12.0753122,
+        "lon": -77.064071
+      },
+      {
+        "nombre": "Centro Comercial Guizaldo Plaza",
+        "lat": -12.0670018,
+        "lon": -77.0500098
+      },
+      {
+        "nombre": "Centro Comercial Mega Rekord",
+        "lat": -12.0674383,
+        "lon": -77.0507454
+      },
+      {
+        "nombre": "Real Plaza Salaverry",
+        "lat": -12.0898845,
+        "lon": -77.0527159
+      },
+      {
+        "nombre": "D'Paso Shopping Center",
+        "lat": -12.0744725,
+        "lon": -77.0796283
+      },
+      {
+        "nombre": "Marina Plaza",
+        "lat": -12.0779918,
+        "lon": -77.0789096
+      },
+      {
+        "nombre": "El Rey",
+        "lat": -12.0756031,
+        "lon": -77.0501382
+      },
+      {
+        "nombre": "Galería Santa Patricia",
+        "lat": -12.0893545,
+        "lon": -77.073731
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP Pueblo Libre",
+        "lat": -12.0770328,
+        "lon": -77.0654215
+      },
+      {
+        "nombre": "Comisaría PNP Breña",
+        "lat": -12.0670319,
+        "lon": -77.0531072
+      },
+      {
+        "nombre": "Comisaría PNP Magdalena",
+        "lat": -12.0878794,
+        "lon": -77.0731981
+      }
+    ]
+  },
+  "Magdalena": {
+    "parques": [
+      {
+        "nombre": "Parque Santa Eulalia",
+        "lat": -12.0860242,
+        "lon": -77.0752859
+      },
+      {
+        "nombre": "Parque Leoncio Prado",
+        "lat": -12.0893167,
+        "lon": -77.0614666
+      },
+      {
+        "nombre": "Parque Inmaculado Corazón",
+        "lat": -12.0972892,
+        "lon": -77.0721033
+      },
+      {
+        "nombre": "Grau",
+        "lat": -12.0984049,
+        "lon": -77.0707866
+      },
+      {
+        "nombre": "Plaza Túpac Amaru",
+        "lat": -12.0919459,
+        "lon": -77.0735278
+      },
+      {
+        "nombre": "Plaza Independencia",
+        "lat": -12.0904083,
+        "lon": -77.0699927
+      },
+      {
+        "nombre": "Plazuela de Trujillo",
+        "lat": -12.0902252,
+        "lon": -77.0611728
+      }
+    ],
+    "transporte": [],
+    "salud": [
+      {
+        "nombre": "Hospital Víctor Larco Herrera",
+        "lat": -12.0971351,
+        "lon": -77.0654764
+      },
+      {
+        "nombre": "Hospital Central Militar Coronel Luis Arias Schreiber",
+        "lat": -12.0855549,
+        "lon": -77.0613919
+      },
+      {
+        "nombre": "Hospital Nacional PNP Luis N. Saenz",
+        "lat": -12.0851485,
+        "lon": -77.0607601
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio Parroquial San Juan María Vianney",
+        "lat": -12.0935797,
+        "lon": -77.0679914
+      },
+      {
+        "nombre": "Institución Educativa Santa Ana",
+        "lat": -12.0869629,
+        "lon": -77.0778642
+      },
+      {
+        "nombre": "Institución Educativa Rosenthal De La Puente",
+        "lat": -12.0927938,
+        "lon": -77.0740472
+      },
+      {
+        "nombre": "Institución Educativa Nuestra Señora De La Paz",
+        "lat": -12.0963484,
+        "lon": -77.0731023
+      },
+      {
+        "nombre": "Institución Educativa 1099 Comp Educ Exp Augusto Perez Aranibar",
+        "lat": -12.0999568,
+        "lon": -77.065696
+      },
+      {
+        "nombre": "Institución Educativa 072 San Martin De Porres",
+        "lat": -12.087202,
+        "lon": -77.0690844
+      },
+      {
+        "nombre": "Institución Educativa Saint Camilas School",
+        "lat": -12.0907223,
+        "lon": -77.066312
+      },
+      {
+        "nombre": "Institución Educativa Emiliano Pisculich Ramirez",
+        "lat": -12.0886751,
+        "lon": -77.0672094
+      },
+      {
+        "nombre": "Institución Educativa 1214 Señor De Los Milagros",
+        "lat": -12.0882269,
+        "lon": -77.0690283
+      },
+      {
+        "nombre": "Institución Educativa Santa Maria De La Gracia De Magdalena",
+        "lat": -12.0912784,
+        "lon": -77.071651
+      },
+      {
+        "nombre": "Limatambo",
+        "lat": -12.0913236,
+        "lon": -77.0700531
+      },
+      {
+        "nombre": "Escuela Nacional De Formacion Y Capacitacion De Serenos Y Agentes De Seguridad",
+        "lat": -12.0896052,
+        "lon": -77.0667188
+      },
+      {
+        "nombre": "De Optometria Y Ciencias Eurohispano",
+        "lat": -12.0892895,
+        "lon": -77.0651598
+      },
+      {
+        "nombre": "Institución Educativa Jose Antonio Encinas",
+        "lat": -12.0943056,
+        "lon": -77.0727782
+      },
+      {
+        "nombre": "Institución Educativa San Juan Maria Vianney",
+        "lat": -12.0935856,
+        "lon": -77.067992
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Centro Comerical Tacna",
+        "lat": -12.0915596,
+        "lon": -77.0719186
+      },
+      {
+        "nombre": "Bella Mar",
+        "lat": -12.0916324,
+        "lon": -77.0713769
+      },
+      {
+        "nombre": "Sandra",
+        "lat": -12.0915397,
+        "lon": -77.0712463
+      },
+      {
+        "nombre": "Galería Santa Patricia",
+        "lat": -12.0893545,
+        "lon": -77.073731
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP Magdalena",
+        "lat": -12.0878794,
+        "lon": -77.0731981
+      }
+    ]
+  },
+  "Lince": {
+    "parques": [
+      {
+        "nombre": "Parque Mariscal Castilla",
+        "lat": -12.0885924,
+        "lon": -77.0413787
+      },
+      {
+        "nombre": "Parque Santos Dumont",
+        "lat": -12.0872441,
+        "lon": -77.0270487
+      },
+      {
+        "nombre": "Parque Elías Aguirre",
+        "lat": -12.0898341,
+        "lon": -77.0255074
+      },
+      {
+        "nombre": "Plaza Pedro Ruiz Gallo",
+        "lat": -12.0824978,
+        "lon": -77.0310755
+      },
+      {
+        "nombre": "Plaza de la Democratia",
+        "lat": -12.0801272,
+        "lon": -77.0420079
+      },
+      {
+        "nombre": "Urbanización Jardín",
+        "lat": -12.0892862,
+        "lon": -77.0266231
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación Canadá",
+        "lat": -12.0824136,
+        "lon": -77.0265799
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Hospital Nacional Edgardo Rebagliati Martins",
+        "lat": -12.0781476,
+        "lon": -77.0399884
+      },
+      {
+        "nombre": "Complejo Hospitalario Arenales",
+        "lat": -12.0785806,
+        "lon": -77.0371482
+      },
+      {
+        "nombre": "Centro de Atención Primaria Alfredo Piazza Roberts",
+        "lat": -12.0863619,
+        "lon": -77.0276373
+      },
+      {
+        "nombre": "SISOL Salud Lince",
+        "lat": -12.0840314,
+        "lon": -77.0395119
+      },
+      {
+        "nombre": "Torre Trecca",
+        "lat": -12.0788208,
+        "lon": -77.0369795
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio Los Angeles",
+        "lat": -12.08408,
+        "lon": -77.03943
+      },
+      {
+        "nombre": "Colegio Gimnasio Peruano",
+        "lat": -12.0798755,
+        "lon": -77.03336
+      },
+      {
+        "nombre": "colegio no escolarizado CEBA PB",
+        "lat": -12.0804878,
+        "lon": -77.0352399
+      },
+      {
+        "nombre": "Institución Educativa 1070 Meliton Carvajal",
+        "lat": -12.0846686,
+        "lon": -77.0271451
+      },
+      {
+        "nombre": "Institución Educativa Santa Rosa De Lima",
+        "lat": -12.0868682,
+        "lon": -77.0390818
+      },
+      {
+        "nombre": "Institución Educativa Dalton",
+        "lat": -12.0827421,
+        "lon": -77.0333735
+      },
+      {
+        "nombre": "Institución Educativa Santa Maria Del Carmen",
+        "lat": -12.083288,
+        "lon": -77.0397062
+      },
+      {
+        "nombre": "Institución Educativa Albert Einstein",
+        "lat": -12.0811567,
+        "lon": -77.0370927
+      },
+      {
+        "nombre": "Institución Educativa Divina Trinidad",
+        "lat": -12.0827176,
+        "lon": -77.0329049
+      },
+      {
+        "nombre": "Institución Educativa Sor Ines",
+        "lat": -12.0815587,
+        "lon": -77.0370197
+      },
+      {
+        "nombre": "Usamedic",
+        "lat": -12.0830431,
+        "lon": -77.036868
+      },
+      {
+        "nombre": "Seminario Teologico Evangelico Presbiteriano Del Peru",
+        "lat": -12.0806262,
+        "lon": -77.0373745
+      },
+      {
+        "nombre": "De Diseño Publicitario Leo Design",
+        "lat": -12.0893571,
+        "lon": -77.0339784
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Risso",
+        "lat": -12.0863063,
+        "lon": -77.0348226
+      },
+      {
+        "nombre": "Arenales Plaza",
+        "lat": -12.082002,
+        "lon": -77.0356336
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP Lince",
+        "lat": -12.0833211,
+        "lon": -77.0271556
+      }
+    ]
+  },
+  "Surquillo": {
+    "parques": [
+      {
+        "nombre": "Parque Héroes de la Paz",
+        "lat": -12.1164033,
+        "lon": -77.0017505
+      },
+      {
+        "nombre": "Parque Reducto N°5",
+        "lat": -12.1128966,
+        "lon": -77.0046795
+      },
+      {
+        "nombre": "Parque Manuel Villavicencio",
+        "lat": -12.117665,
+        "lon": -77.0111642
+      },
+      {
+        "nombre": "Parque Francisco Garcia Calderón",
+        "lat": -12.1198615,
+        "lon": -77.0098445
+      },
+      {
+        "nombre": "Parque Juan Bautista Berninzoni",
+        "lat": -12.1052958,
+        "lon": -77.0130445
+      },
+      {
+        "nombre": "Parque Jorge Chávez",
+        "lat": -12.1198186,
+        "lon": -77.005855
+      },
+      {
+        "nombre": "Parque Virgen Milagrosa",
+        "lat": -12.1109811,
+        "lon": -77.0090251
+      },
+      {
+        "nombre": "Parque Las Orquídeas",
+        "lat": -12.1186166,
+        "lon": -77.0064703
+      },
+      {
+        "nombre": "Parque República de la India",
+        "lat": -12.1199547,
+        "lon": -77.0023052
+      },
+      {
+        "nombre": "Parque Vasil Levski",
+        "lat": -12.12148,
+        "lon": -77.0029392
+      },
+      {
+        "nombre": "Parque La Unión",
+        "lat": -12.1195909,
+        "lon": -77.0015294
+      },
+      {
+        "nombre": "Parque Juan Villalobos",
+        "lat": -12.12177,
+        "lon": -77.0101898
+      },
+      {
+        "nombre": "Parque Eduardo Orrego",
+        "lat": -12.1168067,
+        "lon": -77.0074325
+      },
+      {
+        "nombre": "Parque Mercedes Cabello de Carbonera",
+        "lat": -12.1051278,
+        "lon": -77.0284336
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación Angamos",
+        "lat": -12.1132067,
+        "lon": -77.0259753
+      },
+      {
+        "nombre": "Estación Domingo Orué",
+        "lat": -12.1084776,
+        "lon": -77.0264514
+      },
+      {
+        "nombre": "Estación \"Angamos\"",
+        "lat": -12.1102845,
+        "lon": -77.0003319
+      },
+      {
+        "nombre": "La Estacion Centro Veterinario",
+        "lat": -12.1195732,
+        "lon": -77.0235377
+      },
+      {
+        "nombre": "Estación Ricardo Palma",
+        "lat": -12.1189574,
+        "lon": -77.0259296
+      },
+      {
+        "nombre": "Estación de Reciclaje",
+        "lat": -12.1058165,
+        "lon": -77.0163431
+      },
+      {
+        "nombre": "La 5 Estación",
+        "lat": -12.1051245,
+        "lon": -77.000898
+      },
+      {
+        "nombre": "El Piñon Loco",
+        "lat": -12.1081054,
+        "lon": -77.0045395
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Hospital III Suarez Angamos",
+        "lat": -12.1133598,
+        "lon": -77.0281371
+      },
+      {
+        "nombre": "Policlínico Suárez",
+        "lat": -12.1096731,
+        "lon": -77.0271871
+      },
+      {
+        "nombre": "Centro de Salud Villa Victoria",
+        "lat": -12.108796,
+        "lon": -77.012017
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio Nuestra Señora de la Alegria",
+        "lat": -12.1164294,
+        "lon": -77.0236873
+      },
+      {
+        "nombre": "Institución Educativa Nº 7089 Romeo Luna Victoria",
+        "lat": -12.1062005,
+        "lon": -77.004783
+      },
+      {
+        "nombre": "Confusio",
+        "lat": -12.1146842,
+        "lon": -77.0008159
+      },
+      {
+        "nombre": "Institución Educativa 7014 Vasil Levski",
+        "lat": -12.1218926,
+        "lon": -77.0033473
+      },
+      {
+        "nombre": "Institución Educativa 7022 Albert Einstein",
+        "lat": -12.1146552,
+        "lon": -77.0054858
+      },
+      {
+        "nombre": "Institución Educativa Nuestra Señora de Lourdes",
+        "lat": -12.1129142,
+        "lon": -77.0090486
+      },
+      {
+        "nombre": "Institución Educativa 7031 Reina De La Familia",
+        "lat": -12.1095925,
+        "lon": -77.0112513
+      },
+      {
+        "nombre": "Institución Educativa Inicial Pequeño San Borja",
+        "lat": -12.1060267,
+        "lon": -77.0022078
+      },
+      {
+        "nombre": "Institución Educativa 7029 Virgen Milagrosa",
+        "lat": -12.1101651,
+        "lon": -77.0090819
+      },
+      {
+        "nombre": "Institución Educativa 7001 Andres Bello",
+        "lat": -12.1141308,
+        "lon": -77.027102
+      },
+      {
+        "nombre": "Institución Educativa Diego Thomson",
+        "lat": -12.1083905,
+        "lon": -77.0229339
+      },
+      {
+        "nombre": "Institución Educativa Santo Grial",
+        "lat": -12.1144961,
+        "lon": -77.0062852
+      },
+      {
+        "nombre": "Institución Educativa La Divina Providencia",
+        "lat": -12.1123288,
+        "lon": -77.006192
+      },
+      {
+        "nombre": "Institución Educativa Divino Niño Jesus",
+        "lat": -12.1137869,
+        "lon": -77.0068785
+      },
+      {
+        "nombre": "Institución Educativa Santa Cecilia De La Calera",
+        "lat": -12.1149052,
+        "lon": -77.004307
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Centro Comercial Plaza Hogar Design Center",
+        "lat": -12.1114345,
+        "lon": -77.0145942
+      },
+      {
+        "nombre": "Centro Comercial Fortuna",
+        "lat": -12.1106749,
+        "lon": -77.0256044
+      },
+      {
+        "nombre": "Centro Comercial Marsano Center",
+        "lat": -12.1165814,
+        "lon": -77.0089195
+      },
+      {
+        "nombre": "Centro Comercial Esperanza",
+        "lat": -12.1205523,
+        "lon": -77.0278645
+      },
+      {
+        "nombre": "Centro Comercial Cantuarias",
+        "lat": -12.1215036,
+        "lon": -77.0285275
+      },
+      {
+        "nombre": "Real Plaza Primavera",
+        "lat": -12.1101168,
+        "lon": -77.0016537
+      },
+      {
+        "nombre": "Mallplaza Angamos",
+        "lat": -12.1115064,
+        "lon": -77.0118223
+      },
+      {
+        "nombre": "El Paseo",
+        "lat": -12.1218295,
+        "lon": -77.0275953
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP Surquillo",
+        "lat": -12.1186374,
+        "lon": -77.0222992
+      },
+      {
+        "nombre": "Comisaría PNP Miraflores",
+        "lat": -12.1148015,
+        "lon": -77.027878
+      },
+      {
+        "nombre": "Comisaría PNP San Antonio de Miraflores",
+        "lat": -12.1148199,
+        "lon": -77.0108557
+      }
+    ]
+  },
+  "La Molina": {
+    "parques": [
+      {
+        "nombre": "Parque Municipal Héroes de la FAP",
+        "lat": -12.077013,
+        "lon": -76.9331954
+      },
+      {
+        "nombre": "Parque Carlos Malpica",
+        "lat": -12.094624,
+        "lon": -76.9653492
+      },
+      {
+        "nombre": "La Amistad",
+        "lat": -12.0663199,
+        "lon": -76.9458675
+      },
+      {
+        "nombre": "Costa Azul",
+        "lat": -12.0718992,
+        "lon": -76.9498924
+      },
+      {
+        "nombre": "Los Forestales",
+        "lat": -12.0706638,
+        "lon": -76.9508942
+      },
+      {
+        "nombre": "Cerro La Molina Alta",
+        "lat": -12.0888367,
+        "lon": -76.9432315
+      },
+      {
+        "nombre": "Antúnez de Mayolo",
+        "lat": -12.0732688,
+        "lon": -76.9422916
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Primax Ferrero",
+        "lat": -12.0918639,
+        "lon": -76.9527341
+      }
+    ],
+    "salud": [],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio Sagrados Corazones Recoleta",
+        "lat": -12.0749474,
+        "lon": -76.9604813
+      },
+      {
+        "nombre": "Colegio italiano Antonio Raimondi",
+        "lat": -12.0745135,
+        "lon": -76.9516951
+      },
+      {
+        "nombre": "Colegio Villa Cáritas",
+        "lat": -12.0994156,
+        "lon": -76.9204167
+      },
+      {
+        "nombre": "Colegio Pío XII",
+        "lat": -12.0978939,
+        "lon": -76.9660414
+      },
+      {
+        "nombre": "Colegio Peruano Alemán Augusto Weberbauer",
+        "lat": -12.094547,
+        "lon": -76.9673052
+      },
+      {
+        "nombre": "Colegio Leonardo Da Vinci",
+        "lat": -12.0765518,
+        "lon": -76.9592585
+      },
+      {
+        "nombre": "Colegio Bruning",
+        "lat": -12.0665842,
+        "lon": -76.9463756
+      },
+      {
+        "nombre": "Colegio San Agustín",
+        "lat": -12.0678556,
+        "lon": -76.9431406
+      },
+      {
+        "nombre": "Institución Educativa Fap Jose Abelardo Quiñones",
+        "lat": -12.0682854,
+        "lon": -76.9695998
+      },
+      {
+        "nombre": "Institución Educativa Altair",
+        "lat": -12.0932304,
+        "lon": -76.950019
+      },
+      {
+        "nombre": "I.E. 1140 \"Aurelio Miro Quesada Sosa",
+        "lat": -12.0848003,
+        "lon": -76.9277268
+      },
+      {
+        "nombre": "Félix Tello Rojas",
+        "lat": -12.0704405,
+        "lon": -76.939881
+      },
+      {
+        "nombre": "Institución Educativa Santa Magdalena Sofia Barat",
+        "lat": -12.0663793,
+        "lon": -76.9663064
+      },
+      {
+        "nombre": "Institución Educativa Jean Piaget",
+        "lat": -12.0990705,
+        "lon": -76.9492381
+      },
+      {
+        "nombre": "Institución Educativa Nuestra Madre Maria Auxiliadora",
+        "lat": -12.0688711,
+        "lon": -76.955798
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Centro Comercial Plaza Center La Molina",
+        "lat": -12.0912904,
+        "lon": -76.9501696
+      },
+      {
+        "nombre": "Centro Comercial La Rotonda",
+        "lat": -12.0729263,
+        "lon": -76.9550457
+      },
+      {
+        "nombre": "Centro Comercial La Fontana",
+        "lat": -12.0770614,
+        "lon": -76.9640664
+      },
+      {
+        "nombre": "Cenco La Molina",
+        "lat": -12.0918687,
+        "lon": -76.9512801
+      },
+      {
+        "nombre": "Plaza Camacho",
+        "lat": -12.079795,
+        "lon": -76.9668593
+      },
+      {
+        "nombre": "Parque La Molina",
+        "lat": -12.0760675,
+        "lon": -76.9356478
+      },
+      {
+        "nombre": "MoliCentro",
+        "lat": -12.0827988,
+        "lon": -76.9283334
+      },
+      {
+        "nombre": "Patio Panorama Lifestyle Center",
+        "lat": -12.0828749,
+        "lon": -76.9686493
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP La Molina",
+        "lat": -12.0773319,
+        "lon": -76.916565
+      },
+      {
+        "nombre": "Comisaría PNP Santa Felicia",
+        "lat": -12.0724228,
+        "lon": -76.9551483
+      }
+    ]
+  },
+  "Ate Vitarte": {
+    "parques": [
+      {
+        "nombre": "Parque Cultural de Ceres",
+        "lat": -12.0280609,
+        "lon": -76.9268331
+      },
+      {
+        "nombre": "Parque Virgen de la Asuncion",
+        "lat": -12.0637192,
+        "lon": -76.9527509
+      },
+      {
+        "nombre": "Parque Tematico Cultural Puruchuco",
+        "lat": -12.0420938,
+        "lon": -76.9343771
+      },
+      {
+        "nombre": "Parque Sucre",
+        "lat": -12.0428159,
+        "lon": -76.961874
+      },
+      {
+        "nombre": "Parque Zarzamoras",
+        "lat": -12.0301582,
+        "lon": -76.9552218
+      },
+      {
+        "nombre": "Parque Virgen",
+        "lat": -12.0642841,
+        "lon": -76.9484222
+      },
+      {
+        "nombre": "Parque 3",
+        "lat": -12.0625369,
+        "lon": -76.9358175
+      },
+      {
+        "nombre": "Parque Divino Niño",
+        "lat": -12.0522266,
+        "lon": -76.9848978
+      },
+      {
+        "nombre": "Km 32 – Panamericana Sur (Lurín, Lima",
+        "lat": -12.0384787,
+        "lon": -76.981643
+      },
+      {
+        "nombre": "Santa Ana",
+        "lat": -12.0367543,
+        "lon": -76.9238258
+      },
+      {
+        "nombre": "Vitarte",
+        "lat": -12.0283733,
+        "lon": -76.928252
+      },
+      {
+        "nombre": "Santa Anita",
+        "lat": -12.0295042,
+        "lon": -76.9484126
+      },
+      {
+        "nombre": "Plaza de Armas de Ate",
+        "lat": -12.0259895,
+        "lon": -76.9188718
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación Colectora Industrial",
+        "lat": -12.0512441,
+        "lon": -76.9565615
+      },
+      {
+        "nombre": "VAO Estacion Kio",
+        "lat": -12.0630102,
+        "lon": -76.9697182
+      },
+      {
+        "nombre": "Estación Evitamiento",
+        "lat": -12.0586025,
+        "lon": -76.9738002
+      },
+      {
+        "nombre": "Estación Óvalo Santa Anita",
+        "lat": -12.0543281,
+        "lon": -76.9638076
+      },
+      {
+        "nombre": "Estación 24",
+        "lat": -12.0440039,
+        "lon": -76.9380603
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Hospital Jorge Voto Bernales",
+        "lat": -12.0455045,
+        "lon": -76.9480955
+      },
+      {
+        "nombre": "Hospital Hermilio Valdizán",
+        "lat": -12.0456989,
+        "lon": -76.9460188
+      },
+      {
+        "nombre": "Hospital de Lima Este - Vitarte",
+        "lat": -12.0260013,
+        "lon": -76.9173858
+      },
+      {
+        "nombre": "Hospital Carlos Alcántara Butterfield",
+        "lat": -12.0618216,
+        "lon": -76.9455001
+      },
+      {
+        "nombre": "Hospital Essalud II Vitarte",
+        "lat": -12.0270143,
+        "lon": -76.9237262
+      },
+      {
+        "nombre": "Hospital Vitarte",
+        "lat": -12.0263437,
+        "lon": -76.9199018
+      },
+      {
+        "nombre": "Centro Médico Municipal Molisalud",
+        "lat": -12.0635757,
+        "lon": -76.9459763
+      },
+      {
+        "nombre": "Centro Materno Infantil Santa Anita",
+        "lat": -12.0411917,
+        "lon": -76.9689242
+      },
+      {
+        "nombre": "SISOL Salud Ate",
+        "lat": -12.0289805,
+        "lon": -76.9262702
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio Santa Felicia",
+        "lat": -12.0629175,
+        "lon": -76.9550332
+      },
+      {
+        "nombre": "Institución Educativa Nuestro Señor de la Asención",
+        "lat": -12.0248443,
+        "lon": -76.9764923
+      },
+      {
+        "nombre": "Institución Educativa 1227 Indira Gandhi",
+        "lat": -12.0331803,
+        "lon": -76.9318774
+      },
+      {
+        "nombre": "Institución Educativa 0124 Gloriosa Legion Caceres",
+        "lat": -12.0526749,
+        "lon": -76.9843148
+      },
+      {
+        "nombre": "Institución Educativa San Matías de Jesús",
+        "lat": -12.0244114,
+        "lon": -76.9846604
+      },
+      {
+        "nombre": "Institución Educativa 1211 José María Arguedas",
+        "lat": -12.0464688,
+        "lon": -76.9585804
+      },
+      {
+        "nombre": "Institución Educativa 1288 Albert Einstein",
+        "lat": -12.027045,
+        "lon": -76.951886
+      },
+      {
+        "nombre": "Institución Educativa John Neper",
+        "lat": -12.0237505,
+        "lon": -76.9756739
+      },
+      {
+        "nombre": "Institución Educativa Lider Ingenieros Uni",
+        "lat": -12.0188283,
+        "lon": -76.9737208
+      },
+      {
+        "nombre": "Institución Educativa 0097 Patricia Antonia Lopez",
+        "lat": -12.0497098,
+        "lon": -76.9801973
+      },
+      {
+        "nombre": "Institución Educativa Asambleas De Dios",
+        "lat": -12.02426,
+        "lon": -76.97266
+      },
+      {
+        "nombre": "IEP Santa Anita",
+        "lat": -12.0479951,
+        "lon": -76.964363
+      },
+      {
+        "nombre": "Institución Educativa Ernest Hemingway",
+        "lat": -12.0477631,
+        "lon": -76.9621094
+      },
+      {
+        "nombre": "Institución Educativa Dora Mayer",
+        "lat": -12.0625836,
+        "lon": -76.9412034
+      },
+      {
+        "nombre": "Seminario Evangelico De Lima",
+        "lat": -12.063766,
+        "lon": -76.9599854
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Real Plaza Puruchuco",
+        "lat": -12.040852,
+        "lon": -76.932244
+      },
+      {
+        "nombre": "Centro Comercial Plaza Vitarte",
+        "lat": -12.0257196,
+        "lon": -76.9211252
+      },
+      {
+        "nombre": "Centro Comercial Plaza Josfel",
+        "lat": -12.0428489,
+        "lon": -76.9372985
+      },
+      {
+        "nombre": "Centro Comercial Jessie",
+        "lat": -12.0574829,
+        "lon": -76.9696904
+      },
+      {
+        "nombre": "Centro Comercial Pitu",
+        "lat": -12.0170911,
+        "lon": -76.9837103
+      },
+      {
+        "nombre": "Centro Bancario Santa Anita",
+        "lat": -12.056323,
+        "lon": -76.969673
+      },
+      {
+        "nombre": "El Dorado",
+        "lat": -12.060824,
+        "lon": -76.963915
+      },
+      {
+        "nombre": "Mall Aventura Santa Anita",
+        "lat": -12.0562907,
+        "lon": -76.9710539
+      },
+      {
+        "nombre": "Real Plaza Vitarte APROMEC",
+        "lat": -12.0261924,
+        "lon": -76.9223959
+      },
+      {
+        "nombre": "Promart",
+        "lat": -12.0583053,
+        "lon": -76.96383
+      },
+      {
+        "nombre": "Ecoplaza",
+        "lat": -12.0588986,
+        "lon": -76.9622404
+      },
+      {
+        "nombre": "Vulcano Premium Outlet",
+        "lat": -12.0606283,
+        "lon": -76.9549619
+      },
+      {
+        "nombre": "El Marabu",
+        "lat": -12.0537085,
+        "lon": -76.9645702
+      },
+      {
+        "nombre": "El Tifon",
+        "lat": -12.0325607,
+        "lon": -76.9279222
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP Vitarte",
+        "lat": -12.026159,
+        "lon": -76.9195063
+      },
+      {
+        "nombre": "Comisaría PNP Santa Anita",
+        "lat": -12.0447742,
+        "lon": -76.9765766
+      }
+    ]
+  },
+  "Cercado de Lima": {
+    "parques": [
+      {
+        "nombre": "Parque Oxapampa",
+        "lat": -12.0630131,
+        "lon": -77.0580992
+      },
+      {
+        "nombre": "Parque Rio Grande",
+        "lat": -12.0672524,
+        "lon": -77.0556226
+      },
+      {
+        "nombre": "Parque Juegos Zona de Ejercicio",
+        "lat": -12.0482612,
+        "lon": -77.056895
+      },
+      {
+        "nombre": "Alameda Las Malvinas",
+        "lat": -12.0439255,
+        "lon": -77.0483792
+      },
+      {
+        "nombre": "Plazuela Presa",
+        "lat": -12.0367174,
+        "lon": -77.0325077
+      },
+      {
+        "nombre": "Plazuela Paracoto",
+        "lat": -12.0523075,
+        "lon": -77.0487704
+      },
+      {
+        "nombre": "Chacra Colorada",
+        "lat": -12.0514496,
+        "lon": -77.0460142
+      },
+      {
+        "nombre": "Zona Verde Torre 03 Frontis",
+        "lat": -12.047106,
+        "lon": -77.0569231
+      },
+      {
+        "nombre": "Zona Verde Torre 09 Trasera",
+        "lat": -12.04614,
+        "lon": -77.0571948
+      },
+      {
+        "nombre": "Zona Verde 01 Torre 01 Frontis",
+        "lat": -12.0470336,
+        "lon": -77.0566968
+      },
+      {
+        "nombre": "Zona Verde 02 Torre 08 Frontis",
+        "lat": -12.0466962,
+        "lon": -77.0569696
+      },
+      {
+        "nombre": "Zona Verde 01 Torre 08 Frontis",
+        "lat": -12.0464492,
+        "lon": -77.0569946
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación Presbítero Maestro",
+        "lat": -12.0418133,
+        "lon": -77.0116484
+      },
+      {
+        "nombre": "Estación de Desamparados",
+        "lat": -12.0443045,
+        "lon": -77.0286907
+      },
+      {
+        "nombre": "Estacion \"Gamarra\"",
+        "lat": -12.0656281,
+        "lon": -77.012505
+      },
+      {
+        "nombre": "Estación Central L2 Metro",
+        "lat": -12.0599327,
+        "lon": -77.0376051
+      },
+      {
+        "nombre": "Acceso Estación Central",
+        "lat": -12.0579274,
+        "lon": -77.0357878
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Hospital Nacional Dos de Mayo",
+        "lat": -12.0559005,
+        "lon": -77.0156753
+      },
+      {
+        "nombre": "Hospital Nacional Arzobispo Loayza",
+        "lat": -12.0495782,
+        "lon": -77.0442704
+      },
+      {
+        "nombre": "Hospital Nacional Guillermo Almenara Irigoyen",
+        "lat": -12.0596314,
+        "lon": -77.0223451
+      },
+      {
+        "nombre": "Hospital Augusto B. Leguía",
+        "lat": -12.0351789,
+        "lon": -77.0337996
+      },
+      {
+        "nombre": "Hospital Nacional Docente Madre Niño San Bartolome",
+        "lat": -12.0497488,
+        "lon": -77.0419138
+      },
+      {
+        "nombre": "Hospital Especializado de Emergencias Pediatricas",
+        "lat": -12.0584183,
+        "lon": -77.0214349
+      },
+      {
+        "nombre": "Hospital de Emergencias Grau",
+        "lat": -12.0589113,
+        "lon": -77.031069
+      },
+      {
+        "nombre": "Instituto Nacional de Salud del Niño",
+        "lat": -12.0651531,
+        "lon": -77.0465607
+      },
+      {
+        "nombre": "Hospicio San Vicente",
+        "lat": -12.0434083,
+        "lon": -77.0117319
+      },
+      {
+        "nombre": "Instituto Nacional de Ciencias Neurológicas",
+        "lat": -12.0455718,
+        "lon": -77.0161073
+      },
+      {
+        "nombre": "Instituto Nacional Materno Perinatal",
+        "lat": -12.0523057,
+        "lon": -77.022092
+      },
+      {
+        "nombre": "Centro de Salud - Raul Patrucco Puig",
+        "lat": -12.053423,
+        "lon": -77.0224438
+      },
+      {
+        "nombre": "Centro de Rehabilitación Personal La Victoria",
+        "lat": -12.0614801,
+        "lon": -77.0217453
+      },
+      {
+        "nombre": "Clinica Internacional",
+        "lat": -12.0584644,
+        "lon": -77.0386672
+      },
+      {
+        "nombre": "Policlínico Ramón Castilla",
+        "lat": -12.0444742,
+        "lon": -77.0440414
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio El Jardin de las Sonrisas",
+        "lat": -12.05819,
+        "lon": -77.04348
+      },
+      {
+        "nombre": "Institución Educativa Emblemática Nuestra Señora de Guadalupe",
+        "lat": -12.0553297,
+        "lon": -77.041171
+      },
+      {
+        "nombre": "Institución Educativa 1037 Ramon Espinosa",
+        "lat": -12.047279,
+        "lon": -77.0165047
+      },
+      {
+        "nombre": "Institución Educativa Nuestra Señora De Montserrat",
+        "lat": -12.0419956,
+        "lon": -77.0362994
+      },
+      {
+        "nombre": "Centro Folklórico del Magisterio Alejandro Vivanco Guerra",
+        "lat": -12.0520632,
+        "lon": -77.0461047
+      },
+      {
+        "nombre": "Institución Educativa Alfonso Ugarte",
+        "lat": -12.0593036,
+        "lon": -77.0426665
+      },
+      {
+        "nombre": "Institución Educativa España",
+        "lat": -12.0583567,
+        "lon": -77.0435012
+      },
+      {
+        "nombre": "Benjamin Galecio Mattos",
+        "lat": -12.0607131,
+        "lon": -77.0410337
+      },
+      {
+        "nombre": "Institución Educativa 1008 Virgen De Lourdes",
+        "lat": -12.0559267,
+        "lon": -77.0470936
+      },
+      {
+        "nombre": "Celdep",
+        "lat": -12.0631616,
+        "lon": -77.0402397
+      },
+      {
+        "nombre": "Institución Educativa Joseph And Mery High School",
+        "lat": -12.0657417,
+        "lon": -77.0441976
+      },
+      {
+        "nombre": "Institución Educativa La Católica",
+        "lat": -12.0479433,
+        "lon": -77.0308255
+      },
+      {
+        "nombre": "Institución Educativa Santa Maria De Los Angeles",
+        "lat": -12.0382462,
+        "lon": -77.0515241
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Centro Comercial El Progreso",
+        "lat": -12.0431423,
+        "lon": -77.0490814
+      },
+      {
+        "nombre": "Centro Comercial Centro Lima",
+        "lat": -12.054953,
+        "lon": -77.0372088
+      },
+      {
+        "nombre": "Centro Comercial Mesa Redonda",
+        "lat": -12.0429338,
+        "lon": -77.0475139
+      },
+      {
+        "nombre": "Centro Comercial Plaza 2 de Mayo",
+        "lat": -12.045514,
+        "lon": -77.0421987
+      },
+      {
+        "nombre": "Centro Comercial Mega Rekord",
+        "lat": -12.0674383,
+        "lon": -77.0507454
+      },
+      {
+        "nombre": "Centro Comercial Breña",
+        "lat": -12.0674147,
+        "lon": -77.0495015
+      },
+      {
+        "nombre": "Guizando",
+        "lat": -12.0615292,
+        "lon": -77.0153835
+      },
+      {
+        "nombre": "Malvitec",
+        "lat": -12.0429384,
+        "lon": -77.048099
+      },
+      {
+        "nombre": "CC. Polvos Azules de Paruro",
+        "lat": -12.04316,
+        "lon": -77.0467096
+      },
+      {
+        "nombre": "Plaza Ferretero Las Malvinas",
+        "lat": -12.045816,
+        "lon": -77.0444807
+      },
+      {
+        "nombre": "Cyber Plaza",
+        "lat": -12.0568916,
+        "lon": -77.0388153
+      },
+      {
+        "nombre": "Galería Plaza Union",
+        "lat": -12.0439718,
+        "lon": -77.042475
+      },
+      {
+        "nombre": "Galería de Ferreteros",
+        "lat": -12.0446089,
+        "lon": -77.0493037
+      },
+      {
+        "nombre": "Vía Veneno",
+        "lat": -12.0504494,
+        "lon": -77.0340606
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP Cotabambas",
+        "lat": -12.0580556,
+        "lon": -77.0341488
+      },
+      {
+        "nombre": "Comisaría PNP Alfonso Ugarte",
+        "lat": -12.056772,
+        "lon": -77.0410699
+      },
+      {
+        "nombre": "Comisaría PNP Breña",
+        "lat": -12.0670319,
+        "lon": -77.0531072
+      },
+      {
+        "nombre": "Comisaría Monserrate",
+        "lat": -12.0413645,
+        "lon": -77.0392486
+      },
+      {
+        "nombre": "Comisaría PNP Rímac",
+        "lat": -12.0396869,
+        "lon": -77.027898
+      },
+      {
+        "nombre": "Comisaría PNP de la familia El Agustino",
+        "lat": -12.0516211,
+        "lon": -77.0111923
+      },
+      {
+        "nombre": "Comisaría PNP Petit Thouars",
+        "lat": -12.0688801,
+        "lon": -77.0352972
+      },
+      {
+        "nombre": "Comisaría Chacra Colorada",
+        "lat": -12.0542542,
+        "lon": -77.050881
+      },
+      {
+        "nombre": "Comisaría PNP Conde de la Vega",
+        "lat": -12.0382973,
+        "lon": -77.0531905
+      },
+      {
+        "nombre": "Comisaría PNP Piedra Liza",
+        "lat": -12.0396992,
+        "lon": -77.0177603
+      },
+      {
+        "nombre": "Comisaría PNP de la familia Bertha Gonzales Posada Eyzaguirre",
+        "lat": -12.0578237,
+        "lon": -77.0342047
+      },
+      {
+        "nombre": "Comisaría PNP La Victoria",
+        "lat": -12.0629304,
+        "lon": -77.0259361
+      },
+      {
+        "nombre": "Comisaría PNP San Andrés",
+        "lat": -12.0511519,
+        "lon": -77.0235552
+      }
+    ]
+  },
+  "Chorrillos": {
+    "parques": [
+      {
+        "nombre": "Parque Villa Alegre",
+        "lat": -12.1643054,
+        "lon": -76.99108
+      },
+      {
+        "nombre": "Parque Mateo Pumacahua",
+        "lat": -12.1892043,
+        "lon": -76.9828694
+      },
+      {
+        "nombre": "Parque María Auxiliadora 2",
+        "lat": -12.1658932,
+        "lon": -76.9791199
+      },
+      {
+        "nombre": "Parque Sarita Colonia",
+        "lat": -12.1882588,
+        "lon": -77.0066375
+      },
+      {
+        "nombre": "Parque Ganimedes",
+        "lat": -12.1658946,
+        "lon": -76.997156
+      },
+      {
+        "nombre": "Parque Central Sagitario",
+        "lat": -12.1645583,
+        "lon": -76.9964449
+      },
+      {
+        "nombre": "Parque Ariadna",
+        "lat": -12.1620418,
+        "lon": -76.996123
+      },
+      {
+        "nombre": "Parque José Olaya",
+        "lat": -12.1673524,
+        "lon": -77.0289139
+      },
+      {
+        "nombre": "Parque el Mirador",
+        "lat": -12.1621532,
+        "lon": -77.0241235
+      },
+      {
+        "nombre": "Parque Coovisan",
+        "lat": -12.1607733,
+        "lon": -76.9968341
+      },
+      {
+        "nombre": "Parque Fovipol",
+        "lat": -12.2095837,
+        "lon": -77.0178489
+      },
+      {
+        "nombre": "San Juan de Miraflores",
+        "lat": -12.1642072,
+        "lon": -76.978891
+      },
+      {
+        "nombre": "Santiago de Surco",
+        "lat": -12.1621975,
+        "lon": -76.9930928
+      },
+      {
+        "nombre": "Los Cedros",
+        "lat": -12.2062621,
+        "lon": -77.0157473
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación Rosario de Villa",
+        "lat": -12.1730247,
+        "lon": -77.0151099
+      },
+      {
+        "nombre": "Estación Terán",
+        "lat": -12.1686435,
+        "lon": -77.0186235
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Hospital Militar Geriátrico",
+        "lat": -12.1619388,
+        "lon": -77.0199937
+      },
+      {
+        "nombre": "Instituto Nacional de Salud",
+        "lat": -12.1825604,
+        "lon": -77.0167153
+      },
+      {
+        "nombre": "Instituto Nacional de Rehabilitación",
+        "lat": -12.1920976,
+        "lon": -77.0031839
+      },
+      {
+        "nombre": "SISOL Salud Chorrillos",
+        "lat": -12.1675142,
+        "lon": -77.0191963
+      },
+      {
+        "nombre": "Centro Materno Infantil Chorrillos II",
+        "lat": -12.1661043,
+        "lon": -77.0202617
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "I.E. \"Virgen del Morro Solar\"",
+        "lat": -12.1854688,
+        "lon": -77.0174822
+      },
+      {
+        "nombre": "Institución Educativa 7039 Manuel Scorza Torres",
+        "lat": -12.1838065,
+        "lon": -76.9930128
+      },
+      {
+        "nombre": "Innova School",
+        "lat": -12.1781261,
+        "lon": -77.0032677
+      },
+      {
+        "nombre": "Zumbayllu",
+        "lat": -12.1964376,
+        "lon": -76.9849991
+      },
+      {
+        "nombre": "Institución Educativa Niño Jesus De Belen",
+        "lat": -12.1704992,
+        "lon": -77.0218229
+      },
+      {
+        "nombre": "Institución Educativa San Christoferus",
+        "lat": -12.1715311,
+        "lon": -76.9940006
+      },
+      {
+        "nombre": "Institución Educativa Alipio Ponce Vasquez",
+        "lat": -12.1725703,
+        "lon": -76.9946826
+      },
+      {
+        "nombre": "Institución Educativa Virgen Maria De Fatima",
+        "lat": -12.1815446,
+        "lon": -76.9956013
+      },
+      {
+        "nombre": "Institución Educativa Innova Schools La Campiña",
+        "lat": -12.1780823,
+        "lon": -77.003502
+      },
+      {
+        "nombre": "Inicial Parroquial Niño Jesus de Praga",
+        "lat": -12.181081,
+        "lon": -77.0012294
+      },
+      {
+        "nombre": "Institución Educativa Clemente Althaus",
+        "lat": -12.1837869,
+        "lon": -76.9963013
+      },
+      {
+        "nombre": "Institución Educativa Alfred Marshall",
+        "lat": -12.1618869,
+        "lon": -76.9841107
+      },
+      {
+        "nombre": "Institución Educativa Jesus Amado",
+        "lat": -12.1648013,
+        "lon": -76.9886759
+      },
+      {
+        "nombre": "Institución Educativa Inmaculada Concepcion",
+        "lat": -12.1850144,
+        "lon": -77.0031201
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Plaza Lima Sur",
+        "lat": -12.1729316,
+        "lon": -77.0130451
+      },
+      {
+        "nombre": "Centro Comercial Megaplaza Express Villa",
+        "lat": -12.1967056,
+        "lon": -77.0119674
+      },
+      {
+        "nombre": "Centro Comercial Los Pinos",
+        "lat": -12.1889574,
+        "lon": -77.0143249
+      },
+      {
+        "nombre": "Real Plaza Guardia Civil",
+        "lat": -12.1724917,
+        "lon": -76.9927683
+      },
+      {
+        "nombre": "Galaxy Plaza",
+        "lat": -12.1767765,
+        "lon": -77.015841
+      },
+      {
+        "nombre": "Vía Mix Chorrillos",
+        "lat": -12.1840637,
+        "lon": -77.000604
+      },
+      {
+        "nombre": "Strip Center Matellini",
+        "lat": -12.1805521,
+        "lon": -77.011096
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP Chorrillos",
+        "lat": -12.1703922,
+        "lon": -77.0234108
+      },
+      {
+        "nombre": "Comisaría PNP San Genaro",
+        "lat": -12.1940745,
+        "lon": -77.0205811
+      },
+      {
+        "nombre": "Comisaría PNP Chorrillos Mateo Pumacahua",
+        "lat": -12.1920086,
+        "lon": -76.9799433
+      },
+      {
+        "nombre": "Comisaría PNP Villa Chorrillos",
+        "lat": -12.1857536,
+        "lon": -77.0081276
+      },
+      {
+        "nombre": "Comisaría PNP Sagitario",
+        "lat": -12.1649143,
+        "lon": -76.9967505
+      }
+    ]
+  },
+  "Los Olivos": {
+    "parques": [
+      {
+        "nombre": "Parque Primavera",
+        "lat": -11.9631206,
+        "lon": -77.0590351
+      },
+      {
+        "nombre": "Parque Los Diamantes",
+        "lat": -11.9627985,
+        "lon": -77.0610692
+      },
+      {
+        "nombre": "Parque Virgen del Carmen",
+        "lat": -11.9946129,
+        "lon": -77.0803238
+      },
+      {
+        "nombre": "Parque APUPAL",
+        "lat": -11.9886092,
+        "lon": -77.0730435
+      },
+      {
+        "nombre": "Parque Magdalena",
+        "lat": -11.9915042,
+        "lon": -77.0667208
+      },
+      {
+        "nombre": "Parque Virgen de la Merced",
+        "lat": -11.9729283,
+        "lon": -77.0733719
+      },
+      {
+        "nombre": "Parque El Olivar",
+        "lat": -11.9819403,
+        "lon": -77.0770333
+      },
+      {
+        "nombre": "Chavarría",
+        "lat": -11.993748,
+        "lon": -77.0835566
+      },
+      {
+        "nombre": "Club Metropolitano Lloque Yupanqui",
+        "lat": -11.9771679,
+        "lon": -77.0744766
+      },
+      {
+        "nombre": "Santa Rosa",
+        "lat": -11.9789452,
+        "lon": -77.0792344
+      },
+      {
+        "nombre": "Solidaridad",
+        "lat": -11.9795268,
+        "lon": -77.0736003
+      },
+      {
+        "nombre": "San Martín de Porres",
+        "lat": -11.9861914,
+        "lon": -77.0807856
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "La Estacion",
+        "lat": -11.9800452,
+        "lon": -77.0615429
+      },
+      {
+        "nombre": "Estación Naranjal",
+        "lat": -11.9827434,
+        "lon": -77.0586044
+      },
+      {
+        "nombre": "Estación Naranjal - Puerta Sur",
+        "lat": -11.9827536,
+        "lon": -77.0586
+      },
+      {
+        "nombre": "Estación Universidad",
+        "lat": -11.9623949,
+        "lon": -77.0622704
+      },
+      {
+        "nombre": "Estación Pacífico",
+        "lat": -11.9948804,
+        "lon": -77.0559897
+      },
+      {
+        "nombre": "Estación Independencia",
+        "lat": -11.9987456,
+        "lon": -77.0552032
+      },
+      {
+        "nombre": "Estación Izaguirre",
+        "lat": -11.9895485,
+        "lon": -77.0570156
+      },
+      {
+        "nombre": "Estación de carga EV Volvo",
+        "lat": -11.9948384,
+        "lon": -77.0627799
+      },
+      {
+        "nombre": "Z-Buss Estación Previ",
+        "lat": -11.9854922,
+        "lon": -77.0641877
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Hospìtal Municipal de los Olivos",
+        "lat": -11.9765789,
+        "lon": -77.0633889
+      },
+      {
+        "nombre": "SISOL Salud Comas",
+        "lat": -11.9707295,
+        "lon": -77.0572978
+      },
+      {
+        "nombre": "Carlos Cueto Fernandini",
+        "lat": -11.9816276,
+        "lon": -77.0715761
+      },
+      {
+        "nombre": "SISOL Salud Los Olivos",
+        "lat": -11.9792433,
+        "lon": -77.0768775
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Institución Educativa Visionarios Colegio",
+        "lat": -11.9613048,
+        "lon": -77.0707705
+      },
+      {
+        "nombre": "Colegio A. Von Humboldt",
+        "lat": -11.9660946,
+        "lon": -77.0735954
+      },
+      {
+        "nombre": "Institución Educativa 2096 Perú Japón",
+        "lat": -11.9804473,
+        "lon": -77.0681077
+      },
+      {
+        "nombre": "Institución Educativa 3080 Perú - Canadá",
+        "lat": -11.9644763,
+        "lon": -77.0709978
+      },
+      {
+        "nombre": "Institución Educativa Saco Oliveros De Los Olivos",
+        "lat": -11.9670673,
+        "lon": -77.0726374
+      },
+      {
+        "nombre": "Institución Educativa Marcelino Champagnat",
+        "lat": -11.9756842,
+        "lon": -77.0708953
+      },
+      {
+        "nombre": "Institución Educativa Carlos Sanchez Malaga",
+        "lat": -11.9716143,
+        "lon": -77.0736895
+      },
+      {
+        "nombre": "Institución Educativa Atenas",
+        "lat": -11.9926931,
+        "lon": -77.0699249
+      },
+      {
+        "nombre": "Institución Educativa Sebastian Salazar Bondy",
+        "lat": -11.9876984,
+        "lon": -77.0600228
+      },
+      {
+        "nombre": "Institución Educativa Nuestra Señora De La Inmaculada",
+        "lat": -11.9614915,
+        "lon": -77.0807013
+      },
+      {
+        "nombre": "Institución Educativa Manuel Scorza",
+        "lat": -11.9686066,
+        "lon": -77.0711013
+      },
+      {
+        "nombre": "Institución Educativa Niños De Maria",
+        "lat": -11.9711869,
+        "lon": -77.0732878
+      },
+      {
+        "nombre": "Institución Educativa Dios Supremo",
+        "lat": -11.9690079,
+        "lon": -77.0603027
+      },
+      {
+        "nombre": "Institución Educativa Clements Markham",
+        "lat": -11.965575,
+        "lon": -77.0688752
+      },
+      {
+        "nombre": "Institución Educativa San Eulogio",
+        "lat": -11.9630895,
+        "lon": -77.061608
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Royal Plaza",
+        "lat": -11.9906172,
+        "lon": -77.062674
+      },
+      {
+        "nombre": "Comercial Laura Caller",
+        "lat": -11.9703192,
+        "lon": -77.0786173
+      },
+      {
+        "nombre": "MegaPlaza Lima Norte",
+        "lat": -11.9944447,
+        "lon": -77.061105
+      },
+      {
+        "nombre": "San Lázaro Center",
+        "lat": -11.9887207,
+        "lon": -77.0608153
+      },
+      {
+        "nombre": "Plaza Aurora",
+        "lat": -11.9902994,
+        "lon": -77.062126
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP Laura Caller Iberico",
+        "lat": -11.970573,
+        "lon": -77.078039
+      }
+    ]
+  },
+  "La Victoria": {
+    "parques": [
+      {
+        "nombre": "Parque del Migrante José María Arguedas",
+        "lat": -12.0629052,
+        "lon": -77.0112901
+      },
+      {
+        "nombre": "Parque de la Historia de la Medicina Peruana",
+        "lat": -12.0565014,
+        "lon": -77.0172774
+      },
+      {
+        "nombre": "Parque Ramiro Prialé Prialé",
+        "lat": -12.0767559,
+        "lon": -77.0133095
+      },
+      {
+        "nombre": "Parque Francisco Graña",
+        "lat": -12.0827264,
+        "lon": -77.0066713
+      },
+      {
+        "nombre": "Parque 2 de Mayo",
+        "lat": -12.0816319,
+        "lon": -77.0152655
+      },
+      {
+        "nombre": "Parque Manuel Seaone",
+        "lat": -12.0732464,
+        "lon": -77.0078688
+      },
+      {
+        "nombre": "Parque Armando Revoredo",
+        "lat": -12.0836637,
+        "lon": -77.0094254
+      },
+      {
+        "nombre": "Parque Bellas Artes",
+        "lat": -12.0735658,
+        "lon": -77.0125768
+      },
+      {
+        "nombre": "Parque Andres Avelino Caceres",
+        "lat": -12.0779549,
+        "lon": -77.0088759
+      },
+      {
+        "nombre": "Parque Toribio Mogrovejo",
+        "lat": -12.0837955,
+        "lon": -77.0154641
+      },
+      {
+        "nombre": "Parque A. Bertello",
+        "lat": -12.0834159,
+        "lon": -77.0115188
+      },
+      {
+        "nombre": "Parque Corazon de Jesus",
+        "lat": -12.0827579,
+        "lon": -77.0104668
+      },
+      {
+        "nombre": "Parque San Juan",
+        "lat": -12.0761835,
+        "lon": -77.0127626
+      },
+      {
+        "nombre": "Plaza Derechos Humanos",
+        "lat": -12.0774873,
+        "lon": -77.0106208
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación Estadio Nacional",
+        "lat": -12.0685302,
+        "lon": -77.0321386
+      },
+      {
+        "nombre": "Estación México",
+        "lat": -12.0772359,
+        "lon": -77.029022
+      },
+      {
+        "nombre": "Estacion \"Gamarra\"",
+        "lat": -12.0656281,
+        "lon": -77.012505
+      },
+      {
+        "nombre": "Estación \"Arriola\"",
+        "lat": -12.0747708,
+        "lon": -77.0111741
+      },
+      {
+        "nombre": "Estacion Gamarra",
+        "lat": -12.0653179,
+        "lon": -77.0123564
+      },
+      {
+        "nombre": "Estación \"Gamarra\"",
+        "lat": -12.0656159,
+        "lon": -77.0121783
+      },
+      {
+        "nombre": "Ciclo Estación",
+        "lat": -12.0776321,
+        "lon": -77.0318637
+      },
+      {
+        "nombre": "Estación del Metropolitano \"Gamarra\"",
+        "lat": -12.0647046,
+        "lon": -77.0124926
+      },
+      {
+        "nombre": "Estación Canadá",
+        "lat": -12.0824136,
+        "lon": -77.0265799
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Hospital Nacional Dos de Mayo",
+        "lat": -12.0559005,
+        "lon": -77.0156753
+      },
+      {
+        "nombre": "Hospital Nacional Guillermo Almenara Irigoyen",
+        "lat": -12.0596314,
+        "lon": -77.0223451
+      },
+      {
+        "nombre": "Hospital Especializado de Emergencias Pediatricas",
+        "lat": -12.0584183,
+        "lon": -77.0214349
+      },
+      {
+        "nombre": "Hospital de Emergencias Grau",
+        "lat": -12.0589113,
+        "lon": -77.031069
+      },
+      {
+        "nombre": "Centro de Rehabilitación Personal La Victoria",
+        "lat": -12.0614801,
+        "lon": -77.0217453
+      },
+      {
+        "nombre": "Clínica Maison de Sante",
+        "lat": -12.0574445,
+        "lon": -77.0339055
+      },
+      {
+        "nombre": "Centro De Salud Mental Comunitario La Victoria",
+        "lat": -12.0712645,
+        "lon": -77.013399
+      },
+      {
+        "nombre": "SISOL Salud La Victoria",
+        "lat": -12.0609184,
+        "lon": -77.0299712
+      },
+      {
+        "nombre": "Hospitalidad de la Solidaridad",
+        "lat": -12.0609093,
+        "lon": -77.0294569
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Institución Educativa 1035 Jose Del Carmen Marin Arista",
+        "lat": -12.0559219,
+        "lon": -77.0275776
+      },
+      {
+        "nombre": "Institución Educativa 1110 Republica De Panama",
+        "lat": -12.0650867,
+        "lon": -77.0302433
+      },
+      {
+        "nombre": "Institución Educativa 1107 Javier Prado",
+        "lat": -12.0630732,
+        "lon": -77.0208382
+      },
+      {
+        "nombre": "Institución Educativa 1059 Maria Inmaculada",
+        "lat": -12.0826426,
+        "lon": -77.0319524
+      },
+      {
+        "nombre": "Institución Educativa Lima Santa Beatriz",
+        "lat": -12.0648733,
+        "lon": -77.0339956
+      },
+      {
+        "nombre": "Institución Educativa Rosa Merino",
+        "lat": -12.0604618,
+        "lon": -77.0202587
+      },
+      {
+        "nombre": "Institución Educativa Los Robles",
+        "lat": -12.07667,
+        "lon": -77.0319514
+      },
+      {
+        "nombre": "Mi Sagrado Corazón de Jesús",
+        "lat": -12.0739545,
+        "lon": -77.0086777
+      },
+      {
+        "nombre": "Institución Educativa Diego Thompson",
+        "lat": -12.0731118,
+        "lon": -77.0094987
+      },
+      {
+        "nombre": "Institución Educativa 1032 Republica Del Brasil",
+        "lat": -12.0559105,
+        "lon": -77.0219
+      },
+      {
+        "nombre": "Institución Educativa Santa Teresa",
+        "lat": -12.0689597,
+        "lon": -77.009604
+      },
+      {
+        "nombre": "Institución Educativa Cristo Morado",
+        "lat": -12.065617,
+        "lon": -77.005408
+      },
+      {
+        "nombre": "De La Construccion - Capeco",
+        "lat": -12.0638708,
+        "lon": -77.0335303
+      },
+      {
+        "nombre": "Institución Educativa Ing. Jorge Cabrera Tapia",
+        "lat": -12.0738299,
+        "lon": -77.033425
+      },
+      {
+        "nombre": "Institución Educativa La Merced",
+        "lat": -12.0667144,
+        "lon": -77.019404
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Gamarra Moda Plaza",
+        "lat": -12.0708582,
+        "lon": -77.0124809
+      },
+      {
+        "nombre": "Centro Comercial Polvos Azules",
+        "lat": -12.0616486,
+        "lon": -77.0335096
+      },
+      {
+        "nombre": "Centro Comercial 5 Continentes",
+        "lat": -12.0574162,
+        "lon": -77.0293282
+      },
+      {
+        "nombre": "Centro Comercial Polvos Blancos",
+        "lat": -12.0560001,
+        "lon": -77.0291858
+      },
+      {
+        "nombre": "Centro Comercial El Zapatón",
+        "lat": -12.057231,
+        "lon": -77.0283373
+      },
+      {
+        "nombre": "Centro Comercial Señor de Luren",
+        "lat": -12.0586016,
+        "lon": -77.0296448
+      },
+      {
+        "nombre": "Centro Comercial Unicachi",
+        "lat": -12.0575068,
+        "lon": -77.0303314
+      },
+      {
+        "nombre": "Centro Comercial Montevideo",
+        "lat": -12.0580697,
+        "lon": -77.0304894
+      },
+      {
+        "nombre": "Centro Comercial Sumac Fashion",
+        "lat": -12.0580613,
+        "lon": -77.0297351
+      },
+      {
+        "nombre": "Galeria Comercial Luna Pizarro",
+        "lat": -12.0600099,
+        "lon": -77.0280051
+      },
+      {
+        "nombre": "Galería Comercial San Pedro",
+        "lat": -12.069984,
+        "lon": -77.013054
+      },
+      {
+        "nombre": "Guizando",
+        "lat": -12.0615292,
+        "lon": -77.0153835
+      },
+      {
+        "nombre": "Galeria Richi",
+        "lat": -12.0600867,
+        "lon": -77.0321588
+      },
+      {
+        "nombre": "Parque Pedro Cánepa",
+        "lat": -12.0646919,
+        "lon": -77.0147666
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP La Victoria",
+        "lat": -12.0629304,
+        "lon": -77.0259361
+      },
+      {
+        "nombre": "Comisaría PNP Lince",
+        "lat": -12.0833211,
+        "lon": -77.0271556
+      },
+      {
+        "nombre": "Comisaría PNP San Cayetano",
+        "lat": -12.0568209,
+        "lon": -77.0078532
+      },
+      {
+        "nombre": "Comisaría PNP Cotabambas",
+        "lat": -12.0580556,
+        "lon": -77.0341488
+      },
+      {
+        "nombre": "Comisaría PNP La Victoria Apolo",
+        "lat": -12.0714384,
+        "lon": -77.0099356
+      },
+      {
+        "nombre": "Comisaría PNP San Cosme",
+        "lat": -12.0644182,
+        "lon": -77.0076758
+      },
+      {
+        "nombre": "Comisaría PNP de la familia Bertha Gonzales Posada Eyzaguirre",
+        "lat": -12.0578237,
+        "lon": -77.0342047
+      }
+    ]
+  },
+  "Breña": {
+    "parques": [
+      {
+        "nombre": "Parque Murillo",
+        "lat": -12.0565692,
+        "lon": -77.0517613
+      },
+      {
+        "nombre": "Parque de los Bomberos",
+        "lat": -12.0676549,
+        "lon": -77.0435874
+      },
+      {
+        "nombre": "Parque Sesquicentenario",
+        "lat": -12.0639095,
+        "lon": -77.0562784
+      },
+      {
+        "nombre": "Parque Pedro D'onofrio",
+        "lat": -12.0653457,
+        "lon": -77.0572251
+      },
+      {
+        "nombre": "Parque Rio Grande",
+        "lat": -12.0672524,
+        "lon": -77.0556226
+      },
+      {
+        "nombre": "Parque Iturregui",
+        "lat": -12.0662813,
+        "lon": -77.0564103
+      },
+      {
+        "nombre": "Concha Acústica",
+        "lat": -12.0665789,
+        "lon": -77.0424205
+      },
+      {
+        "nombre": "Plazuela Paracoto",
+        "lat": -12.0523075,
+        "lon": -77.0487704
+      },
+      {
+        "nombre": "Chacra Colorada",
+        "lat": -12.0536652,
+        "lon": -77.0529585
+      },
+      {
+        "nombre": "Valera",
+        "lat": -12.0549835,
+        "lon": -77.0464772
+      },
+      {
+        "nombre": "Plazuela Pedro Ruiz",
+        "lat": -12.0665223,
+        "lon": -77.0541901
+      },
+      {
+        "nombre": "La Chacra Colorada",
+        "lat": -12.0582913,
+        "lon": -77.0425682
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación España",
+        "lat": -12.057607,
+        "lon": -77.0417893
+      },
+      {
+        "nombre": "Estación Quilca",
+        "lat": -12.0522011,
+        "lon": -77.0422599
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Instituto Nacional de Salud del Niño",
+        "lat": -12.0651531,
+        "lon": -77.0465607
+      },
+      {
+        "nombre": "SINDICATO UNICO DE TRABAJADORES DE SALUD",
+        "lat": -12.0524779,
+        "lon": -77.0444244
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio El Jardin de las Sonrisas",
+        "lat": -12.05819,
+        "lon": -77.04348
+      },
+      {
+        "nombre": "Colegio María de la Merced",
+        "lat": -12.0535136,
+        "lon": -77.0443737
+      },
+      {
+        "nombre": "Institución Educativa Emblemática Nuestra Señora de Guadalupe",
+        "lat": -12.0553297,
+        "lon": -77.041171
+      },
+      {
+        "nombre": "Centro Folklórico del Magisterio Alejandro Vivanco Guerra",
+        "lat": -12.0520632,
+        "lon": -77.0461047
+      },
+      {
+        "nombre": "Copérnico",
+        "lat": -12.0612065,
+        "lon": -77.0419827
+      },
+      {
+        "nombre": "Institución Educativa Albert Einstein",
+        "lat": -12.0566995,
+        "lon": -77.0440662
+      },
+      {
+        "nombre": "Institución educativa inicial \"Santa María de Guadalupe\" n 075",
+        "lat": -12.052676,
+        "lon": -77.0534459
+      },
+      {
+        "nombre": "Institución Educativa Sor Angela Lecca",
+        "lat": -12.0618789,
+        "lon": -77.0456944
+      },
+      {
+        "nombre": "Institución Educativa Alfonso Ugarte",
+        "lat": -12.0593036,
+        "lon": -77.0426665
+      },
+      {
+        "nombre": "Institución Educativa Corazon De Jesus",
+        "lat": -12.0671001,
+        "lon": -77.0437028
+      },
+      {
+        "nombre": "Paul Muller",
+        "lat": -12.06231,
+        "lon": -77.040281
+      },
+      {
+        "nombre": "Institución Educativa San Francisco Javier",
+        "lat": -12.0559185,
+        "lon": -77.0515627
+      },
+      {
+        "nombre": "Institución Educativa España",
+        "lat": -12.0583567,
+        "lon": -77.0435012
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Centro Comercial Guizaldo Plaza",
+        "lat": -12.0670018,
+        "lon": -77.0500098
+      },
+      {
+        "nombre": "Centro Comercial Breña",
+        "lat": -12.0674147,
+        "lon": -77.0495015
+      },
+      {
+        "nombre": "Centro Comercial Mega Rekord",
+        "lat": -12.0674383,
+        "lon": -77.0507454
+      },
+      {
+        "nombre": "La Rambla",
+        "lat": -12.0662233,
+        "lon": -77.0476522
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP Breña",
+        "lat": -12.0670319,
+        "lon": -77.0531072
+      },
+      {
+        "nombre": "Comisaría PNP Alfonso Ugarte",
+        "lat": -12.056772,
+        "lon": -77.0410699
+      },
+      {
+        "nombre": "Comisaría Chacra Colorada",
+        "lat": -12.0542542,
+        "lon": -77.050881
+      }
+    ]
+  },
+  "Bellavista": {
+    "parques": [
+      {
+        "nombre": "Parque 10 de junio",
+        "lat": -12.0550056,
+        "lon": -77.1091784
+      },
+      {
+        "nombre": "Parque Fanning",
+        "lat": -12.0587874,
+        "lon": -77.1136411
+      },
+      {
+        "nombre": "Parque Señora Divina Misericordia",
+        "lat": -12.0623494,
+        "lon": -77.1054479
+      },
+      {
+        "nombre": "Parque Ayllu",
+        "lat": -12.0508025,
+        "lon": -77.1100221
+      },
+      {
+        "nombre": "Parque Luis Alberto Sánchez",
+        "lat": -12.0691296,
+        "lon": -77.1161276
+      },
+      {
+        "nombre": "Santa Clara",
+        "lat": -12.0516466,
+        "lon": -77.1070945
+      },
+      {
+        "nombre": "San Judas Tadeo",
+        "lat": -12.0622298,
+        "lon": -77.111949
+      }
+    ],
+    "transporte": [],
+    "salud": [
+      {
+        "nombre": "Hospital Nacional Daniel Alcides Carrión",
+        "lat": -12.0632314,
+        "lon": -77.1240002
+      },
+      {
+        "nombre": "Hospital Nacional Alberto Sabogal Sologuren",
+        "lat": -12.0642508,
+        "lon": -77.1223004
+      },
+      {
+        "nombre": "Centro de Salud Perú-Korea Bellavista",
+        "lat": -12.0618132,
+        "lon": -77.1068553
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio San Antonio Marianista",
+        "lat": -12.0603462,
+        "lon": -77.1244147
+      },
+      {
+        "nombre": "Colegio Parroquial San José / Secundaria",
+        "lat": -12.0690532,
+        "lon": -77.1169458
+      },
+      {
+        "nombre": "Institución Educativa Callao",
+        "lat": -12.0630317,
+        "lon": -77.118833
+      },
+      {
+        "nombre": "Institución Educativa 5011 Dario Arrus Cuestas",
+        "lat": -12.0624443,
+        "lon": -77.113366
+      },
+      {
+        "nombre": "Institución Educativa 5050 San Pedro",
+        "lat": -12.0603759,
+        "lon": -77.1068077
+      },
+      {
+        "nombre": "Liceo Naval Capitan de Navio Luis German Astete",
+        "lat": -12.0662873,
+        "lon": -77.1064832
+      },
+      {
+        "nombre": "CEP Concordia Universal",
+        "lat": -12.0690884,
+        "lon": -77.121661
+      },
+      {
+        "nombre": "Institución Educativa 5078 José A. Quiñones Gonzáles",
+        "lat": -12.0528439,
+        "lon": -77.1223689
+      },
+      {
+        "nombre": "Institución Educativa 4007 Virgen Del Pilar",
+        "lat": -12.054837,
+        "lon": -77.1123608
+      },
+      {
+        "nombre": "Institución Educativa 4006 Santa Rosa de América",
+        "lat": -12.0561334,
+        "lon": -77.1161472
+      },
+      {
+        "nombre": "Institución Educativa 4008 Nuestra Señora de Fátima",
+        "lat": -12.0525967,
+        "lon": -77.1084015
+      },
+      {
+        "nombre": "Los Ángeles de San José",
+        "lat": -12.0699725,
+        "lon": -77.1243759
+      },
+      {
+        "nombre": "Ángeles de Fátima",
+        "lat": -12.055128,
+        "lon": -77.1075042
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [],
+    "seguridad": []
+  },
+  "La Perla": {
+    "parques": [
+      {
+        "nombre": "Parque Pascual Farfán",
+        "lat": -12.0734058,
+        "lon": -77.1189687
+      },
+      {
+        "nombre": "parque Espana",
+        "lat": -12.0677648,
+        "lon": -77.1185274
+      },
+      {
+        "nombre": "Parque de Vilcahuara",
+        "lat": -12.0790243,
+        "lon": -77.1029098
+      },
+      {
+        "nombre": "Parque Luis Lituma Portocarrero",
+        "lat": -12.0742095,
+        "lon": -77.116857
+      },
+      {
+        "nombre": "San Fernando",
+        "lat": -12.0766024,
+        "lon": -77.1145725
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estacion de Servicio La Perla - PRIMAX",
+        "lat": -12.0758482,
+        "lon": -77.1147323
+      },
+      {
+        "nombre": "Estación Naval La Perla",
+        "lat": -12.0701553,
+        "lon": -77.1068597
+      },
+      {
+        "nombre": "La Gran Estación",
+        "lat": -12.065592,
+        "lon": -77.104352
+      }
+    ],
+    "salud": [],
+    "educacion_colegios": [
+      {
+        "nombre": "Colegio Parroquial San José / Secundaria",
+        "lat": -12.0690532,
+        "lon": -77.1169458
+      },
+      {
+        "nombre": "María Rosario Aráoz Pinto",
+        "lat": -12.0717153,
+        "lon": -77.1027761
+      },
+      {
+        "nombre": "Liceo Naval Capitan de Navio Luis German Astete",
+        "lat": -12.0662873,
+        "lon": -77.1064832
+      },
+      {
+        "nombre": "Comunidad Teologica Del Peru",
+        "lat": -12.0771449,
+        "lon": -77.1006617
+      },
+      {
+        "nombre": "Institución Educativa Corazon De Jesus",
+        "lat": -12.0796252,
+        "lon": -77.100692
+      },
+      {
+        "nombre": "Grupo Scout La Perla 172",
+        "lat": -12.0687862,
+        "lon": -77.1173585
+      },
+      {
+        "nombre": "Institución Educativa Inicial Virgen de Aránzazu",
+        "lat": -12.0767291,
+        "lon": -77.1000254
+      },
+      {
+        "nombre": "Institución Educativa San Agustin",
+        "lat": -12.0737315,
+        "lon": -77.1076504
+      },
+      {
+        "nombre": "Institución Educativa 1086 Jesús Redentor",
+        "lat": -12.076095,
+        "lon": -77.1045796
+      },
+      {
+        "nombre": "Institución Educativa Innova Schools - San Miguel 3 La Paz",
+        "lat": -12.0772877,
+        "lon": -77.1092729
+      },
+      {
+        "nombre": "Institución Educativa Carlos Augusto Salaverry",
+        "lat": -12.0776984,
+        "lon": -77.106701
+      },
+      {
+        "nombre": "Institución Educativa Mi Pequeñita Luz",
+        "lat": -12.0770889,
+        "lon": -77.1077973
+      },
+      {
+        "nombre": "PAMER",
+        "lat": -12.0794409,
+        "lon": -77.1041442
+      },
+      {
+        "nombre": "Institución Educativa Santo Toribio De Mogrovejo",
+        "lat": -12.0749046,
+        "lon": -77.1021
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [],
+    "seguridad": []
+  },
+  "Comas": {
+    "parques": [
+      {
+        "nombre": "Parque Central",
+        "lat": -11.9365025,
+        "lon": -77.0624708
+      },
+      {
+        "nombre": "Parque Jorge Chávez",
+        "lat": -11.9599658,
+        "lon": -77.054898
+      },
+      {
+        "nombre": "Parque laboral Perú China",
+        "lat": -11.9567626,
+        "lon": -77.0387589
+      },
+      {
+        "nombre": "Parque La Juventud",
+        "lat": -11.9579183,
+        "lon": -77.0545843
+      },
+      {
+        "nombre": "Infantas",
+        "lat": -11.9489821,
+        "lon": -77.0641162
+      },
+      {
+        "nombre": "El Carmen",
+        "lat": -11.9461949,
+        "lon": -77.051052
+      },
+      {
+        "nombre": "Año Nuevo",
+        "lat": -11.916913,
+        "lon": -77.040897
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Estación 22 de Agosto",
+        "lat": -11.9469984,
+        "lon": -77.0605316
+      },
+      {
+        "nombre": "Estación de Biblioteca Pública \"Ricardo Palma Soriano\"",
+        "lat": -11.9437695,
+        "lon": -77.0488445
+      },
+      {
+        "nombre": "Estación Andrés Belaunde",
+        "lat": -11.9355628,
+        "lon": -77.0566824
+      },
+      {
+        "nombre": "Estación Las Vegas",
+        "lat": -11.9548804,
+        "lon": -77.059926
+      },
+      {
+        "nombre": "Estación Los Incas",
+        "lat": -11.9158536,
+        "lon": -77.0482698
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "Hospital Nacional Sergio E. Bernales",
+        "lat": -11.9141137,
+        "lon": -77.0375129
+      },
+      {
+        "nombre": "Hospital Marino Molina Scippa",
+        "lat": -11.9431531,
+        "lon": -77.0571865
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Institución Educativa Colegio Mayor Sistema San Marcos",
+        "lat": -11.9537066,
+        "lon": -77.0700007
+      },
+      {
+        "nombre": "Institución Educativa 3047 República de Canadá",
+        "lat": -11.9588382,
+        "lon": -77.0405278
+      },
+      {
+        "nombre": "Institución Educativa 2086 Peru Holanda",
+        "lat": -11.9163585,
+        "lon": -77.0349637
+      },
+      {
+        "nombre": "Institución Educativa Fe y Alegría 10",
+        "lat": -11.9169428,
+        "lon": -77.0403718
+      },
+      {
+        "nombre": "Institución Educativa Fe y Alegría 08",
+        "lat": -11.9204698,
+        "lon": -77.0383155
+      },
+      {
+        "nombre": "Institución Educativa Innova Schools",
+        "lat": -11.9321078,
+        "lon": -77.0603422
+      },
+      {
+        "nombre": "Institución Educativa Maria Reina Del Carmelo",
+        "lat": -11.9166067,
+        "lon": -77.0551317
+      },
+      {
+        "nombre": "Institución Educativa Madre Teresa De La Cruz",
+        "lat": -11.9312527,
+        "lon": -77.0576534
+      },
+      {
+        "nombre": "Institución Educativa Nuestra Patrona De Las Mercedes",
+        "lat": -11.9495832,
+        "lon": -77.0490336
+      },
+      {
+        "nombre": "Institución Educativa Santa Ursula De Las Vegas",
+        "lat": -11.9542236,
+        "lon": -77.063808
+      },
+      {
+        "nombre": "Institución Educativa Ebenezer",
+        "lat": -11.9404381,
+        "lon": -77.0607946
+      },
+      {
+        "nombre": "Institución Educativa Jose Carlos Mariategui",
+        "lat": -11.9261816,
+        "lon": -77.0550054
+      },
+      {
+        "nombre": "Institución Educativa Jesus El Maestro",
+        "lat": -11.9162092,
+        "lon": -77.031402
+      },
+      {
+        "nombre": "Institución Educativa Caminito Del Saber",
+        "lat": -11.9260236,
+        "lon": -77.053502
+      },
+      {
+        "nombre": "Institución Educativa Mario Vargas Llosa",
+        "lat": -11.9245882,
+        "lon": -77.053604
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Real Plaza Pro",
+        "lat": -11.9400983,
+        "lon": -77.0697536
+      },
+      {
+        "nombre": "Centro Comercial Santa Luisa",
+        "lat": -11.9468122,
+        "lon": -77.0665877
+      },
+      {
+        "nombre": "Complejo Comercial Mayorista Unicachi",
+        "lat": -11.9391518,
+        "lon": -77.0662456
+      },
+      {
+        "nombre": "Mall Plaza Comas",
+        "lat": -11.9363406,
+        "lon": -77.065452
+      },
+      {
+        "nombre": "3840",
+        "lat": -11.9332703,
+        "lon": -77.0454239
+      },
+      {
+        "nombre": "Honduras Center",
+        "lat": -11.9521518,
+        "lon": -77.053531
+      },
+      {
+        "nombre": "Minimarket La Alborada",
+        "lat": -11.9115115,
+        "lon": -77.0462675
+      },
+      {
+        "nombre": "Rivera",
+        "lat": -11.9392427,
+        "lon": -77.066564
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP Túpac Amaru",
+        "lat": -11.9552328,
+        "lon": -77.052566
+      },
+      {
+        "nombre": "Comisaría PNP Santa Luzmila",
+        "lat": -11.9443417,
+        "lon": -77.0662999
+      },
+      {
+        "nombre": "Comisaría PNP La Pascana",
+        "lat": -11.9349513,
+        "lon": -77.0458435
+      },
+      {
+        "nombre": "Comisaría PNP Universitaria",
+        "lat": -11.9474723,
+        "lon": -77.0599981
+      }
+    ]
+  },
+  "Carabayllo": {
+    "parques": [
+      {
+        "nombre": "Parque Amautas",
+        "lat": -11.8921016,
+        "lon": -77.0433357
+      },
+      {
+        "nombre": "Parque Ramón Castilla",
+        "lat": -11.9008391,
+        "lon": -77.0361293
+      },
+      {
+        "nombre": "Parque La Flor",
+        "lat": -11.8960486,
+        "lon": -77.0277765
+      },
+      {
+        "nombre": "Club Metropolitano Manco Cápac",
+        "lat": -11.8881177,
+        "lon": -77.0259768
+      },
+      {
+        "nombre": "San Pedro de Carabayllo",
+        "lat": -11.8536787,
+        "lon": -77.0369805
+      },
+      {
+        "nombre": "Santo Domingo",
+        "lat": -11.8747433,
+        "lon": -77.0252785
+      },
+      {
+        "nombre": "Raúl Porras Barrenechea",
+        "lat": -11.8948367,
+        "lon": -77.0264372
+      },
+      {
+        "nombre": "El Progreso",
+        "lat": -11.8731947,
+        "lon": -77.0250161
+      },
+      {
+        "nombre": "San Antonio",
+        "lat": -11.8668388,
+        "lon": -77.0399096
+      }
+    ],
+    "transporte": [
+      {
+        "nombre": "Taxi Estación",
+        "lat": -11.8913064,
+        "lon": -77.0271922
+      },
+      {
+        "nombre": "Estación Chimpu Ocllo",
+        "lat": -11.8969464,
+        "lon": -77.0376941
+      }
+    ],
+    "salud": [
+      {
+        "nombre": "SISOL Salud Carabayllo",
+        "lat": -11.9012598,
+        "lon": -77.034356
+      },
+      {
+        "nombre": "Posta Médica Los Geranios",
+        "lat": -11.8960439,
+        "lon": -77.0434252
+      }
+    ],
+    "educacion_colegios": [
+      {
+        "nombre": "Institución Educativa Raúl Porras Barrenechea",
+        "lat": -11.8931831,
+        "lon": -77.0242869
+      },
+      {
+        "nombre": "Institución Educativa 3058 Virgen de Fátima",
+        "lat": -11.8927277,
+        "lon": -77.0239751
+      },
+      {
+        "nombre": "Institución Educativa Inicial Nº 882",
+        "lat": -11.8887169,
+        "lon": -77.0193986
+      },
+      {
+        "nombre": "Institución Educativa Nº 2080 Andrés Bello",
+        "lat": -11.8867396,
+        "lon": -77.0226811
+      },
+      {
+        "nombre": "Institución Educativa 3054 La Flor",
+        "lat": -11.8956754,
+        "lon": -77.027221
+      },
+      {
+        "nombre": "Institución Educativa San Sebastián de Lima Norte",
+        "lat": -11.8932992,
+        "lon": -77.0260507
+      },
+      {
+        "nombre": "Institución Educativa Ana Maria Kan",
+        "lat": -11.8763554,
+        "lon": -77.0177839
+      },
+      {
+        "nombre": "Institución Educativa Leonard Euler",
+        "lat": -11.868179,
+        "lon": -77.0167
+      },
+      {
+        "nombre": "Institución Educativa Luis Agassiz",
+        "lat": -11.8751941,
+        "lon": -77.0231859
+      },
+      {
+        "nombre": "Institución Educativa Neumann School",
+        "lat": -11.8671171,
+        "lon": -77.0194993
+      },
+      {
+        "nombre": "Institución Educativa Nuestra Señora De Copacabana",
+        "lat": -11.874321,
+        "lon": -77.0182194
+      },
+      {
+        "nombre": "Institución Educativa Magister",
+        "lat": -11.868821,
+        "lon": -77.0165013
+      },
+      {
+        "nombre": "Institución Educativa Hispano Americano Trini",
+        "lat": -11.8637622,
+        "lon": -77.0282262
+      },
+      {
+        "nombre": "Institución Educativa Ingenieria De Carabayllo",
+        "lat": -11.8972882,
+        "lon": -77.0300987
+      },
+      {
+        "nombre": "Institución Educativa Francisco De Asis",
+        "lat": -11.8927118,
+        "lon": -77.022002
+      }
+    ],
+    "universidades": [
+      {
+        "nombre": "Universidad Nacional Federico Villarreal",
+        "lat": -12.0424076,
+        "lon": -76.9908982,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Ricardo Palma",
+        "lat": -12.1322779,
+        "lon": -76.9800955,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Escuela Nacional de Bellas Artes",
+        "lat": -12.0466398,
+        "lon": -77.0238535,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Juan Bautista",
+        "lat": -12.1965193,
+        "lon": -77.0069315,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Pontificia Universidad Católica del Perú",
+        "lat": -12.0691658,
+        "lon": -77.0799348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Santo Domingo de Guzmán",
+        "lat": -11.9114939,
+        "lon": -76.9830248,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Inca Garcilaso de la Vega",
+        "lat": -12.0747658,
+        "lon": -77.0550649,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Alas Peruanas",
+        "lat": -12.2383914,
+        "lon": -76.8624348,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Peruana de Ciencias Aplicadas",
+        "lat": -12.1975896,
+        "lon": -77.0082777,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad San Ignacio de Loyola",
+        "lat": -12.2361326,
+        "lon": -76.8669342,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte - Filial Comas",
+        "lat": -11.9344299,
+        "lon": -77.0584881,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Privada del Norte Lima Norte",
+        "lat": -11.9595307,
+        "lon": -77.0677791,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Humanidades",
+        "lat": -11.9609957,
+        "lon": -77.065308,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad de Ciencias y Artes de América Latina",
+        "lat": -12.0855677,
+        "lon": -76.9086341,
+        "tipo": "Universidad"
+      },
+      {
+        "nombre": "Universidad Nacional Mayor de San Marcos",
+        "lat": -12.0581921,
+        "lon": -77.0189182,
+        "tipo": "Universidad"
+      }
+    ],
+    "centros_comerciales": [
+      {
+        "nombre": "Galería Comercial El Zapatón",
+        "lat": -11.8565909,
+        "lon": -77.039217
+      },
+      {
+        "nombre": "Galería Comercial Mega San Felipe",
+        "lat": -11.8997587,
+        "lon": -77.0387886
+      },
+      {
+        "nombre": "Mercado Lucho",
+        "lat": -11.8551087,
+        "lon": -77.0375936
+      }
+    ],
+    "seguridad": [
+      {
+        "nombre": "Comisaría PNP Santa Isabel",
+        "lat": -11.9017948,
+        "lon": -77.0323368
+      },
+      {
+        "nombre": "Comisaría PNP El Progreso",
+        "lat": -11.8746384,
+        "lon": -77.0157896
+      },
+      {
+        "nombre": "Comisaría PNP Carabayllo",
+        "lat": -11.8540427,
+        "lon": -77.0377817
+      }
+    ]
+  }
+}

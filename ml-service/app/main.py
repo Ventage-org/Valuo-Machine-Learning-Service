@@ -34,8 +34,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 if hasattr(sys.stdout, "reconfigure"):
     try:
-        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
     except Exception:
         pass
 
@@ -44,6 +44,7 @@ load_dotenv(find_dotenv(usecwd=True))
 load_dotenv()
 
 from app.core.model_loader import cargar_modelo, liberar_recursos, model_state
+from app.services.comparables_service import comparables_service
 from app.routers import configuracion as configuracion_router
 from app.routers import entrenamiento as entrenamiento_router
 from app.routers import health as health_router
@@ -51,6 +52,7 @@ from app.routers import modelos as modelos_router
 from app.routers import monitoreo as monitoreo_router
 from app.routers import prediccion as prediccion_router
 from app.routers import sensibilidad as sensibilidad_router
+from app.routers import mercado as mercado_router
 
 
 
@@ -62,20 +64,26 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     Startup: carga modelo, SHAP explainer y data provider.
     Shutdown: libera recursos.
     """
-    print("\n" + "=" * 55)
-    print("  ML Service - Tasacion Inmobiliaria Lima")
-    print("  Iniciando carga de artefactos ...")
-    print("=" * 55)
+    print("\n" + "=" * 55, flush=True)
+    print("  ML Service - Tasacion Inmobiliaria Lima", flush=True)
+    print("  Iniciando carga de artefactos ...", flush=True)
+    print("=" * 55, flush=True)
 
-    cargar_modelo(model_state)
+    listo = cargar_modelo(model_state, esperar_mlflow=True)
+    comparables_service.cargar_datos()
 
-    print("=" * 55)
-    print("  Servicio listo. Accede a /docs para la API.")
-    print("=" * 55 + "\n")
+    print("=" * 55, flush=True)
+    if listo:
+        print("  Servicio 100% operativo. Modelos en RAM listos.", flush=True)
+    else:
+        print("  Servicio activo en modo Standby / Recuperación.", flush=True)
+        print("  Los modelos se sincronizarán on-demand con MLflow.", flush=True)
+    print("  Accede a /docs para la API.", flush=True)
+    print("=" * 55 + "\n", flush=True)
 
     yield  # ← El servidor está activo aquí
 
-    print("\n[ML Service] Cerrando servicio ...")
+    print("\n[ML Service] Cerrando servicio ...", flush=True)
     liberar_recursos(model_state)
 
 
@@ -135,3 +143,4 @@ app.include_router(modelos_router.router)
 app.include_router(monitoreo_router.router)
 app.include_router(configuracion_router.router)
 app.include_router(sensibilidad_router.router)
+app.include_router(mercado_router.router)

@@ -10,3 +10,8 @@ env/
 *.log
 scratch/
 .pytest_cache/
+
+# Excluir binarios pesados de modelos para mantener la imagen ligera
+models/*.pkl
+models/*.joblib
+models/*.bin

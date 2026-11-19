@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING, Literal
 
 import mlflow
 import mlflow.xgboost
+from mlflow.entities.model_registry import ModelVersion
 import shap
 from fastapi import HTTPException, status
 
@@ -28,6 +29,7 @@ from app.schemas.modelos import (
     BenchmarkResponse,
     ComparativaCandidato,
     DeltaMetricas,
+    DescartarModeloResponse,
     HistorialModelosResponse,
     MetricasModelo,
     PromoverModeloResponse,
@@ -60,10 +62,12 @@ def _build_version_info(
     run_id: str | None = None,
     tags: dict[str, str] | None = None,
     created_at_timestamp: int | float | None = None,
+    aliases: list[str] | None = None,
 ) -> VersionModeloInfo:
     """Construye un VersionModeloInfo consultando las métricas del run en MLflow."""
     metricas = MetricasModelo()
     tags_dict = tags or {}
+    aliases_list = list(aliases) if aliases else []
 
     if run_id and mlflow_manager.check_connection():
         try:
@@ -74,6 +78,10 @@ def _build_version_info(
                 r2=m.get("r2"),
                 mae=m.get("mae"),
                 rmse=m.get("rmse"),
+                cod_iaao=m.get("cod_pct") or m.get("cod_iaao"),
+                cov_iaao=m.get("cov_pct") or m.get("cov_iaao"),
+                prd_iaao=m.get("prd") or m.get("prd_iaao"),
+                prb_iaao=m.get("prb") or m.get("prb_iaao"),
                 n_train=int(m.get("n_train")) if "n_train" in m else None,
                 n_test=int(m.get("n_test")) if "n_test" in m else None,
             )
@@ -90,13 +98,23 @@ def _build_version_info(
         except Exception:
             pass
 
+    # Normalización exhaustiva de Stage
+    stage_str = str(stage).strip() if stage is not None else ""
+    if "champion" in aliases_list or stage_str.lower() in ("production", "prod") or tags_dict.get("estado_gobernanza") == "production":
+        stage_final = "Production"
+    elif stage_str.lower() in ("archived", "archivado") or tags_dict.get("estado_gobernanza") in ("archived", "discarded"):
+        stage_final = "Archived"
+    else:
+        stage_final = "Candidate"
+
     return VersionModeloInfo(
         nombre_modelo=model_name,
         version=str(version),
-        stage=stage,
+        stage=stage_final,
         run_id=run_id,
         metricas=metricas,
         tags=tags_dict,
+        aliases=aliases_list,
         creado_en=creado_en,
         fuente_artefacto=f"models:/{model_name}/{version}",
     )
@@ -128,6 +146,7 @@ def obtener_benchmark(
                 run_id=prod_ver.run_id,
                 tags=getattr(prod_ver, "tags", {}),
                 created_at_timestamp=getattr(prod_ver, "creation_timestamp", None),
+                aliases=getattr(prod_ver, "aliases", []),
             )
 
     # Si MLflow no tiene aún una versión en Production, usar la configuración activa en memoria
@@ -143,6 +162,10 @@ def obtener_benchmark(
                 r2=cfg.get("r2_test"),
                 mae=cfg.get("mae_test"),
                 rmse=cfg.get("rmse_test"),
+                cod_iaao=cfg.get("cod_iaao", cfg.get("iaao", {}).get("cod_pct")),
+                cov_iaao=cfg.get("cov_iaao", cfg.get("iaao", {}).get("cov_pct")),
+                prd_iaao=cfg.get("prd_iaao", cfg.get("iaao", {}).get("prd")),
+                prb_iaao=cfg.get("prb_iaao", cfg.get("iaao", {}).get("prb")),
             ),
             tags={"fuente": "config_local"},
             fuente_artefacto="memoria_activa",
@@ -152,7 +175,7 @@ def obtener_benchmark(
     candidatos_evaluados: list[ComparativaCandidato] = []
 
     if mlflow_manager.check_connection():
-        candidates: list[Any] = []
+        candidates: list[ModelVersion] = []
         if version_candidato:
             specific_ver = mlflow_manager.get_model_version(model_name, version_candidato)
             if specific_ver:
@@ -169,6 +192,7 @@ def obtener_benchmark(
                 run_id=cand_ver.run_id,
                 tags=getattr(cand_ver, "tags", {}),
                 created_at_timestamp=getattr(cand_ver, "creation_timestamp", None),
+                aliases=getattr(cand_ver, "aliases", []),
             )
 
             # Calcular deltas frente a Producción
@@ -268,6 +292,7 @@ def obtener_historial_versiones(
             run_id=v.run_id,
             tags=getattr(v, "tags", {}),
             created_at_timestamp=getattr(v, "creation_timestamp", None),
+            aliases=getattr(v, "aliases", []),
         )
         for v in all_versions
     ]
@@ -355,15 +380,49 @@ def promover_modelo_a_produccion(
         )
 
     # 2. Descargar y Cargar en RAM
-    model_uri = f"models:/{model_name}/{version_str}"
-    print(f"[ModelRegistryService] Cargando modelo en RAM desde {model_uri}...")
+    target_run = ver_nueva.run_id if 'ver_nueva' in locals() and ver_nueva else None
+    if not target_run:
+        try:
+            v_obj = mlflow_manager.get_model_version(model_name, version_str)
+            target_run = v_obj.run_id if v_obj else None
+        except Exception:
+            pass
+
+    nuevo_modelo = None
+    # Prioridad 1: Descarga ultrarrápida vía HTTP proxy de MLflow (sin depender de Azure Credentials en el cliente)
+    if target_run:
+        from app.core.model_loader import _descargar_modelo_mlflow_http
+        print(f"[ModelRegistryService] Descargando modelo v{version_str} vía proxy HTTP de MLflow (run_id: {target_run})...")
+        nuevo_modelo = _descargar_modelo_mlflow_http(mlflow_manager.tracking_uri, target_run)
+
+    # Prioridad 2: Carga nativa mlflow.load_model si falla el proxy
+    if nuevo_modelo is None:
+        try:
+            model_uri = f"models:/{model_name}/{version_str}"
+            print(f"[ModelRegistryService] Intentando carga nativa desde {model_uri}...")
+            nuevo_modelo = mlflow.xgboost.load_model(model_uri)
+        except Exception as e_load:
+            print(f"[ModelRegistryService] Fallo carga nativa: {e_load}")
+
+    if nuevo_modelo is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": "error_carga_ram",
+                "message": f"El modelo se promovió en MLflow pero falló al cargarse en RAM.",
+            },
+        )
 
     try:
-        nuevo_modelo = mlflow.xgboost.load_model(model_uri)
         print("[ModelRegistryService] Construyendo SHAP TreeExplainer en RAM...")
         nuevo_explainer = shap.TreeExplainer(nuevo_modelo)
 
         # 3. Hot-reload atómico en memoria
+        import json
+        from app.core.model_loader import _resolver_ruta
+        config_path_env = os.getenv("CONFIG_PATH" if tipo_operacion == "venta" else "CONFIG_ALQUILER_PATH")
+        config_path = _resolver_ruta(config_path_env or f"config/model_{'alquiler_' if tipo_operacion == 'alquiler' else ''}config.json")
+
         if tipo_operacion == "venta":
             state.modelo = nuevo_modelo
             state.explainer = nuevo_explainer
@@ -371,6 +430,7 @@ def promover_modelo_a_produccion(
                 state.feature_cols = list(nuevo_modelo.feature_names_in_)
             state.config["modelo_version"] = f"v{version_str}_mlflow"
             state.config["promoted_at"] = datetime.now(timezone.utc).isoformat()
+            cfg_to_persist = dict(state.config)
         else:
             state.modelo_alquiler = nuevo_modelo
             state.explainer_alquiler = nuevo_explainer
@@ -378,6 +438,25 @@ def promover_modelo_a_produccion(
                 state.feature_cols_alquiler = list(nuevo_modelo.feature_names_in_)
             state.config_alquiler["modelo_version"] = f"v{version_str}_mlflow"
             state.config_alquiler["promoted_at"] = datetime.now(timezone.utc).isoformat()
+            cfg_to_persist = dict(state.config_alquiler)
+
+        try:
+            if os.path.exists(config_path):
+                with open(config_path, "w", encoding="utf-8") as fp:
+                    json.dump(cfg_to_persist, fp, indent=2, ensure_ascii=False)
+        except Exception as e_cfg:
+            print(f"[ModelRegistryService] Advertencia al persistir config: {e_cfg}")
+
+        # Sincronizar gobernanza en jobs de entrenamiento
+        try:
+            from app.services.entrenamiento_service import actualizar_estado_gobernanza_job
+            actualizar_estado_gobernanza_job(
+                tipo_operacion=tipo_operacion,
+                version_promovida=version_str,
+                version_anterior=ver_anterior_str,
+            )
+        except Exception as e_sync:
+            print(f"[ModelRegistryService] Advertencia al sincronizar estado_gobernanza_job: {e_sync}")
 
         print(f"[ModelRegistryService] [OK] Hot-Reload completado en RAM para {tipo_operacion} (versión {version_str}).")
 
@@ -397,6 +476,7 @@ def promover_modelo_a_produccion(
         version=version_str,
         stage="Production",
         run_id=ver_nueva.run_id if ver_nueva else None,
+        aliases=["champion"],
     ) if ver_nueva else None
 
     deltas = None
@@ -470,4 +550,125 @@ def ejecutar_rollback(
         version=target_version,
         motivo=motivo_final,
         state=state,
+    )
+
+
+def descartar_modelo_candidato(
+    tipo_operacion: Literal["venta", "alquiler"],
+    version: str | int | None,
+    motivo: str,
+) -> DescartarModeloResponse:
+    """
+    Descarta y archiva un modelo candidato en MLflow Model Registry:
+    1. Verifica que la versión objetivo exista y no sea la versión activa en Producción.
+    2. Transiciona su stage a 'Archived' en MLflow y estampa tags de auditoría.
+    3. Sincroniza el estado en el registro en caliente de jobs si aplica.
+    """
+    model_name = _get_model_name(tipo_operacion)
+
+    if not mlflow_manager.check_connection():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                "error": "mlflow_no_disponible",
+                "message": "El servidor MLflow no está accesible para procesar el descarte.",
+            },
+        )
+
+    # Sanitizar versión
+    target_version: str | None = None
+    if version is not None:
+        v_raw = str(version).strip()
+        m = re.search(r"\d+", v_raw)
+        if m:
+            target_version = m.group(0)
+
+    # Si no se pasó versión específica, buscar el candidato activo más reciente
+    if not target_version:
+        candidates = mlflow_manager.get_latest_candidate_versions(model_name, limit=1)
+        if not candidates:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "error": "sin_candidatos",
+                    "message": f"No se encontró ninguna versión candidata activa para descartar en '{model_name}'.",
+                },
+            )
+        target_version = str(candidates[0].version)
+
+    # Verificar existencia de la versión en MLflow
+    v_obj = mlflow_manager.get_model_version(model_name, target_version)
+    if not v_obj:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "error": "version_no_encontrada",
+                "message": f"La versión {target_version} de '{model_name}' no existe en el Model Registry.",
+            },
+        )
+
+    # Proteger contra el descarte accidental del modelo en Producción
+    is_prod = (
+        v_obj.current_stage == "Production"
+        or "champion" in getattr(v_obj, "aliases", [])
+        or getattr(v_obj, "tags", {}).get("estado_gobernanza") == "production"
+    )
+    if is_prod:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error": "modelo_en_produccion",
+                "message": (
+                    f"La versión {target_version} de '{model_name}' está actualmente en PRODUCCIÓN. "
+                    "No se puede descartar directamente. Promueva otra versión o ejecute un rollback primero."
+                ),
+            },
+        )
+
+    # 1. Transicionar y archivar en MLflow
+    try:
+        mlflow_manager.discard_candidate_version(
+            model_name=model_name,
+            version=target_version,
+            motivo=motivo,
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error": "error_descarte_mlflow",
+                "message": f"No se pudo archivar la versión {target_version} en MLflow: {e}",
+            },
+        )
+
+    # 2. Sincronizar en el registro de jobs
+    try:
+        from app.services.entrenamiento_service import descartar_estado_gobernanza_job
+        descartar_estado_gobernanza_job(
+            tipo_operacion=tipo_operacion,
+            version_descartada=target_version,
+            motivo=motivo,
+        )
+    except Exception as e_sync:
+        print(f"[ModelRegistryService] Advertencia al sincronizar descarte en jobs: {e_sync}")
+
+    # 3. Obtener métricas históricas de la versión descartada para trazabilidad
+    info_descartada = _build_version_info(
+        model_name=model_name,
+        version=target_version,
+        stage="Archived",
+        run_id=v_obj.run_id,
+        tags=getattr(v_obj, "tags", {}),
+    )
+
+    print(f"[ModelRegistryService] [OK] Modelo {model_name} v{target_version} descartado y archivado.")
+
+    return DescartarModeloResponse(
+        exito=True,
+        mensaje=f"Modelo candidato {model_name} v{target_version} descartado y archivado exitosamente.",
+        tipo_operacion=tipo_operacion,
+        version_descartada=target_version,
+        nuevo_stage="Archived",
+        motivo=motivo,
+        metricas=info_descartada.metricas if info_descartada else None,
     )

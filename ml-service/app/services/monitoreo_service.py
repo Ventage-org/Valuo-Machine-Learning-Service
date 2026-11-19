@@ -223,7 +223,11 @@ def obtener_fluctuacion_temporal(
     threshold = 15.0 if tipo_operacion == "venta" else 17.89
 
     from app.core.db_provider import PostgreSQLTrainingProvider
-    from app.services.entrenamiento_service import _construir_features, _target_encoding_distrito
+    from app.services.entrenamiento_service import (
+        _calcular_metricas_iaao,
+        _construir_features,
+        _target_encoding_distrito,
+    )
 
     provider = PostgreSQLTrainingProvider()
     if tipo_operacion == "venta":
@@ -298,6 +302,9 @@ def obtener_fluctuacion_temporal(
         m_pct = round(float(grp["abs_pct_err"].mean()), 2)
         mae_v = round(float(grp["abs_err"].mean()), 2)
         n_cnt = int(len(grp))
+
+        iaao_grp = _calcular_metricas_iaao(grp["target_real"].values, grp["y_pred"].values)
+
         puntos.append(
             PuntoFluctuacionTemporal(
                 period=str(periodo),
@@ -306,6 +313,12 @@ def obtener_fluctuacion_temporal(
                 upper_threshold_mape=threshold,
                 sample_count=n_cnt,
                 exceeds_threshold=(m_pct > threshold),
+                cod_iaao=iaao_grp["cod_pct"],
+                prd_iaao=iaao_grp["prd"],
+                prb_iaao=iaao_grp["prb"],
+                median_ratio=iaao_grp["median_ratio"],
+                cumple_iaao_cod=iaao_grp["cumple_iaao_cod"],
+                cumple_iaao_prd=iaao_grp["cumple_iaao_prd"],
             )
         )
 
@@ -314,12 +327,19 @@ def obtener_fluctuacion_temporal(
     avg_mape = round(float(df_test["abs_pct_err"].mean()), 2)
     avg_mae  = round(float(df_test["abs_err"].mean()), 2)
 
+    iaao_global = _calcular_metricas_iaao(df_test["target_real"].values, df_test["y_pred"].values)
+
     resp = FluctuacionTemporalResponse(
         operation_type=tipo_operacion,
         threshold_mape=threshold,
         time_series=puntos,
         average_mape=avg_mape,
         average_mae=avg_mae,
+        global_cod_iaao=iaao_global["cod_pct"],
+        global_prd_iaao=iaao_global["prd"],
+        global_prb_iaao=iaao_global["prb"],
+        global_median_ratio=iaao_global["median_ratio"],
+        cumple_norma_iaao=bool(iaao_global["cumple_iaao_cod"] and iaao_global["cumple_iaao_prd"]),
         total_evaluated_samples=len(df_test),
         generated_at=datetime.now(timezone.utc),
     )
@@ -343,9 +363,9 @@ def medir_latencia_p95(
     if tipo_operacion == "venta":
         modelo = state.modelo
         version = state.config.get("modelo_version", "v2")
-        pkl_name = state.config.get("modelo_archivo", "xgboost_venta_v2.pkl")
-        params_file = "models/xgboost_venta_v2_params.json"
-        metricas_file = "models/xgboost_venta_v2_metricas.json"
+        pkl_name = state.config.get("modelo_archivo", "xgboost_venta_v1.pkl")
+        params_file = "models/xgboost_venta_v1_params.json"
+        metricas_file = "models/xgboost_venta_v1_metricas.json"
         config_file = "config/model_config.json"
     else:
         modelo = state.modelo_alquiler
@@ -360,7 +380,7 @@ def medir_latencia_p95(
     pkl_path = os.path.join(models_dir, pkl_name)
 
     artifacts = {
-        "model_pkl": os.path.exists(pkl_path),
+        "model_pkl": (modelo is not None) or os.path.exists(pkl_path),
         "params_json": os.path.exists(params_file),
         "metrics_json": os.path.exists(metricas_file),
         "model_config_json": os.path.exists(config_file),

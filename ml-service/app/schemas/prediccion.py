@@ -194,11 +194,114 @@ class Explicabilidad(BaseModel):
     )
 
 
+class DiferenciasInmueble(BaseModel):
+    """Diferencias físicas directas entre el testigo y el inmueble evaluado (testigo - target)."""
+    dif_superficie_m2: float = Field(
+        description="Diferencia de superficie en m² respecto al inmueble tasado."
+    )
+    dif_habitaciones: int = Field(
+        description="Diferencia de habitaciones respecto al inmueble tasado."
+    )
+    dif_banios: float = Field(
+        description="Diferencia de baños respecto al inmueble tasado."
+    )
+    dif_antiguedad_anios: int = Field(
+        description="Diferencia de antigüedad en años respecto al inmueble tasado."
+    )
+    dif_piso: int = Field(
+        description="Diferencia de piso respecto al inmueble tasado."
+    )
+
+
+class MuestraComparable(BaseModel):
+    """
+    Muestra de mercado comparable explícita para sustento de tasación (Regla de las 3 muestras del RNTP - Art. 3).
+    """
+    posicion: int = Field(
+        description="Posición ordinal según proximidad física y metodológica (1 = más semejante)."
+    )
+    distrito: str = Field(
+        description="Distrito donde se ubica el inmueble testigo de mercado."
+    )
+    es_mismo_distrito: bool = Field(
+        default=True,
+        description="True si el testigo pertenece al mismo distrito que el inmueble tasado."
+    )
+    zona_homogenea: str = Field(
+        description="Zona homogénea o estrato socioeconómico de Lima (ej: LIMA_TOP, LIMA_MODERNA)."
+    )
+    superficie_m2: float = Field(
+        description="Superficie total en m² del inmueble testigo."
+    )
+    habitaciones: int = Field(
+        description="Número de habitaciones/dormitorios."
+    )
+    banios: float = Field(
+        description="Número de baños."
+    )
+    garajes: int = Field(
+        description="Número de cocheras/estacionamientos."
+    )
+    piso: int = Field(
+        description="Piso en el que se ubica el testigo."
+    )
+    antiguedad_anios: int = Field(
+        description="Antigüedad del inmueble testigo en años."
+    )
+    precio_total_pen: float = Field(
+        description="Precio de venta o canon de alquiler mensual en Soles (PEN) actualizado por IPC."
+    )
+    precio_m2_pen: float = Field(
+        description="Precio de venta o alquiler mensual por m² en Soles (PEN)."
+    )
+    periodo_muestra: str = Field(
+        description="Año y trimestre en que se registró la muestra (ej: '2025-Q2')."
+    )
+    indice_similitud_pct: float = Field(
+        description="Porcentaje de similitud física multidimensional respecto al inmueble objetivo (0% a 100%)."
+    )
+    diferencias: DiferenciasInmueble = Field(
+        description="Diferencias físicas detalladas respecto al inmueble valuado."
+    )
+
+
+class ResumenComparablesRNTP(BaseModel):
+    """Resumen estadístico de las 3 muestras comparables conforme al RNTP."""
+    cantidad_muestras: int = Field(
+        description="Cantidad de muestras comparables obtenidas (mínimo 3 según RNTP Art. 3)."
+    )
+    precio_promedio_pen: float = Field(
+        description="Precio o renta mensual promedio de los testigos comparables en Soles."
+    )
+    precio_m2_promedio_pen: float = Field(
+        description="Precio o renta promedio por m² de los testigos comparables en Soles."
+    )
+    desviacion_vs_prediccion_pct: float = Field(
+        description="Diferencia porcentual entre el valor predicho por el modelo y el promedio de los testigos de mercado."
+    )
+    cumple_regla_tres_muestras: bool = Field(
+        default=True,
+        description="True si se encontraron las 3 muestras de mercado exigidas por la normativa."
+    )
+    criterio_busqueda: str = Field(
+        default="Mismo distrito",
+        description="Criterio metodológico aplicado: 'Mismo distrito' o 'Zona homogénea (NSE)'."
+    )
+    advertencia: str | None = Field(
+        default=None,
+        description="Advertencia en caso de baja densidad muestral o fallback zonal."
+    )
+
+
 class InfoModelo(BaseModel):
     """Metadata del modelo incluida en cada response."""
     version: str
     mape_test: float
     r2_test: float
+    cod_iaao: float | None = Field(default=None, description="Coeficiente de Dispersión IAAO (%)")
+    cov_iaao: float | None = Field(default=None, description="Coeficiente de Variación IAAO (%)")
+    prd_iaao: float | None = Field(default=None, description="Price-Related Differential IAAO")
+    prb_iaao: float | None = Field(default=None, description="Price-Related Bias IAAO")
     ipc_factor: float
     periodo_ipc: str
     train_periodo: str
@@ -209,8 +312,9 @@ class InfoModelo(BaseModel):
 
 class PrediccionVentaResponse(BaseModel):
     """
-    Respuesta completa del endpoint de predicción de venta.
-    Incluye precio, intervalo de confianza, explicabilidad SHAP y metadata del modelo.
+    Respuesta completa del endpoint de predicción de venta o alquiler.
+    Incluye precio, intervalo de confianza, explicabilidad SHAP, metadata del modelo,
+    alerta de contexto distrital y 3 muestras comparables normativas RNTP.
     """
     distrito: str
     superficie_m2: float
@@ -218,6 +322,18 @@ class PrediccionVentaResponse(BaseModel):
     intervalo_confianza: IntervaloConfianza
     explicabilidad: Explicabilidad
     modelo: InfoModelo
+    alerta_contexto: str | None = Field(
+        default=None,
+        description="Aviso metodológico cuando la información socioeconómica del distrito proviene de estimación imputada (muestra ENAHO reducida).",
+    )
+    comparables_rntp: list[MuestraComparable] = Field(
+        default_factory=list,
+        description="Tres muestras de mercado comparables para sustento de la tasación (RNTP Art. 3).",
+    )
+    resumen_rntp: ResumenComparablesRNTP | None = Field(
+        default=None,
+        description="Resumen estadístico de las muestras comparables y desviación respecto al valor predicho.",
+    )
 
     model_config = {"json_schema_extra": {
         "example": {
@@ -245,6 +361,8 @@ class PrediccionVentaResponse(BaseModel):
                         "shap_value": 0.312,
                         "valor_feature": 75.0,
                         "impacto": "positivo",
+                        "peso_porcentaje": 32.4,
+                        "nivel_impacto": "Impacto Muy Alto",
                     },
                     {
                         "feature": "distrito_encoded",
@@ -252,20 +370,57 @@ class PrediccionVentaResponse(BaseModel):
                         "shap_value": -0.198,
                         "valor_feature": 287982.23,
                         "impacto": "negativo",
+                        "peso_porcentaje": 20.6,
+                        "nivel_impacto": "Impacto Alto",
                     },
                 ],
-                "n_features_mostradas": 10,
+                "n_features_mostradas": 29,
                 "n_features_total": 33,
                 "nota": "Los shap_values están en escala logarítmica.",
             },
             "modelo": {
                 "version": "v2",
-                "mape_test": 15.04,
-                "r2_test": 0.7469,
+                "mape_test": 14.86,
+                "r2_test": 0.7477,
                 "ipc_factor": 169.18,
                 "periodo_ipc": "2026-Q1",
                 "train_periodo": "2016-2023",
                 "test_periodo": "2024-2025",
+            },
+            "alerta_contexto": None,
+            "comparables_rntp": [
+                {
+                    "posicion": 1,
+                    "distrito": "San Miguel",
+                    "es_mismo_distrito": True,
+                    "zona_homogenea": "LIMA_MODERNA",
+                    "superficie_m2": 75.0,
+                    "habitaciones": 3,
+                    "banios": 2.0,
+                    "garajes": 1,
+                    "piso": 5,
+                    "antiguedad_anios": 8,
+                    "precio_total_pen": 482873.01,
+                    "precio_m2_pen": 6438.31,
+                    "periodo_muestra": "2025-Q2",
+                    "indice_similitud_pct": 100.0,
+                    "diferencias": {
+                        "dif_superficie_m2": 0.0,
+                        "dif_habitaciones": 0,
+                        "dif_banios": 0.0,
+                        "dif_antiguedad_anios": 0,
+                        "dif_piso": 0,
+                    },
+                }
+            ],
+            "resumen_rntp": {
+                "cantidad_muestras": 3,
+                "precio_promedio_pen": 486691.0,
+                "precio_m2_promedio_pen": 6433.14,
+                "desviacion_vs_prediccion_pct": 0.26,
+                "cumple_regla_tres_muestras": True,
+                "criterio_busqueda": "Mismo distrito",
+                "advertencia": None,
             },
         }
     }}

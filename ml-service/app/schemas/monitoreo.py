@@ -57,22 +57,35 @@ class DriftAnalisisResponse(BaseModel):
 # ─── 3. Fluctuación Temporal del Ciclo de Mercado ─────────────────────────────
 
 class PuntoFluctuacionTemporal(BaseModel):
-    """Punto en la serie de tiempo para la gráfica de error continuo."""
+    """Punto en la serie de tiempo para la gráfica de error continuo y métricas normativas IAAO."""
     period: str = Field(description="Etiqueta temporal (ej: 2024-Q1, 2024-Q2)")
     mape_pct: float = Field(description="MAPE alcanzado en dicho periodo")
     mae_soles: float = Field(description="MAE en Soles constantes para dicho periodo")
     upper_threshold_mape: float = Field(description="Cota máxima admisible del estándar", default=15.0)
     sample_count: int = Field(description="Número de transacciones en la ventana temporal")
     exceeds_threshold: bool = Field(description="True si el error superó el límite del 15%")
+    # Métricas estándar IAAO (Standard on Ratio Studies 2013/2020) por trimestre:
+    cod_iaao: float | None = Field(default=None, description="Coeficiente de Dispersión (COD <= 15.0% según IAAO)")
+    prd_iaao: float | None = Field(default=None, description="Price-Related Differential (0.98 - 1.03)")
+    prb_iaao: float | None = Field(default=None, description="Price-Related Bias (-0.05 a +0.05)")
+    median_ratio: float | None = Field(default=None, description="Nivel de evaluación (0.90 - 1.10)")
+    cumple_iaao_cod: bool | None = Field(default=None, description="True si COD <= 15.0%")
+    cumple_iaao_prd: bool | None = Field(default=None, description="True si 0.98 <= PRD <= 1.03")
 
 
 class FluctuacionTemporalResponse(BaseModel):
-    """Serie de tiempo completa para graficar MAPE y MAE a lo largo de los periodos."""
+    """Serie de tiempo completa para graficar MAPE, MAE y métricas IAAO a lo largo de los periodos."""
     operation_type: Literal["venta", "alquiler"]
     threshold_mape: float = Field(description="Umbral regulatorio máximo (15.0% venta / 17.89% alquiler)")
     time_series: list[PuntoFluctuacionTemporal] = Field(description="Puntos de la serie temporal")
     average_mape: float = Field(description="MAPE promedio en toda la ventana evaluada")
     average_mae: float = Field(description="MAE promedio en toda la ventana evaluada")
+    # Resumen global IAAO de la ventana evaluada
+    global_cod_iaao: float | None = Field(default=None, description="COD global alcanzado en la ventana evaluada")
+    global_prd_iaao: float | None = Field(default=None, description="PRD global alcanzado en la ventana evaluada")
+    global_prb_iaao: float | None = Field(default=None, description="PRB global alcanzado en la ventana evaluada")
+    global_median_ratio: float | None = Field(default=None, description="Mediana de ratios global de la ventana")
+    cumple_norma_iaao: bool = Field(default=True, description="True si cumple estándares de dispersión y equidad IAAO")
     total_evaluated_samples: int = Field(description="Total de transacciones evaluadas en la serie")
     generated_at: datetime = Field(description="Timestamp UTC de generación")
 
@@ -94,3 +107,34 @@ class LatenciaP95Response(BaseModel):
     )
     all_artifacts_ready: bool = Field(description="True si todos los artefactos requeridos están presentes")
     measured_at: datetime = Field(description="Timestamp UTC de la medición")
+
+
+# ─── 5. Auditoría y Ejecuciones del Pipeline ETL ──────────────────────────────
+
+class PipelineEjecucionItem(BaseModel):
+    """Resumen de los datos relevantes de una ejecución del pipeline de datos ETL."""
+    id: int | str = Field(description="Identificador único de la ejecución")
+    tipo_ejecucion: str | None = Field(None, description="Tipo de ejecución (ej. manual, programada, backfill)")
+    ejecutado_por: str | None = Field(None, description="Usuario, servicio o trigger que ejecutó el pipeline")
+    iniciado_en: datetime | None = Field(None, description="Fecha y hora de inicio UTC")
+    finalizado_en: datetime | None = Field(None, description="Fecha y hora de finalización UTC")
+    duracion_segundos: float | None = Field(None, description="Duración total de la ejecución en segundos")
+    registros_leidos: int | None = Field(0, description="Total de registros extraídos de la fuente")
+    registros_guardados: int | None = Field(0, description="Total de registros limpios persistidos")
+    registros_filtrados: int | None = Field(0, description="Total de registros descartados por filtros de calidad")
+    tasa_efectividad_pct: float | None = Field(
+        None, description="Porcentaje de registros útiles guardados respecto a los leídos"
+    )
+    estado: str = Field(description="Estado de la ejecución (ej: COMPLETADO, EXITOSO, FALLIDO)")
+    observaciones: str | None = Field(None, description="Notas u observaciones del pipeline")
+    errores: Any | None = Field(None, description="Detalle de errores o excepciones capturadas")
+    metricas_salida: Any | None = Field(None, description="Métricas de salida generadas por el pipeline")
+
+
+class PipelineEjecucionesResponse(BaseModel):
+    """Historial de ejecuciones del pipeline de datos con metadatos de supervisión."""
+    total_ejecuciones: int = Field(description="Total de ejecuciones registradas retornadas")
+    ultima_ejecucion: datetime | None = Field(None, description="Fecha y hora de la corrida más reciente")
+    tasa_exito_pct: float | None = Field(None, description="Porcentaje de ejecuciones con estado exitoso/completado")
+    ejecuciones: list[PipelineEjecucionItem] = Field(description="Listado cronológico inverso de ejecuciones")
+    consultado_en: datetime = Field(description="Timestamp UTC de la consulta")
